@@ -48,7 +48,7 @@ body {
 
 /* ====== Hero Section ====== */
 .hero {
-    background-image: url('{{ asset("images/portail.jpg") }}'); /* chemin de l'image */
+  background-image: url('{{ asset("images/portail.jpg") }}');
     background-size: cover;
     background-position: center;
     height: 350px;
@@ -221,7 +221,7 @@ body {
 
     .hero p {
         font-size: 1.1rem;
-    }git 
+    }
 
     .info-sections {
         flex-direction: column;
