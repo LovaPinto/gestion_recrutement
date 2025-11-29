@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>JobTracker</title>
+    <link rel="stylesheet" href="{{ asset('styles/portail.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo"><span class="orange">Job</span>Tracker</div>
+        <div class="login">
+            <a href="#" class="btn-login">Se connecter</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Bienvenue sur JobTracker</h1>
+            <p>Découvrez les meilleures opportunités pour booster votre carrière à Madagascar.</p>
+        </div>
+    </section>
+
+    <!-- Section principale -->
+    <section class="main-content">
+        <!-- Recherche -->
+        <div class="search-form">
+            <input type="search" name="search" placeholder="Search your job skill">
+            <button>Rechercher</button>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filters-row">
+            <div class="filter-box">
+                <label>Entreprise :</label>
+                <select>
+                    <option>Entreprise A</option>
+                    <option>Entreprise B</option>
+                </select>
+            </div>
+            <div class="filter-box">
+                <label>Département :</label>
+                <select>
+                    <option>IT</option>
+                    <option>Marketing</option>
+                </select>
+            </div>
+            <div class="filter-box">
+                <label>Poste disponible :</label>
+                <select>
+                    <option>Développeur</option>
+                    <option>Manager</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Sections Pourquoi et Contact côte à côte -->
+        <div class="info-sections">
+            <section class="reasons">
+                <h2>Pourquoi utiliser JobTracker</h2>
+                <ul>
+                    <li>Facile à utiliser</li>
+                    <li>Offres fiables</li>
+                    <li>Suivi personnalisé</li>
+                </ul>
+            </section>
+
+            <section class="contact">
+                <h2>Contacts possibles</h2>
+                <p>Email : contact@jobtracker.mg</p>
+                <p>Téléphone : +261 34 12 345 67</p>
+            </section>
+        </div>
+    </section>
+</body>
+</html>
