@@ -11,7 +11,7 @@
     <header class="header">
         <div class="logo"><span class="orange">Job</span>Tracker</div>
         <div class="login">
-            <a href="#" class="btn-login">Se connecter</a>
+            <a href="/login" class="btn-login">Se connecter</a>
         </div>
     </header>
 
@@ -97,7 +97,7 @@
               </tr>
             </thead>
             <tbody>
-              {% if datas is not empty %}
+        {% if datas is defined and datas is not empty %}
               {% for job in datas %}
                   <tr>
                       <td class="position" data-label="Position">{{ job.description }}</td>
