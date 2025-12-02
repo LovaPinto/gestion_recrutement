@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\JobOfferRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\Types\Integer;
 
 #[ORM\Entity(repositoryClass: JobOfferRepository::class)]
 class JobOffer
@@ -25,6 +26,21 @@ class JobOffer
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $deadline = null;
+    
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): self
+    {
+        $this->company = $company;
+        return $this;
+    }
 
     public function getId(): ?int
     {
