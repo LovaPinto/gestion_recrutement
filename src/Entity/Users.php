@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UsersRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UsersRepository::class)]
@@ -24,6 +26,24 @@ class Users
 
     #[ORM\Column(length: 50)]
     private ?string $password = null;
+
+    #[ORM\ManyToOne]
+    private ?Role $Role = null;
+
+    #[ORM\ManyToOne(targetEntity: Department::class)]
+    private ?Department $department = null;
+
+    // --- getters/setters ---
+    public function getDepartment(): ?Department
+    {
+        return $this->department;
+    }
+
+    public function setDepartment(?Department $department): static
+    {
+        $this->department = $department;
+        return $this;
+    }
 
     public function getId(): ?int
     {
@@ -81,6 +101,18 @@ class Users
     public function setPassword(string $password): static
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    public function getRole(): ?Role
+    {
+        return $this->Role;
+    }
+
+    public function setRole(?Role $Role): static
+    {
+        $this->Role = $Role;
 
         return $this;
     }

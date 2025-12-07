@@ -5,81 +5,76 @@
     <title>JobTracker</title>
     <link rel="stylesheet" href="{{ asset('styles/portail.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/emplois.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/head.css') }}">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="logo"><span class="orange">Job</span>Tracker</div>
-        <div class="login">
-            <a href="#" class="btn-login">Se connecter</a>
+    <header>
+        <div>
+          <div class="logo">Nextwork</div>
+          <div class="slogan">Ensemble, changeons le quotidien des Malagasy</div>
         </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Bienvenue sur JobTracker</h1>
-            <p>Découvrez les meilleures opportunités pour booster votre carrière à Madagascar.</p>
+        <div class="actions">
+          <div class="bell">🔔</div>
+          <button class="login-btn">Se connecter</button>
         </div>
-    </section>
+      </header>
 
-    <!-- Section principale -->
-    <section class="main-content">
-        <!-- Recherche -->
-        <div class="search-form">
-            <input type="search" name="search" placeholder="Search your job skill">
-            <button>Rechercher</button>
+      <section class="search-section">
+        <div class="search-bar">
+          <input type="text" placeholder="Search Jobs and keywords" />
+          <select>
+            <option>Entreprise</option>
+            <option>Nexthope</option>
+            <option>Autres</option>
+          </select>
+          <select>
+            <option>Département</option>
+            <option>IT</option>
+            <option>RH</option>
+          </select>
+          <select>
+            <option>Type de contrat</option>
+            <option>CDI</option>
+            <option>CDD</option>
+            <option>Stage</option>
+            <option>Freelance</option>
+          </select>
         </div>
 
-        <!-- Filtres -->
-        <div class="filters-row">
-            <div class="filter-box">
-                <label>Entreprise :</label>
-                <select>
-                    <option>Entreprise A</option>
-                    <option>Entreprise B</option>
-                </select>
+        <div class="section-title">Postes disponibles</div>
+        <div class="job-count">Plus de 3 postes disponibles</div>
+
+        <div class="section-title">Derniers emplois</div>
+        <div class="job-list">
+          <div class="job-item">
+            <div class="job-info">
+              <div>Assistant admin et paie</div>
+              <div class="contract">CDD</div>
             </div>
-            <div class="filter-box">
-                <label>Département :</label>
-                <select>
-                    <option>IT</option>
-                    <option>Marketing</option>
-                </select>
+            <div>Nexthope</div>
+          </div>
+          <div class="job-item">
+            <div class="job-info">
+              <div>Ingénieur Réseau, Système, Sécurité</div>
+              <div class="contract">CDD</div>
             </div>
-            <div class="filter-box">
-                <label>Poste disponible :</label>
-                <select>
-                    <option>Développeur</option>
-                    <option>Manager</option>
-                </select>
+            <div>Nexthope</div>
+          </div>
+          <div class="job-item">
+            <div class="job-info">
+              <div>Assistant admin et paie</div>
+              <div class="contract">CDI</div>
             </div>
+            <div>Nexthope</div>
+          </div>
         </div>
-
-        <!-- Sections Pourquoi et Contact côte à côte -->
-        <div class="info-sections">
-            <section class="reasons">
-                <h2>Pourquoi utiliser JobTracker</h2>
-                <ul>
-                    <li>Facile à utiliser</li>
-                    <li>Offres fiables</li>
-                    <li>Suivi personnalisé</li>
-                </ul>
-            </section>
-
-            <section class="contact">
-                <h2>Contacts possibles</h2>
-                <p>Email : contact@jobtracker.mg</p>
-                <p>Téléphone : +261 34 12 345 67</p>
-            </section>
-        </div>
-    </section>
+      </section>
     <div class="container">
         <section class="section">
           <div class="section-header">
             <h2 class="title">Derniers emplois</h2>
           </div>
-    
+
           <nav class="filters" aria-label="Filtrer par type de contrat">
             <button class="filter active" type="button">Toutes les offres</button>
             <button class="filter" type="button">CDI</button>
@@ -87,7 +82,7 @@
             <button class="filter" type="button">Stage</button>
             <button class="filter" type="button">Freelance</button>
           </nav>
-    
+
           <table class="table" role="table">
             <thead>
               <tr>
@@ -101,16 +96,16 @@
               {% for job in datas %}
                   <tr>
                       <td class="position" data-label="Position">{{ job.description }}</td>
-                      <td class="company" data-label="Entreprise">{{ job.company.companyName }}</td>
+                      <td class="company" data-label="Entreprise">{{ job.user.department.company.companyName }}</td>
                       <td data-label="Contract"><span class="contract cdd">{{ job.offerType }}</span></td>
                   </tr>
               {% endfor %}
           {% else %}
               <p>Aucune offre disponible</p>
-          {% endif %}          
+          {% endif %}
             </tbody>
           </table>
-    
+
           <div class="actions">
             <a class="btn" href="#" aria-label="Voir plus d’emplois">More Jobs &gt;</a>
           </div>
