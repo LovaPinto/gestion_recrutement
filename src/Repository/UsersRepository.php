@@ -25,6 +25,17 @@ class UsersRepository extends ServiceEntityRepository
             ->setParameter('email', $email)
             ->setParameter('password', $password)
             ->getQuery()
+       
             ->getOneOrNullResult();
+    }
+
+    public function saveUser( string $firstname,string $lastname,string $email,string $password ){
+        $user = new Users;
+        $user->setFirstName($firstname);
+        $user->setLastName($lastname);
+        $user->setEmail($email);
+        $user->setPassword($password);
+
+
     }
 }
