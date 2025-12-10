@@ -77,13 +77,14 @@
                 <h2 class="title">Derniers emplois</h2>
             </div>
 
-            <nav class="filters" aria-label="Filtrer par type de contrat">
-                <button class="filter active" type="button">Toutes les offres</button>
-                <button class="filter" type="button">CDI</button>
-                <button class="filter" type="button">CDD</button>
-                <button class="filter" type="button">Stage</button>
-                <button class="filter" type="button">Freelance</button>
-            </nav>
+    <nav class="filters" aria-label="Filtrer par type de contrat">
+        <a class="filter {% if selectedType == 'Toutes les offres' %}active{% endif %}" href="{{ path('app_job_portail', {'offertype': 'Toutes les offres'}) }}">Toutes les offres</a>
+        <a class="filter {% if selectedType == 'CDI' %}active{% endif %}" href="{{ path('app_job_portail', {'offertype': 'CDI'}) }}">CDI</a>
+        <a class="filter {% if selectedType == 'CDD' %}active{% endif %}" href="{{ path('app_job_portail', {'offertype': 'CDD'}) }}">CDD</a>
+        <a class="filter {% if selectedType == 'Stage' %}active{% endif %}" href="{{ path('app_job_portail', {'offertype': 'Stage'}) }}">Stage</a>
+        <a class="filter {% if selectedType == 'Freelance' %}active{% endif %}" href="{{ path('app_job_portail', {'offertype': 'Freelance'}) }}">Freelance</a>
+    </nav>
+
 
             <table class="table">
                 <thead>
@@ -96,13 +97,13 @@
                 <tbody>
                 {% if datas is defined and datas is not empty %}
                     {% for job in datas %}
-                        <tr 
+                        <tr
                             data-description="{{ job.description }}"
-                            data-company="{{ job.company.companyName }}"
+                            data-company="{{ job.user.department.company.companyName }}"
                             data-offertype="{{ job.offerType }}"
                         >
                             <td class="position">{{ job.description }}</td>
-                            <td class="company">{{ job.company.companyName }}</td>
+                            <td class="company">{{ job.user.department.company.companyName }}</td>
                             <td><span class="contract cdd">{{ job.offerType }}</span></td>
                         </tr>
                     {% endfor %}

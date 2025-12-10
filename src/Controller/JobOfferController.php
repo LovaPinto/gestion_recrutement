@@ -50,12 +50,28 @@ final class JobOfferController extends AbstractController{
         $jobDatas = $jobOfferRepository->findAllJob();
         return $this->render('job_offer/index.html.twig', ['datas' => $jobDatas]);
     }
-
+    //portail
     #[Route('/portail', name: 'app_job_portail')]
     public function portail(JobOfferRepository $jobOfferRepository): Response{
         $jobDatas = $jobOfferRepository->findAllJob();
-        return $this->render('candidate/Portail_Candidate.html.twig', ['datas' => $jobDatas,]);
+        return $this->render('candidate/Portail_candidate.html.twig', ['datas' => $jobDatas,]);
     }
+
+    #[Route('/portail/{offertype}', name: 'app_job_portail')]
+    public function portai(JobOfferRepository $jobOfferRepository, string $offertype = null): Response
+    {
+    if ($offertype === null || $offertype === 'Toutes les offres') {
+        $jobDatas = $jobOfferRepository->findAllJob();
+    } else {
+        $jobDatas = $jobOfferRepository->findAllJobByOfferType($offertype);
+    }
+
+    return $this->render('candidate/Portail_candidate.html.twig', [
+        'datas' => $jobDatas,
+        'selectedType' => $offertype,
+    ]);
+}
+
 
     #[Route('/job/offer/all/test', name: 'app_job_offer_test')]
     public function findAllJobTest(JobOfferRepository $jobOfferRepository): Response {
