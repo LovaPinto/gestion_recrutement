@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Candidat{% endblock %}
+
+{% block body %}
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background: #f1f1f1;
+    }
+
+    .dashboard-wrapper {
+        display: flex;
+        min-height: 100vh;
+        background: white;
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+        width: 260px;
+        background: #111;
+        color: white;
+        padding: 30px 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar h2 {
+        font-size: 26px;
+        font-weight: 700;
+        margin-bottom: 40px;
+        text-align: left;
+    }
+
+    .sidebar a {
+        padding: 14px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        text-decoration: none;
+        color: white;
+        font-weight: 500;
+        transition: 0.25s ease;
+    }
+
+    .sidebar a:hover {
+        background: #333;
+    }
+
+    /* --- MAIN CONTENT --- */
+    .main-content {
+        flex: 1;
+        padding: 40px;
+        background: #f8f8f8;
+    }
+
+    .main-content h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #111;
+        margin-bottom: 25px;
+    }
+
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 25px;
+    }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+        transition: 0.25s ease;
+        border-left: 5px solid #111;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+    }
+
+    .card h3 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .card p {
+        font-size: 14px;
+        color: #555;
+    }
+</style>
+
+<div class="dashboard-wrapper">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2>JobTracker</h2>
+
+        <a href="#">🏠 &nbsp; Accueil</a>
+        <a href="#">📄 &nbsp; Offres enregistrées</a>
+        <a href="#">💬 &nbsp; Messages</a>
+        <a href="#">⚙️ &nbsp; Paramètres</a>
+        <a href="{{ path('app_logout') }}">🚪 &nbsp; Déconnexion</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <h1>Bienvenue sur votre Dashboard</h1>
+
+        <div class="cards">
+
+            <div class="card">
+                <h3>Total de vos candidatures</h3>
+                <p>12 candidatures au total</p>
+            </div>
+
+            <div class="card">
+                <h3>Offres sauvegardées</h3>
+                <p>5 offres enregistrées dans vos favoris</p>
+            </div>
+
+            <div class="card">
+                <h3>Entretiens programmés</h3>
+                <p>2 entretiens à venir</p>
+            </div>
+
+            <div class="card">
+                <h3>Notifications</h3>
+                <p>Aucune nouvelle notification</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

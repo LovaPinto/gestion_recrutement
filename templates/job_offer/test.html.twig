@@ -1,0 +1,28 @@
+{% if datas is not empty %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>User</th>
+                <th>Department</th>
+                <th>Company</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in datas %}
+                <tr>
+                    <td>{{ job.id }}</td>
+                    <td>{{ job.offerType }}</td>
+                    <td>{{ job.description }}</td>
+                    <td>{{ job.user.firstName ?? 'Pas d\'utilisateur' }}</td>
+                    <td>{{ job.user.department.departmentName ?? 'Pas de département' }}</td>
+                    <td>{{ job.user.department.company.companyName ?? 'Pas de société' }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Aucune offre trouvée.</p>
+{% endif %}
