@@ -8,9 +8,10 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #111;
+    background-color: #f5f5f5;
 }
 
-/* ====== Header ====== */
+/* ====== Header / Navbar ====== */
 .header {
     display: flex;
     justify-content: space-between;
@@ -29,7 +30,7 @@ body {
 }
 
 .header .logo .orange {
-    color: orange; /* met "Job" en orange */
+    color: orange;
 }
 
 .header .login .btn-login {
@@ -46,208 +47,249 @@ body {
     background-color: #ddd;
 }
 
-/* ====== Hero Section ====== */
+/* ====== Hero Section / Bienvenue ====== */
 .hero {
-    background-image: url('{{ asset("images/portail.jpg") }}'); /* chemin de l'image */
+  background-image: url('{{ asset("images/portail.jpg") }}');
+    background-image: url("https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1400&q=80");
     background-size: cover;
     background-position: center;
-    height: 350px;
+    height: 440px;
     display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     padding: 0 50px;
     position: relative;
     color: #fff;
+    padding-bottom: 2%;
 }
 
 .hero::after {
     content: "";
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.25); /* moins sombre pour rendre le texte visible */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.35);
 }
 
-.hero .hero-content {
+.hero-content {
     position: relative;
-    max-width: 600px;
-    background: rgba(0, 0, 0, 0.3);
+    max-width: 1050px;
+    background: rgba(0,0,0,0.35);
     padding: 40px;
     border-radius: 20px;
     color: #fff;
     backdrop-filter: blur(5px);
-    text-align: left;
+    text-align: center;
+    z-index: 1;
 }
 
 .hero h1 {
     font-size: 3rem;
     margin-bottom: 15px;
-    line-height: 1.2;
-}
-
-.hero p {
-    font-size: 1.3rem;
-    line-height: 1.5;
-}
-
-/* ====== Section principale (fond clair) ====== */
-.main-content {
-    background-color: #f5f5f5;
-    padding: 40px 20px;
-}
-
-/* ====== Recherche ====== */
-.search-form {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.search-form input {
-    padding: 12px 15px;
-    width: 320px;
-    border: 2px solid #111;
-    border-radius: 25px;
-    outline: none;
-    transition: all 0.3s;
-}
-
-.search-form input:focus {
-    border-color: #555;
-}
-
-.search-form button {
-    padding: 12px 20px;
-    border: none;
-    background-color: #111;
     color: #fff;
-    border-radius: 25px;
-    margin-left: 10px;
-    cursor: pointer;
-    transition: all 0.3s;
 }
 
-.search-form button:hover {
-    background-color: #555;
+/* ====== Formulaire indépendant du hero ====== */
+.hero-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+    z-index: 2;
 }
 
-/* ====== Filtres côte à côte ====== */
+.input-wrapper {
+    position: relative;
+    width: 500px;
+    margin-bottom: 15px;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    background-color: #fff !important;
+    color: #222121;
+    font-size: 1rem;
+}
+
+.input-wrapper .search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.3rem;
+    color: #111;
+}
+
+/* ====== Filtres ====== */
 .filters-row {
     display: flex;
-    justify-content: space-between;
-    gap: 20px;
+    justify-content: center;
+    gap: 15px;
     flex-wrap: wrap;
-    margin-bottom: 30px;
-}
-
-.filter-box {
-    flex: 1;
 }
 
 .filter-box label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
+    min-width: 120px;
+    color: #fff;
 }
 
 .filter-box select {
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #616161;
+}
+
+/* ====== Section Emplois ====== */
+.main-content {
+    padding: 40px 20px;
+}
+
+.table {
     width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.table th, .table td {
+    border: 1px solid #ddd;
     padding: 10px;
-    border-radius: 15px;
-    border: 2px solid #111;
-    outline: none;
-    transition: all 0.3s;
 }
 
-.filter-box select:hover {
-    border-color: #555;
+.table th {
+    background: #111;
+    color: #fff;
 }
 
-/* ====== Sections Pourquoi et Contact ====== */
-.info-sections {
+/* ====== Bottom Section (Galerie + Raison) ====== */
+.bottom-section {
     display: flex;
     gap: 30px;
-    flex-wrap: wrap;
+    margin-top: 50px;
+    flex-wrap: nowrap;
 }
 
-.info-sections section {
+/* GALERIE 2–3–2 avec images de même taille */
+.gallery {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Chaque ligne = bloc */
+.gallery .row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* Ligne 1 et 3 : 2 images centrées */
+.gallery .row-1 img,
+.gallery .row-3 img {
+    height: 120px;  /* taille réduite */
+    width: 140px;
+    max-width: 45%;  /* pour que deux images tiennent */
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Ligne 2 : 3 images */
+.gallery .row-2 img {
+    height: 120px;
+    width:140px;
+    max-width: 30%;  /* pour que trois images tiennent */
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Section raisons (droite) */
+.reasons-right {
     flex: 1;
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
     box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-    transition: all 0.3s;
 }
 
-.info-sections section:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-}
-
-.info-sections h2 {
+.reasons-right h2 {
     margin-bottom: 15px;
-    color: #111;
-    border-bottom: 2px solid #111;
-    padding-bottom: 5px;
 }
 
-.info-sections ul {
-    margin-left: 20px;
-    line-height: 1.8;
-}
-
-.info-sections ul li {
-    padding: 5px 0;
-    transition: all 0.3s;
-}
-
-.info-sections ul li:hover {
-    color: #111;
-    font-weight: bold;
-}
-
-.contact p {
-    margin: 8px 0;
-    color: #333;
+.reasons-right ul {
+    list-style: disc inside;
 }
 
 /* ====== Responsive ====== */
 @media (max-width: 992px) {
-    .hero {
-        padding: 0 30px;
-    }
-
-    .hero h1 {
-        font-size: 2.5rem;
+    .input-wrapper {
+        width: 80%;
     }
 
     .hero p {
         font-size: 1.1rem;
-    }git 
+    }
 
     .info-sections {
+    .bottom-section {
         flex-direction: column;
     }
 }
 
 @media (max-width: 768px) {
-    .header {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .hero h1 {
-        font-size: 2.2rem;
-    }
-
-    .search-form input {
-        width: 80%;
-        margin-bottom: 10px;
-    }
-
-    .search-form button {
-        width: 50%;
-    }
-
-    .filters-row {
+    .gallery .row {
         flex-direction: column;
     }
+    .gallery .row-1 img,
+    .gallery .row-2 img,
+    .gallery .row-3 img {
+        max-width: 100%;
+        height: 180px;
+    }
+}
+/* ===== Barre de recherche moderne ===== */
+.modern-search {
+    width: 700px;
+    max-width: 100%;
+    position: relative;
+}
+
+.modern-search input {
+    width: 100%;
+    padding: 12px 55px 12px 20px;
+    font-size: 1.05rem;
+    border: none;
+    border-radius: 40px;
+    background: #ffffff;
+    color: #333;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.15);
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.modern-search input:focus {
+    box-shadow: 0 4px 25px rgba(0,0,0,0.25);
+    transform: scale(1.02);
+}
+
+.modern-search .search-icon {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.modern-search svg {
+    stroke: #555;
+}
+
 }
