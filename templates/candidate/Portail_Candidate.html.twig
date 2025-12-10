@@ -25,25 +25,24 @@
         <h1>Booster votre carrière à Madagascar.</h1>
     </div>
 
+    <!-- Barre de recherche + filtres -->
     <div class="hero-form">
         <div class="search-form">
-     <div class="input-wrapper modern-search">
-    <input type="search" placeholder="Rechercher un emploi...">
-    <span class="search-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path d="M15 15L21 21" stroke="#777" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="10" cy="10" r="6" stroke="#777" stroke-width="2"/>
-        </svg>
-    </span>
-</div>
-
-
+            <div class="input-wrapper modern-search">
+                <input type="search" id="job-search" placeholder="Rechercher un emploi...">
+                <span class="search-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M15 15L21 21" stroke="#777" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="10" cy="10" r="6" stroke="#777" stroke-width="2"/>
+                    </svg>
+                </span>
+            </div>
         </div>
 
         <div class="filters-row">
             <div class="filter-box">
                 <label>Entreprise :</label>
-                <select>
+                <select id="filter-company">
                     <option selected>Entreprise A</option>
                     <option>Entreprise B</option>
                 </select>
@@ -51,7 +50,7 @@
 
             <div class="filter-box">
                 <label>Département :</label>
-                <select>
+                <select id="filter-department">
                     <option selected>IT</option>
                     <option>Marketing</option>
                 </select>
@@ -59,7 +58,7 @@
 
             <div class="filter-box">
                 <label>Poste disponible :</label>
-                <select>
+                <select id="filter-position">
                     <option selected>Développeur</option>
                     <option>Manager</option>
                 </select>
@@ -95,7 +94,11 @@
                 <tbody>
                 {% if datas is defined and datas is not empty %}
                     {% for job in datas %}
-                        <tr>
+                        <tr 
+                            data-description="{{ job.description }}"
+                            data-company="{{ job.company.companyName }}"
+                            data-offertype="{{ job.offerType }}"
+                        >
                             <td class="position">{{ job.description }}</td>
                             <td class="company">{{ job.company.companyName }}</td>
                             <td><span class="contract cdd">{{ job.offerType }}</span></td>
@@ -117,39 +120,34 @@
 <!-- Galerie + Pourquoi JobTracker -->
 <section class="bottom-section">
     <div class="gallery">
-        <!-- Ligne 1 : 2 images -->
         <div class="row row-1">
             <img src="{{ asset('images/login.png') }}" alt="">
             <img src="{{ asset('images/business-woman-cute-smart-girl-standing-with-crossed-hands-with-red-lipstick-office-costume.jpg') }}" alt="">
         </div>
-
-        <!-- Ligne 2 : 3 images -->
         <div class="row row-2">
             <img src="{{ asset('images/aza.jpg') }}" alt="">
-                  <img src="{{ asset('images/front-view-young-male-red-sweater-smiling-black-wall.jpg') }}" alt="">
-              <img src="{{ asset('images/portrait-confident-businesswoman-smiling.jpg') }}" alt="">
-           
+            <img src="{{ asset('images/front-view-young-male-red-sweater-smiling-black-wall.jpg') }}" alt="">
+            <img src="{{ asset('images/portrait-confident-businesswoman-smiling.jpg') }}" alt="">
         </div>
-
-        <!-- Ligne 3 : 2 images -->
         <div class="row row-3">
-         <img src="{{ asset('images/blonde-young-woman-against-grey-wall-looking-away.jpg') }}" alt="">
-      
-             <img src="{{ asset('images/young-curly-young-man-with-crossed-hands-isolated-white-wall (1).jpg') }}" alt="">
-           
+            <img src="{{ asset('images/blonde-young-woman-against-grey-wall-looking-away.jpg') }}" alt="">
+            <img src="{{ asset('images/young-curly-young-man-with-crossed-hands-isolated-white-wall (1).jpg') }}" alt="">
         </div>
     </div>
 
-    <!-- Raisons -->
     <section class="reasons-right">
         <h2>Pourquoi utiliser JobTracker</h2>
         <ul>
-            <li>Facile à utiliser</li>
-            <li>Offres fiables</li>
-            <li>Suivi personnalisé</li>
+            <li>+10 ans d'expérience en développement logiciel (backend, frontend ou fullstack)</li>
+            <li>Solide maîtrise d'un ou plusieurs langages (Java, Python, Go, Typescript/React)</li>
+            <li>Expérience avec les architectures cloud (AWS, GCP, Azure) et les microservices</li>
+            <li>Bonnes connaissances en bases de données SQL et NoSQL</li>
         </ul>
     </section>
 </section>
+
+<!-- Inclusion du JS séparé -->
+<script src="{{ asset('js/jobs.js') }}"></script>
 
 </body>
 </html>
