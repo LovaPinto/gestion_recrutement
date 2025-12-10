@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail de l'emploi</title>
+    <link rel="stylesheet" href="{{ asset('styles/jobs_details.css') }}">
+</head>
+<body>
+    <div class="job-detail-container">
+        <h1>Détail de l'offre</h1>
+        <div class="job-detail-card">
+            <p><strong>Poste :</strong> <span id="description"></span></p>
+            <p><strong>Entreprise :</strong> <span id="company"></span></p>
+            <p><strong>Type de contrat :</strong> <span id="offerType"></span></p>
+        </div>
+        <a class="btn-back" href="{{ path('job_list') }}">← Retour aux offres</a>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        document.getElementById('description').textContent = params.get('description');
+        document.getElementById('company').textContent = params.get('company');
+        document.getElementById('offerType').textContent = params.get('offerType');
+    </script>
+</body>
+</html>

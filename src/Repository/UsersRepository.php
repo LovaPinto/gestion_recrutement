@@ -6,9 +6,6 @@ use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Users>
- */
 class UsersRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,28 +13,33 @@ class UsersRepository extends ServiceEntityRepository
         parent::__construct($registry, Users::class);
     }
 
-    //    /**
-    //     * @return Users[] Returns an array of Users objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('u.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Authentification simple (sans hash)
+     */
+    public function authentification(string $email, string $password): ?Users
+    {
+        // Requête SQL simple : email + mot de passe
+        return $this->createQueryBuilder('u')
+            ->where('u.email = :email')
+            ->andWhere('u.password = :password')
+            ->setParameter('email', $email)
+            ->setParameter('password', $password)
+            ->getQuery()
+       
+            ->getOneOrNullResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Users
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function saveUser( string $firstname,string $lastname,string $email,string $password ){
+        $user = new Users;
+        $user->setFirstName($firstname);
+        $user->setLastName($lastname);
+        $user->setEmail($email);
+        $user->setPassword($password);
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+
+    }
+
 }
