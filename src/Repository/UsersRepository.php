@@ -36,6 +36,10 @@ class UsersRepository extends ServiceEntityRepository
         $user->setEmail($email);
         $user->setPassword($password);
 
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
 
     }
+
 }

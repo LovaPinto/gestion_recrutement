@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\HttpFoundation\Request;
 
+
 class UsersController extends AbstractController
 {
     #[Route('/login', name: 'app_user_login')]
@@ -19,15 +20,21 @@ class UsersController extends AbstractController
             'error' => $authenticationUtils->getLastAuthenticationError(),
         ]);
     }
+    #[Route('/new-user', name: 'app_new_user')]
+    public function newUser(): Response
+    {
+        return $this->render('users/form_Add_user.html.twig');
+    }
+
 
     #[Route('/logout', name: 'app_logout')]
     public function logout() {}
-
+    ## Fonxtion d'Authentification
     #[Route('/authentification', name: 'app_authentification', methods: ['POST'])]
     public function authentification(Request $request, UsersRepository $UsersRepository): Response
     {
-        $first_name = $request->request->get('first_name');   
-        $last_name  = $request->request->get('last_name');
+        $firstname = $request->request->get('first_name');
+        $lastname  = $request->request->get('last_name');
         $email      = $request->request->get('email');
         $password   = $request->request->get('password');
 
@@ -51,7 +58,7 @@ class UsersController extends AbstractController
             ]);
         }
 
-        // ⚠️ Comparaison simple du mot de passe (tu as demandé sans hash)
+        // Comparaison simple du mot de passe 
         if ($user->getPassword() !== $password) {
             $erreur = "Mot de passe incorrect.";
             return $this->render('candidate/_form.html.twig', [
@@ -61,5 +68,36 @@ class UsersController extends AbstractController
 
         // Connexion réussie
         return $this->redirectToRoute('candidate_dashboard');
+    }
+
+    ## fonction insertion d'user 
+
+
+    #[Route('/insert-user', name: 'app_insert_user', methods: ['POST'])]
+    public function insertUser(
+        Request $request,
+        UsersRepository $usersRepository
+    ): Response {
+
+        $firstname = $request->request->get('first_name');
+        $lastname = $request->request->get('last_name');
+        $email = $request->request->get('email');
+        $password = $request->request->get('password');
+
+        $erreur = null;
+
+        if (!empty($firstname) && !empty($lastname) && !empty($email) && !empty($password)) {
+ 
+            $usersRepository->saveUser($firstname, $lastname, $email, $password);
+
+            return $this->redirectToRoute('app_user_login');
+        }
+
+        // Si erreur
+        $erreur = "Un ou plusieurs champs sont vides";
+
+        return $this->render('candidate/form_user.html.twig', [
+            'error' => $erreur
+        ]);
     }
 }
