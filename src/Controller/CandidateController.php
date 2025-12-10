@@ -20,6 +20,15 @@ final class CandidateController extends AbstractController
     {
         return $this->render('candidate/Portail_candidate.html.twig');
     }
+// login cadidat
+    #[Route('/login', name: 'app_candidate_login')]
+    public function login(): Response
+    {
+        return $this->render('candidate/login_candidate.html.twig');
+    }
+    //root du post login 
+    
+
 
     // CRUD classique
     #[Route(name: 'app_candidate_index', methods: ['GET'])]
