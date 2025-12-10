@@ -16,6 +16,9 @@ class Department
     #[ORM\Column(length: 50)]
     private ?string $departmentName = null;
 
+    #[ORM\ManyToOne(inversedBy: 'departments')]
+    private ?Company $company = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -36,6 +39,18 @@ class Department
     public function setDepartmentName(string $departmentName): static
     {
         $this->departmentName = $departmentName;
+
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
 
         return $this;
     }

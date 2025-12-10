@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\JobOffer;
-use App\Entity\Company;
+use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -15,34 +15,54 @@ class JobOfferRepository extends ServiceEntityRepository{
     {
         parent::__construct($registry, JobOffer::class);
     }
-    
-    public function findAllJob(): array{
-        return $this->createQueryBuilder('j')
-        ->innerJoin('j.company', 'cp')
-        ->addSelect('cp')
+
+ public function findAllJob(): array
+{
+    return $this->createQueryBuilder('j')
+        // relation JobOffer → User
+        ->innerJoin('j.user', 'u')
+        ->addSelect('u')
+
+        // relation User → Department
+        ->innerJoin('u.department', 'd')
+        ->addSelect('d')
+
+        // relation Department → Company
+        ->innerJoin('d.company', 'c')
+        ->addSelect('c')
+
+
         ->orderBy('j.dateCreation', 'DESC')
         ->setMaxResults(10)
         ->getQuery()
         ->getResult();
-    
-    }
+}
 
-    public function insertJob(string $offerType,string $description,
-    \DateTimeInterface $dateCreation,\DateTimeInterface $deadline,Company $company): void {
-        $job = new JobOffer();
-        $job->setOfferType($offerType);
-        $job->setDescription($description);
-        $job->setDateCreation($dateCreation);
-        $job->setDeadline($deadline);
-        $job->setCompany($company);
-    
-        $em = $this->getEntityManager();
-        $em->persist($job);
-        $em->flush();
-    }
-    
 
-    
+
+
+  public function insertJob(
+    string $offerType,
+    string $description,
+    \DateTimeInterface $dateCreation,
+    \DateTimeInterface $deadline,
+    Users $user
+): void {
+    $job = new JobOffer();
+    $job->setOfferType($offerType);
+    $job->setDescription($description);
+    $job->setDateCreation($dateCreation);
+    $job->setDeadline($deadline);
+    $job->setUser($user);
+
+    $em = $this->getEntityManager();
+    $em->persist($job);
+    $em->flush();
+}
+
+
+
+
     //    /**
     //     * @return JobOffer[] Returns an array of JobOffer objects
     //     */
