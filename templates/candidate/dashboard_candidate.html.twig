@@ -1,140 +1,149 @@
-{% extends 'base.html.twig' %}
+{% extends 'dashboard.html.twig' %}
 
-{% block title %}Dashboard Candidat{% endblock %}
+{% block title %}Dashboard Candidat - JobTracker{% endblock %}
 
 {% block body %}
+<div class="dashboard-container">
 
-<style>
-    body {
-        margin: 0;
-        font-family: 'Poppins', sans-serif;
-        background: #f1f1f1;
-    }
+    <aside class="sidebar">
+        <h2>🎯 JobTracker</h2>
+        <a href="{{ path('candidate_dashboard') }}">
+            <span>🏠</span> Dashboard
+        </a>
+        <a href="#">
+            <span>📄</span> Mes candidatures
+        </a>
+        <a href="#">
+            <span>❤️</span> Favoris
+        </a>
+        <a href="#">
+            <span>💬</span> Messages
+        </a>
+        <a href="#">
+            <span>👤</span> Mon profil
+        </a>
+        <a href="{{ path('app_logout') }}">
+            <span>🚪</span> Déconnexion
+        </a>
+    </aside>
 
-    .dashboard-wrapper {
-        display: flex;
-        min-height: 100vh;
-        background: white;
-    }
+    <!-- Main content -->
+    <main class="main-content">
+        <h1>Tableau de bord</h1>
 
-    /* --- SIDEBAR --- */
-    .sidebar {
-        width: 260px;
-        background: #111;
-        color: white;
-        padding: 30px 20px;
-        display: flex;
-        flex-direction: column;
-    }
+        <!-- Search bar -->
+        <div class="search-bar">
+            <input 
+                type="text" 
+                placeholder="🔍 Rechercher une candidature, une entreprise..."
+            >
+            <button type="button">Rechercher</button>
+        </div>
 
-    .sidebar h2 {
-        font-size: 26px;
-        font-weight: 700;
-        margin-bottom: 40px;
-        text-align: left;
-    }
-
-    .sidebar a {
-        padding: 14px;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        text-decoration: none;
-        color: white;
-        font-weight: 500;
-        transition: 0.25s ease;
-    }
-
-    .sidebar a:hover {
-        background: #333;
-    }
-
-    /* --- MAIN CONTENT --- */
-    .main-content {
-        flex: 1;
-        padding: 40px;
-        background: #f8f8f8;
-    }
-
-    .main-content h1 {
-        font-size: 32px;
-        font-weight: 700;
-        color: #111;
-        margin-bottom: 25px;
-    }
-
-    .cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 25px;
-    }
-
-    .card {
-        background: white;
-        border-radius: 12px;
-        padding: 25px;
-        box-shadow: 0 5px 18px rgba(0,0,0,0.08);
-        transition: 0.25s ease;
-        border-left: 5px solid #111;
-    }
-
-    .card:hover {
-        transform: translateY(-4px);
-    }
-
-    .card h3 {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 10px;
-        color: #333;
-    }
-
-    .card p {
-        font-size: 14px;
-        color: #555;
-    }
-</style>
-
-<div class="dashboard-wrapper">
-
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <h2>JobTracker</h2>
-
-        <a href="#">🏠 &nbsp; Accueil</a>
-        <a href="#">📄 &nbsp; Offres enregistrées</a>
-        <a href="#">💬 &nbsp; Messages</a>
-        <a href="#">⚙️ &nbsp; Paramètres</a>
-        <a href="{{ path('app_logout') }}">🚪 &nbsp; Déconnexion</a>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-        <h1>Bienvenue sur votre Dashboard</h1>
-
+        <!-- Statistics Cards -->
         <div class="cards">
-
             <div class="card">
-                <h3>Total de vos candidatures</h3>
-                <p>12 candidatures au total</p>
+                <h3>Total candidatures</h3>
+                <p>12</p>
+                <small>↑ 2 cette semaine</small>
             </div>
 
             <div class="card">
                 <h3>Offres sauvegardées</h3>
-                <p>5 offres enregistrées dans vos favoris</p>
+                <p>5</p>
+                <small>Vos favoris</small>
             </div>
 
             <div class="card">
                 <h3>Entretiens programmés</h3>
-                <p>2 entretiens à venir</p>
+                <p>2</p>
+                <small>À venir</small>
             </div>
 
             <div class="card">
                 <h3>Notifications</h3>
-                <p>Aucune nouvelle notification</p>
+                <p>0</p>
+                <small>Aucune nouvelle</small>
             </div>
-
         </div>
-    </div>
-</div>
 
+        <!-- Recent Applications Table -->
+        <section style="margin-top: 40px;">
+            <h2 style="font-size: 20px; margin-bottom: 20px; color: #0a0e23;">
+                Candidatures récentes
+            </h2>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Entreprise</th>
+                            <th>Poste</th>
+                            <th>Date candidature</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Google</strong></td>
+                            <td>Développeur Full Stack</td>
+                            <td>15 Déc 2025</td>
+                            <td>
+                                <span style="background-color: #d4edda; color: #155724; 
+                                    padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                                    ✓ En attente
+                                </span>
+                            </td>
+                            <td>
+                                <div class="actions">
+                                    <a href="#" class="btn btn-secondary">Voir</a>
+                                    <button class="btn btn-danger">Retirer</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Microsoft</strong></td>
+                            <td>UX Designer</td>
+                            <td>12 Déc 2025</td>
+                            <td>
+                                <span style="background-color: #fff3cd; color: #856404; 
+                                    padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                                    ⏱ Entretien
+                                </span>
+                            </td>
+                            <td>
+                                <div class="actions">
+                                    <a href="#" class="btn btn-secondary">Voir</a>
+                                    <button class="btn btn-danger">Retirer</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Apple</strong></td>
+                            <td>Product Manager</td>
+                            <td>10 Déc 2025</td>
+                            <td>
+                                <span style="background-color: #cfe2ff; color: #084298; 
+                                    padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                                    ℹ Rejeté
+                                </span>
+                            </td>
+                            <td>
+                                <div class="actions">
+                                    <a href="#" class="btn btn-secondary">Voir</a>
+                                    <button class="btn btn-danger">Retirer</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('styles/dashboard.css') }}">
 {% endblock %}

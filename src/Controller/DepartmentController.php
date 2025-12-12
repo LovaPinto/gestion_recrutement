@@ -15,4 +15,12 @@ final class DepartmentController extends AbstractController
             'controller_name' => 'DepartmentController',
         ]);
     }
+
+    #[Route('/departmentSidebar',name:'app_department_sidebar')]
+    public function sidebar():Response
+    {
+        return $this->render('layout/layout_frontend/sidebar.html.twig',[
+            'controller_name'=>'DepartmentController'
+        ]);
+    }
 }
