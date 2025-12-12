@@ -20,14 +20,14 @@ final class CandidateController extends AbstractController
     {
         return $this->render('candidate/Portail_candidate.html.twig');
     }
-// login cadidat
+    // login cadidat
     #[Route('/login', name: 'app_candidate_login')]
     public function login(): Response
     {
         return $this->render('candidate/login_candidate.html.twig');
     }
     //root du post login 
-    
+
 
 
     // CRUD classique
@@ -38,7 +38,7 @@ final class CandidateController extends AbstractController
             'candidates' => $candidateRepository->findAll(),
         ]);
     }
-     #[Route('/candidate/dashboard', name: 'candidate_dashboard')]
+    #[Route('/candidate/dashboard', name: 'candidate_dashboard')]
     public function dashboard(): Response
     {
         return $this->render('candidate/dashboard_candidate.html.twig');
@@ -96,16 +96,47 @@ final class CandidateController extends AbstractController
     #[Route('/{id}', name: 'app_candidate_delete', methods: ['POST'])]
     public function delete(Request $request, Candidate $candidate, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$candidate->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $candidate->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($candidate);
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_candidate_index', [], Response::HTTP_SEE_OTHER);
     }
+    #[Route('/candidate_profil', name: 'app_candidate_add', methods: ['POST'])]
+    public function AddCandidate(Request $request, Candidate $candidate, CandidateRepository $candidateRepository): Response
+    {
+        $firstname = $request->request->get('first_name');
+        $lastname = $request->request->get('last_name');
+        $email = $request->request->get('email');
+        $adress = $request->request->get('adress');
+        $linkedIn = $request->request->get('linkedIn');
+        $identityCard = $request->request->get('identityCard');
+        $city = $request->request->get('city');
+        $postal_code = $request->request->get('postal_code');
+        $country = $request->request->get('country');
+        $gender = $request->request->get('gender');
+        $nationality = $request->request->get('nationality');
+        $matrimonial_situation = $request->request->get('matrimonial_situation');
+        $actual_status = $request->request->get('actual_status');
+
+
+
+
+        $erreur = null;
+
+        if (!empty($firstname) && !empty($lastname) && !empty($email) && !empty($password)) {
+
+            $candidateRepository->saveUser($firstname, $lastname, $email, $password);
+
+            return $this->redirectToRoute('app_user_login');
+        }
+
+        // Si erreur
+        $erreur = "Un ou plusieurs champs sont vides";
+
+        return $this->render('candidate/form_user.html.twig', [
+            'error' => $erreur
+        ]);
+    }
 }
-
-
-
-
-

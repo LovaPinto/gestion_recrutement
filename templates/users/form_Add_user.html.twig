@@ -1,22 +1,47 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Créer un utilisateur{% endblock %}
 
 {% block body %}
-    <link rel="stylesheet" href="{{ asset('styles/AddUser.css') }}">
-<h2>Créer un utilisateur</h2>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('styles/AddUser.css') }}">
 
 
+<div class="page-wrapper">
 
+    <!-- Partie gauche : image + texte -->
+    <div class="left-side">
+        <div class="overlay"></div>
+        <div class="left-content">
+            <h1>Rejoignez notre plateforme</h1>
+            <p class="description">Pour trouver votre job idéal rapidement.</p>
+        </div>
+    </div>
 
+    <!-- Partie droite : formulaire -->
+    <div class="right-side">
+        <div class="form-card">
+            <h2>Créer un compte utilisateur</h2>
 
-<form action="{{ path('app_insert_user') }}" method="POST" style="display:flex; flex-direction:column; gap:10px; width:300px;" class="form">
+            <form action="{{ path('app_insert_user') }}" method="POST" class="form">
+                <input type="text" name="first_name" placeholder="Prénom" class="input-field" required>
+                <input type="text" name="last_name" placeholder="Nom" class="input-field" required>
+                <input type="email" name="email" placeholder="Email" class="input-field" required>
+                <div class="password-group">
+                    <input type="password" name="password" placeholder="Mot de passe" class="input-field" required>
+                    <span class="toggle-password" onclick="togglePassword()">👁️</span>
+                </div>
+                <button type="submit" class="btn-submit">Enregistrer</button>
+            </form>
+        </div>
+    </div>
 
-    <input type="text" name="first_name" placeholder="Prénom" class"firstname"/>
-    <input type="text" name="last_name" placeholder="Nom" class="lastname" />
-    <input type="email" name="email" placeholder="Email" class="email" />
-    <input type="password" name="password" placeholder="Mot de passe" class="password" />
+</div>
 
-    <button type="submit">Enregistrer</button>
-</form>
-
+<script>
+function togglePassword() {
+    const input = document.querySelector('.password-group input');
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+</script>
 {% endblock %}

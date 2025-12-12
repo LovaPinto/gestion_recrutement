@@ -1,13 +1,145 @@
-.password{
-    
+body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f8f9fa;
 }
-.email{
-    
-}
-form{
-    margin: 0 auto;
-}
-input{
-    width: auto;
 
+/* ===== Page wrapper ===== */
+.page-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ===== Partie gauche ===== */
+.left-side {
+    flex: 1;
+    position: relative;
+    background-image: url('/images/login.png'); /* ton image */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    padding: 40px;
+}
+
+.left-side .overlay {
+    position: absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.5); /* masque sombre pour texte */
+}
+
+.left-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+.left-content h1 {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.left-content p.description {
+    font-size: 20px;
+    font-weight: 300;
+}
+
+/* ===== Partie droite ===== */
+.right-side {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 50px;
+    background-color: #e2dfdf;
+}
+
+.form-card {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-card h2 {
+    text-align: center;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+/* ===== Formulaire ===== */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-field {
+    padding: 15px;
+    border-radius: 12px;
+    border: none; /* plus de bordure */
+    background-color: #fff;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.input-field:focus {
+    outline: none;
+    transform: scale(1.02);
+    box-shadow: 0 5px 15px rgba(255,255,255,0.2);
+}
+
+/* ===== Password toggle ===== */
+.password-group {
+    position: relative;
+}
+
+.password-group .toggle-password {
+    position: relative;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+/* ===== Submit button ===== */
+.btn-submit {
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background-color: #8f8247;
+    color: #000;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-submit:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+/* ===== Responsive ===== */
+@media(max-width: 992px){
+    .page-wrapper {
+        flex-direction: column;
+    }
+    .left-side, .right-side {
+        flex: unset;
+        width: 100%;
+        min-height: 300px;
+    }
+    .left-content h1 {
+        font-size: 36px;
+    }
+    .left-content p.description {
+        font-size: 16px;
+    }
 }
