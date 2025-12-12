@@ -1,0 +1,91 @@
+body{
+    background-color: #f8f9fa;
+    }
+#text-entete{
+    font-size: 4vh;
+}
+
+.sidebar {
+    width: 225px;
+    background-color: #343a40;
+    color: white;
+    height: 100vh;
+    position: fixed;
+    }
+
+.sidebar a {
+    color: white;
+    text-decoration: none;
+     display: block;
+     padding: 10px 20px;
+    }
+
+.sidebar a:hover {
+    background-color: #495057;
+}
+.content {
+    margin-left: 225px;
+    }
+
+.card-metric {
+    min-width: 200px;
+}
+.topbar {
+    background-color: white;
+    padding: 10px 20px; border-bottom: 1px solid #dee2e6; }
+.graph-legend span {
+    margin-right: 15px;
+}
+.graph-legend i {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 5px;
+}
+ /* dashboard  */
+.card-metric {
+  min-height: 100px;
+  min-width: 220px;
+  flex: 1;
+}
+.card-metric .card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.text-Total{
+    color: #717375dc;
+    width: 100%;
+}
+
+
+/*form pour insert company*/
+.form-section {
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      margin: 0 auto;
+
+}
+#form-section{
+    width: 70%;
+}
+    .form-section h3 {
+      margin-bottom: 10px;
+    }
+    .form-section p {
+      margin-bottom: 30px;
+      color: #6c757d;
+    }
+.containerDiv{
+    display: flex;
+    flex-direction: row;
+    gap: 3vh;
+    width: 100%;
+    background-color: blue;
+}
+
+
