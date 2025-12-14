@@ -45,8 +45,8 @@
 /* ========== SIDEBAR ========== */
 .sidebar {
   width: 260px;
-  background: var(--sb-bg);
-  color: var(--sb-text);
+  background-color:#f7f8fa;
+  color:black;
   padding: 20px 16px;
   display: flex;
   flex-direction: column;
@@ -57,9 +57,10 @@
   font-size: 22px;
   font-weight: 700;
   color: #fff;
-  background: transparent;
-  padding: 12px 10px 6px 10px;
-  margin: 0 4px;
+  background: black;
+  padding: 40px 40px 20px 60px;
+  margin-top: 0px;
+  padding-top: 0px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -75,13 +76,13 @@
   height: 38px;
   padding: 8px 36px 8px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.08);
-  color: #fff;
+  border: 1px solid rgba(10, 9, 9, 0.322);
+  background: rgba(7, 6, 6, 0.379);
+  color: #060606;
   font-size: 14px;
   outline: none;
 }
-.search-box input::placeholder{ color: rgba(255,255,255,0.7); }
+.search-box input::placeholder{ color: rgba(0, 0, 0, 0.7); }
 .icon-search {
   position: absolute;
   right: 10px;
@@ -97,10 +98,13 @@
   flex-direction: column;
   gap: 6px;
   margin-top: 8px;
+  color: #0f172a;
+  
+  
 }
 .menu a {
   padding: 10px 12px;
-  color: var(--sb-text);
+  color: black;
   text-decoration: none;
   border-radius: 8px;
   font-size: 14px;
@@ -354,6 +358,7 @@
   transition: background .18s ease, color .18s ease;
   line-height: 1;
   white-space: nowrap;
+  color: black;
 }
 
 .menu a .bx {
@@ -362,16 +367,17 @@
   min-width: 22px;
   text-align: center;
   opacity: .95;
-  color: #e5e7eb;
+  color: #000000;
 }
 
 .menu a:hover {
-  background: var(--sb-hover);
+  background: black;
   color: #fff;
 }
 
 .menu a:hover .bx {
   color: #fff;
+  background: #000000;
 }
 
 /* État actif de l’élément courant */
