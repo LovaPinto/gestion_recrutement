@@ -1,0 +1,82 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.breadcrumb {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 20px;
+}
+
+.btn {
+   display: inline-block;
+  padding: 18px 18px;
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #000306;
+  color: white;
+  background-size: 10px;
+  
+}
+.btn-primary:hover {
+  background-color: #000000;
+  transform: scale(1.05);
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.profile-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.section-title {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.department-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.department-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.department-card h3 {
+  margin-top: 0;
+  color: #222;
+}
+
+.card-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}

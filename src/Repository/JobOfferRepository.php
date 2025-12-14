@@ -37,6 +37,30 @@ class JobOfferRepository extends ServiceEntityRepository{
         ->getQuery()
         ->getResult();
 }
+//maka a partir de offerType
+ public function findAllJobByOfferType($offerType): array
+{
+    return $this->createQueryBuilder('j')
+        // relation JobOffer → User
+        ->innerJoin('j.user', 'u')
+        ->addSelect('u')
+
+        // relation User → Department
+        ->innerJoin('u.department', 'd')
+        ->addSelect('d')
+
+        // relation Department → Company
+        ->innerJoin('d.company', 'c')
+        ->addSelect('c')
+
+        ->andWhere('j.offerType = :offerType')
+        ->setParameter('offerType',$offerType)
+
+        ->orderBy('j.dateCreation', 'DESC')
+        ->setMaxResults(10)
+        ->getQuery()
+        ->getResult();
+}
 
 
 

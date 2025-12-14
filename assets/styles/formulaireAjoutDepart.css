@@ -1,0 +1,44 @@
+/* public/assets/css/departement.css */
+/* Base layout */
+.page-wrap { max-width: 960px; margin: 0 auto; padding: 24px; }
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+.pretitle { font-size: 12px; letter-spacing: .08em; color: #6b7280; text-transform: uppercase; }
+.page-title { margin: 4px 0 4px; font-size: 24px; color: #111827; }
+.page-subtitle { margin: 0; color: #4b5563; }
+
+/* Card */
+.card.form-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(17,24,39,0.06); }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 10px; font-weight: 600; text-decoration: none; cursor: pointer; transition: .2s ease; }
+.btn-primary { background: #111827; color: #fff; border: 1px solid #111827; }
+.btn-primary:hover { background: #1f2937; border-color: #1f2937; }
+.btn-secondary { background: #374151; color: #fff; border: 1px solid #374151; }
+.btn-secondary:hover { background: #111827; border-color: #111827; }
+.btn-ghost { background: #f3f4f6; color: #1f2937; border: 1px solid #e5e7eb; }
+.btn-ghost:hover { background: #e5e7eb; }
+.btn-back .icon { font-size: 16px; line-height: 0; }
+
+/* Form */
+.dept-form { display: grid; gap: 18px; }
+.form-row label { display: block; font-weight: 600; color: #111827; margin-bottom: 8px; }
+.required { color: #ef4444; }
+.input-text { width: 100%; padding: 12px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; color: #111827; background: #fff; }
+.input-text::placeholder { color: #9ca3af; }
+.input-text:focus { outline: none; border-color: #04040c; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+.form-help { margin-top: 8px; font-size: 13px; color: #6b7280; }
+.form-error { margin-top: 8px; font-size: 13px; color: #b91c1c; }
+
+/* Actions */
+.form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+
+/* Alerts */
+.alert { padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid; }
+.alert-success { background: #ecfdf5; color: #065f46; border-color: #10b981; }
+.alert-error, .alert-danger { background: #fef2f2; color: #991b1b; border-color: #ef4444; }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .form-actions { justify-content: stretch; }
+}
