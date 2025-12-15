@@ -1,0 +1,42 @@
+{% extends 'layout/layout_frontend/connexionDepart.html.twig' %}
+
+
+{% block title %}Connexion{% endblock %}
+
+
+{% block auth_content %}
+
+
+<h2>Ravie de te revoir !</h2>
+
+
+
+
+
+<form method="post">
+<input type="email" name="email" placeholder="Mail" value="" required>
+
+
+<div class="password-field">
+<input type="password" name="password" placeholder="Password" required>
+<span class="eye">👁</span>
+</div>
+
+
+<input type="hidden" name="_csrf_token" value="">
+
+
+<button class="btn-primary">Se connecter</button>
+
+
+<button type="button" class="btn-google">
+<img src="https://www.svgrepo.com/show/475656/google-color.svg"> Continue With Google
+</button>
+</form>
+
+
+<p class="register">Don’t have an account ? <a href="{{ path ('creer_Compte_Department')}}">Sign in</a></p>
+<a class="forgot" href="#">Mot de passe oublié ?</a>
+
+
+{% endblock %}
