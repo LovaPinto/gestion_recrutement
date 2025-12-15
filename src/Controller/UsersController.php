@@ -100,4 +100,19 @@ class UsersController extends AbstractController
             'error' => $erreur
         ]);
     }
+
+    #[Route('/loginDepart' ,name:'connexionDepart')]
+    public function connexion() :Response
+    {
+    return $this->render('department/formulaireLoginDepart.html.twig', [
+            'controller_name' => 'UsersController',]);
+    }
+
+     #[Route('/SignUpDepart', name: 'creer_Compte_Department')]
+    public function createAccountDepart(): Response
+    {
+        return $this->render('department/formulaireSignUpDepart.html.twig', [
+            'controller_name' => 'UsersController',
+        ]);
+    }
 }
