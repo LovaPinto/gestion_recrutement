@@ -7,7 +7,7 @@
 }
 
 :root{
-  /* Palette proche de la capture */
+  /* Palette */
   --bg-app: #f5f6fa;
   --bg-surface: #ffffff;
   --text: #0f172a;
@@ -23,7 +23,7 @@
   --sb-active: rgba(255,255,255,0.12);
 
   /* Boutons */
-  --primary: #0f172a;      /* bouton sombre comme sur la capture */
+  --primary: #0f172a;     
   --primary-hover: #111827;
   --light: #f3f4f6;
   --light-hover: #e5e7eb;
@@ -45,39 +45,40 @@
 /* ========== SIDEBAR ========== */
 .sidebar {
   width: 260px;
-  background-color:#f7f8fa;
-  color:black;
-  padding: 20px 16px;
+  background-color: #e9eaec;
+  color: black;
+  padding: 0;                /* IMPORTANT */
   display: flex;
   flex-direction: column;
-  gap: 18px;
 }
 
 .brand {
-  font-size: 22px;
-  font-weight: 700;
+  height: 64px;              /* même hauteur que .header */
+  width: 100%;
+  background: #000;
   color: #fff;
-  background: black;
-  padding: 40px 40px 20px 60px;
-  margin-top: 0px;
-  padding-top: 0px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  padding-left: 69px;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;                 /* enlève l'espace par défaut du h2 */
 }
 
 /* SEARCH BOX dans la sidebar */
 .search-box {
   position: relative;
-  margin: 6px 4px 2px 4px;
+  margin: 14px 4px 2px 4px;
+  background-color: #b1aeaed4;
+  border-radius: 20px
 }
 .search-box input {
   width: 100%;
   height: 38px;
   padding: 8px 36px 8px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(10, 9, 9, 0.322);
-  background: rgba(7, 6, 6, 0.379);
+  border: 1px solid rgba(10, 9, 9, 0.742);
+  background: rgba(7, 6, 6, 0.731);
   color: #060606;
   font-size: 14px;
   outline: none;
@@ -89,15 +90,16 @@
   top: 50%;
   transform: translateY(-50%);
   font-size: 16px;
-  color: rgba(255,255,255,0.8);
+  color: rgba(8, 8, 8, 0.8);
 }
+  
 
 /* MENU */
 .menu {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-top: 8px;
+  margin-top: 60px;
   color: #0f172a;
   
   
@@ -109,7 +111,9 @@
   border-radius: 8px;
   font-size: 14px;
   display: flex;
+  margin-left: 10px;
   align-items: center;
+  font-weight: 500;
   gap: 10px;
   transition: background .18s ease, color .18s ease;
 }
@@ -145,6 +149,13 @@
   font-size: 18px;
   font-weight: 600;
   color: var(--text);
+
+}
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f172a;      /* bleu/noir moderne */
+  margin-bottom: 16px;
 }
 
 /* Header right */
