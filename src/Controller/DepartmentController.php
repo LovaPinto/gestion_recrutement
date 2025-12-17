@@ -57,5 +57,13 @@ final class DepartmentController extends AbstractController
         return $this->render('department/formulaireAjoutDepart.html.twig', [
             'form' => $form->createView(), 
         ]);
-}
+    }
+
+    #[Route ('/manager', name :'managerDepartment')]
+    public function managerAccueil(): Response
+    {
+        return $this->render('department/manager.html.twig',[
+            'controller_name'=>'DepartmentController'
+        ]);
+    }
 }
