@@ -1,0 +1,54 @@
+{% extends 'candidate/menu.html.twig' %}
+
+{% block title %}Dashboard Candidat{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/dashboard.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2 class="mb-4">Profil de {{ candidate.firstName }} {{ candidate.lastName }}</h2>
+
+    <div class="row">
+        <!-- Informations personnelles -->
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    Informations personnelles
+                </div>
+                <div class="card-body">
+                    <p><strong>Prénom :</strong> {{ candidate.firstName }}</p>
+                    <p><strong>Nom :</strong> {{ candidate.lastName }}</p>
+                    <p><strong>Email :</strong> {{ candidate.email }}</p>
+                    <p><strong>Téléphone :</strong> {{ candidate.telephone }}</p>
+                    <p><strong>Date de naissance :</strong> 
+                        {{ candidate.dateNaissance ? candidate.dateNaissance|date('d/m/Y') : 'Non défini' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Autres informations -->
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header bg-secondary text-white">
+                    Autres informations
+                </div>
+                <div class="card-body">
+                    <p><strong>Adresse :</strong> {{ candidate.adresse ?: 'Non définie' }}</p>
+                    <p><strong>Poste recherché :</strong> {{ candidate.jobTitle ?: 'Non défini' }}</p>
+                    <p><strong>CV :</strong>
+                        {% if candidate.cvFile %}
+                            <a href="{{ asset('uploads/cv/' ~ candidate.cvFile) }}" target="_blank">Télécharger</a>
+                        {% else %}
+                            Non disponible
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

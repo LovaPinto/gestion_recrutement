@@ -1,23 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Login Candidat{% endblock %}
+{% block title %}Créer un compte Candidat{% endblock %}
 
 {% block body %}
 <div class="page-wrapper">
 
-
     <div class="left-image">
         <div class="gradient-mask"></div>
-
         <div class="left-text">
             <h1>JobTracker</h1>
-            <p>Vous accompagne vers un avenir meilleur.</p>
+            <p>Rejoignez-nous et démarrez votre carrière.</p>
         </div>
     </div>
+
     <div class="right-side">
         <div class="login-card">
-            <h2>Veuillez vous connecter</h2>
+            <h2>Créer un compte</h2>
             <form method="post">
+                <div class="form-group">
+                    <label>Nom</label>
+                    <input type="text" name="nom" required placeholder="Votre nom">
+                </div>
+                <div class="form-group">
+                    <label>Prénom</label>
+                    <input type="text" name="prenom" required placeholder="Votre prénom">
+                </div>
                 <div class="form-group">
                     <label>Email</label>
                     <input type="email" name="email" required placeholder="Votre email">
@@ -26,14 +33,17 @@
                     <label>Mot de passe</label>
                     <input type="password" name="password" required placeholder="Votre mot de passe">
                 </div>
-                <button type="submit" class="btn-login">Se connecter</button>
+                <button type="submit" class="btn-login">Créer compte</button>
             </form>
+
             <div class="separator"></div>
-            <p class="small-text">Pas encore de compte ?</p>
-            <a href="{{ path('app_candidate_new') }}" class="btn-create">Créer compte</a>
+            <p class="small-text">Vous avez déjà un compte ?</p>
+            <a href="{{ path('app_candidate_login') }}" class="btn-create">Se connecter</a>
         </div>
     </div>
+
 </div>
+
 <style>
 /* --- GLOBAL --- */
 body {
@@ -88,7 +98,6 @@ body {
     justify-content: center;
     align-items: center;
     padding: 40px;
-
 }
 
 /* --- CARTE FORMULAIRE GLASS EFFECT --- */
