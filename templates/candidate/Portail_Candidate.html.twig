@@ -3,75 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <title>JobTracker</title>
+
     <link rel="stylesheet" href="{{ asset('styles/portail.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/emplois.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/galerie.css') }}">
 </head>
+
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="logo"><span class="orange">Job</span>Tracker</div>
-        <div class="login">
-            <a href="#" class="btn-login">Se connecter</a>
-        </div>
-    </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Bienvenue sur JobTracker</h1>
-            <p>Découvrez les meilleures opportunités pour booster votre carrière à Madagascar.</p>
-        </div>
-    </section>
+<!-- Header -->
+<header class="header">
+    <div class="logo"><span class="orange">Next</span>Work</div>
+    <div class="login">
+        <a href="/login" class="btn-login">Se connecter</a>
+    </div>
+</header>
 
-    <!-- Section principale -->
-    <section class="main-content">
-        <!-- Recherche -->
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Booster votre carrière à Madagascar.</h1>
+    </div>
+
+    <!-- Barre de recherche + filtres -->
+    <div class="hero-form">
         <div class="search-form">
-            <input type="search" name="search" placeholder="Search your job skill">
-            <button>Rechercher</button>
+            <div class="input-wrapper modern-search">
+                <input type="search" id="job-search" placeholder="Rechercher un emploi...">
+                <span class="search-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M15 15L21 21" stroke="#777" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="10" cy="10" r="6" stroke="#777" stroke-width="2"/>
+                    </svg>
+                </span>
+            </div>
         </div>
 
-        <!-- Filtres -->
         <div class="filters-row">
             <div class="filter-box">
                 <label>Entreprise :</label>
-                <select>
-                    <option>Entreprise A</option>
+                <select id="filter-company">
+                    <option selected>Entreprise A</option>
                     <option>Entreprise B</option>
                 </select>
             </div>
+
             <div class="filter-box">
                 <label>Département :</label>
-                <select>
-                    <option>IT</option>
+                <select id="filter-department">
+                    <option selected>IT</option>
                     <option>Marketing</option>
                 </select>
             </div>
+
             <div class="filter-box">
                 <label>Poste disponible :</label>
-                <select>
-                    <option>Développeur</option>
+                <select id="filter-position">
+                    <option selected>Développeur</option>
                     <option>Manager</option>
                 </select>
+            
+        </div>
+    </div>
+</section>
+
+<!-- Derniers emplois -->
+<section class="main-content">
+    <div class="container">
+        <section class="section">
+            <div class="section-header">
+                <h2 class="title">Derniers emplois</h2>
             </div>
-        </div>
 
-        <!-- Sections Pourquoi et Contact côte à côte -->
-        <div class="info-sections">
-            <section class="reasons">
-                <h2>Pourquoi utiliser JobTracker</h2>
-                <ul>
-                    <li>Facile à utiliser</li>
-                    <li>Offres fiables</li>
-                    <li>Suivi personnalisé</li>
-                </ul>
-            </section>
+    <nav class="filters" aria-label="Filtrer par type de contrat">
+        <a class="filter {% if selectedType == 'Toutes les offres' %}active{% endif %}" href="{{ path('app_job_portail', {'offertype': 'Toutes les offres'}) }}">Toutes les offres</a>
+        <a class="filter {% if selectedType == 'CDI' %}active{% endif %}" href="{{ path('app_job_portail', {'offertype': 'CDI'}) }}">CDI</a>
+        <a class="filter {% if selectedType == 'CDD' %}active{% endif %}" href="{{ path('app_job_portail', {'offertype': 'CDD'}) }}">CDD</a>
+        <a class="filter {% if selectedType == 'Stage' %}active{% endif %}" href="{{ path('app_job_portail', {'offertype': 'Stage'}) }}">Stage</a>
+        <a class="filter {% if selectedType == 'Freelance' %}active{% endif %}" href="{{ path('app_job_portail', {'offertype': 'Freelance'}) }}">Freelance</a>
+    </nav>
 
-            <section class="contact">
-                <h2>Contacts possibles</h2>
-                <p>Email : contact@jobtracker.mg</p>
-                <p>Téléphone : +261 34 12 345 67</p>
-            </section>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Entreprise</th>
+                        <th>Contract</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% if datas is defined and datas is not empty %}
+                    {% for job in datas %}
+                        <tr
+                            data-description="{{ job.description }}"
+                            data-company="{{ job.user.department.company.companyName }}"
+                            data-offertype="{{ job.offerType }}"
+                        >
+                            <td class="position">{{ job.description }}</td>
+                            <td class="company">{{ job.user.department.company.companyName }}</td>
+                            <td><span class="contract cdd">{{ job.offerType }}</span></td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="3">Aucune offre disponible</td></tr>
+                {% endif %}
+                </tbody>
+            </table>
+
+            <div class="actions">
+                <a class="btn" href="#">More Jobs &gt;</a>
+            </div>
+        </section>
+    </div>
+</section>
+
+<!-- Galerie + Pourquoi JobTracker -->
+<section class="bottom-section">
+    <div class="gallery">
+        <div class="row row-1">
+            <img src="{{ asset('images/login.png') }}" alt="">
+            <img src="{{ asset('images/business-woman-cute-smart-girl-standing-with-crossed-hands-with-red-lipstick-office-costume.jpg') }}" alt="">
         </div>
+        <div class="row row-2">
+            <img src="{{ asset('images/aza.jpg') }}" alt="">
+            <img src="{{ asset('images/front-view-young-male-red-sweater-smiling-black-wall.jpg') }}" alt="">
+            <img src="{{ asset('images/portrait-confident-businesswoman-smiling.jpg') }}" alt="">
+        </div>
+        <div class="row row-3">
+            <img src="{{ asset('images/blonde-young-woman-against-grey-wall-looking-away.jpg') }}" alt="">
+            <img src="{{ asset('images/young-curly-young-man-with-crossed-hands-isolated-white-wall (1).jpg') }}" alt="">
+        </div>
+    </div>
+
+    <section class="reasons-right">
+        <h2>Pourquoi utiliser JobTracker</h2>
+        <ul>
+            <li>+10 ans d'expérience en développement logiciel (backend, frontend ou fullstack)</li>
+            <li>Solide maîtrise d'un ou plusieurs langages (Java, Python, Go, Typescript/React)</li>
+            <li>Expérience avec les architectures cloud (AWS, GCP, Azure) et les microservices</li>
+            <li>Bonnes connaissances en bases de données SQL et NoSQL</li>
+        </ul>
     </section>
+</section>
+
+<!-- Inclusion du JS séparé -->
+<script src="{{ asset('js/jobs.js') }}"></script>
+
 </body>
 </html>

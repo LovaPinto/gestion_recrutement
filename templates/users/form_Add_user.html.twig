@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+    <link rel="stylesheet" href="{{ asset('styles/AddUser.css') }}">
+    
+<h2>Créer un utilisateur</h2>
+
+
+
+
+
+<form action="{{ path('app_insert_user') }}" method="POST" style="display:flex; flex-direction:column; gap:10px; width:300px;" class="form">
+
+    <input type="text" name="first_name" placeholder="Prénom" class"firstname"/>
+    <input type="text" name="last_name" placeholder="Nom" class="lastname" />
+    <input type="email" name="email" placeholder="Email" class="email" />
+    <input type="password" name="password" placeholder="Mot de passe" class="password" />
+
+    <button type="submit">Enregistrer</button>
+</form>
+
+{% endblock %}

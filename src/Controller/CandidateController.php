@@ -92,6 +92,7 @@ final class CandidateController extends AbstractController
         ]);
     }
 
+    // Création d'un candidat
     #[Route('/new', name: 'app_candidate_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {

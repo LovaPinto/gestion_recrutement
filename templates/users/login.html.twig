@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login Candidat{% endblock %}
+
+{% block body %}
+<div class="page-wrapper">
+    <!-- Partie gauche avec image et texte -->
+    <div class="left-image">
+        <div class="gradient-mask"></div>
+        <div class="left-text">
+            <h1>JobTracker</h1>
+            <p>Vous accompagne vers un avenir meilleur.</p>
+        </div>
+    </div>
+
+    <!-- Partie droite avec formulaire -->
+    <div class="right-side">
+        <div class="login-card">
+            <h2>Ravie de te revoir !</h2>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+
+            <form method="post" action="{{ path('app_authentification') }}">
+                {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="email">Mail</label>
+                    <input type="email" id="email" name="email" value="{{ last_username }}" placeholder="Votre email" required autofocus>
+                </div>
+
+                <div class="form-group password-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Votre mot de passe" required>
+                    <span class="toggle-password" onclick="togglePassword()">👁️</span>
+                </div>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <button type="submit" class="btn-login">Se connecter</button>
+            </form>
+
+            <button class="btn-google">
+                <img src="{{ asset('images/google-icon.svg') }}" alt="Google"> Continue With Google
+            </button>
+
+            <div class="separator"></div>
+            <p class="small-text">Don't have an account? <a href="{{ path('app_new_user') }}">Sign in</a></p>
+            <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword() {
+    const input = document.getElementById('password');
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+</script>
+{% endblock %}

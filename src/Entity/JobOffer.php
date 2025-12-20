@@ -26,6 +26,21 @@ class JobOffer
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $deadline = null;
 
+    #[ORM\ManyToOne(targetEntity: Users::class)]
+    private ?Users $user = null;
+
+    // --- getters/setters ---
+    public function getUser(): ?Users
+    {
+        return $this->user;
+    }
+
+    public function setUser(?Users $user): static
+    {
+        $this->user = $user;
+        return $this;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
