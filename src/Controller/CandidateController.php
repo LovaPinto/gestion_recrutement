@@ -6,32 +6,85 @@ use App\Entity\Candidate;
 use App\Form\CandidateType;
 use App\Repository\CandidateRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\Nullable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
+
 
 #[Route('/candidate')]
 final class CandidateController extends AbstractController
 {
-    // Route pour le portail candidat (toujours en premier)
-    #[Route('/jobtracker', name: 'jobtracker')]
+
+    #[Route('/jobtracker', name: 'app_candidate_jobtracker', methods: ['GET'])]
     public function showPortail(): Response
     {
         return $this->render('candidate/Portail_candidate.html.twig');
     }
-// login cadidat
-    #[Route('/login', name: 'app_candidate_login')]
+
+    #[Route('/login', name: 'app_candidate_login', methods: ['GET'])]
     public function login(): Response
     {
         return $this->render('candidate/login_candidate.html.twig');
     }
-    //root du post login 
-    
 
 
-    // CRUD classique
-    #[Route(name: 'app_candidate_index', methods: ['GET'])]
+    #[Route('/dashboard', name: 'app_candidate_dashboard', methods: ['GET'])]
+    public function dashboard(EntityManagerInterface $entityManager): Response
+    {
+        $candidate = $entityManager->getRepository(Candidate::class)->find(1);
+
+
+        if (!$candidate) {
+            throw $this->createNotFoundException('Candidat non trouvéec.');
+        }
+
+        return $this->render('candidate/dashboard.html.twig', [
+            'candidate' => $candidate,
+        ]);
+    }
+
+
+    #[Route('/profil/{id}', name: 'app_candidate_profil', methods: ['GET', 'POST'])]
+    public function profil(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        int $id
+    ): Response {
+
+        $candidate = $entityManager->getRepository(Candidate::class)->find($id);
+
+        if (!$candidate) {
+            throw $this->createNotFoundException('Candidat non trouvé.');
+        }
+
+        $form = $this->createForm(CandidateType::class, $candidate);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($candidate);
+            $entityManager->flush();
+            $this->addFlash('success', 'Profil mis à jour avec succès.');
+            return $this->redirectToRoute('app_candidate_dashboard');
+        }
+
+        return $this->render('candidate/profil.html.twig', [
+            'candidate' => $candidate,
+            'form' => $form->createView(),
+        ]);
+    }
+
+
+
+    #[Route('/menu', name: 'app_candidate_menu', methods: ['GET'])]
+    public function menu(): Response
+    {
+        return $this->render('candidate/menu.html.twig');
+    }
+
+    #[Route('', name: 'app_candidate_index', methods: ['GET'])]
     public function index(CandidateRepository $candidateRepository): Response
     {
         return $this->render('candidate/index.html.twig', [
@@ -50,24 +103,22 @@ final class CandidateController extends AbstractController
             $entityManager->persist($candidate);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_candidate_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Candidat créé avec succès');
+            return $this->redirectToRoute('app_candidate_index');
         }
 
         return $this->render('candidate/new.html.twig', [
-            'candidate' => $candidate,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/{id}', name: 'app_candidate_show', methods: ['GET'])]
+    #[Route('/{id<\d+>}', name: 'app_candidate_show', methods: ['GET'])]
     public function show(Candidate $candidate): Response
     {
-        return $this->render('candidate/show.html.twig', [
-            'candidate' => $candidate,
-        ]);
+        return $this->render('candidate/show.html.twig', ['candidate' => $candidate]);
     }
 
-    #[Route('/{id}/edit', name: 'app_candidate_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id<\d+>}/edit', name: 'app_candidate_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Candidate $candidate, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(CandidateType::class, $candidate);
@@ -75,29 +126,25 @@ final class CandidateController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
-            return $this->redirectToRoute('app_candidate_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Candidat mis à jour');
+            return $this->redirectToRoute('app_candidate_index');
         }
 
         return $this->render('candidate/edit.html.twig', [
             'candidate' => $candidate,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/{id}', name: 'app_candidate_delete', methods: ['POST'])]
+    #[Route('/{id<\d+>}', name: 'app_candidate_delete', methods: ['POST'])]
     public function delete(Request $request, Candidate $candidate, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$candidate->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $candidate->getId(), $request->request->get('_token'))) {
             $entityManager->remove($candidate);
             $entityManager->flush();
+            $this->addFlash('success', 'Candidat supprimé');
         }
 
-        return $this->redirectToRoute('app_candidate_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_candidate_index');
     }
 }
-
-
-
-
-
