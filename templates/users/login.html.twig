@@ -3,20 +3,24 @@
 {% block title %}Login Candidat{% endblock %}
 
 {% block body %}
+<!-- CSS spécifique à cette page -->
+<link rel="stylesheet" href="{{ asset('styles/login.css') }}">
+
 <div class="page-wrapper">
     <!-- Partie gauche avec image et texte -->
     <div class="left-image">
         <div class="gradient-mask"></div>
         <div class="left-text">
-            <h1>JobTracker</h1>
+            <h1><i>Next</i><span>Work</span class="oop"></h1>
             <p>Vous accompagne vers un avenir meilleur.</p>
         </div>
     </div>
+    
 
     <!-- Partie droite avec formulaire -->
     <div class="right-side">
         <div class="login-card">
-            <h2>Ravie de te revoir !</h2>
+            <h2> <span style="color:orange">Ravie</span> de te revoir !</h2>
 
             {% for message in app.flashes('success') %}
                 <div class="alert alert-success">{{ message }}</div>
@@ -33,7 +37,7 @@
                 </div>
 
                 <div class="form-group password-group">
-                    <label for="password">Password</label>
+                    <label for="password">Mot de passe</label>
                     <input type="password" id="password" name="password" placeholder="Votre mot de passe" required>
                     <span class="toggle-password" onclick="togglePassword()">👁️</span>
                 </div>
@@ -44,11 +48,13 @@
             </form>
 
             <button class="btn-google">
-                <img src="{{ asset('images/google-icon.svg') }}" alt="Google"> Continue With Google
+               <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo_black.svg" alt="Google G" width="24" height="24">
+
+                Continuer avec Google
             </button>
 
             <div class="separator"></div>
-            <p class="small-text">Don't have an account? <a href="{{ path('app_new_user') }}">Sign in</a></p>
+            <p class="small-text">Pas encore de compte ? <a href="{{ path('app_new_user') }}">Inscription</a></p>
             <a href="#" class="forgot-link">Mot de passe oublié ?</a>
         </div>
     </div>
