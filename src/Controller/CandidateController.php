@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/candidate')]
 final class CandidateController extends AbstractController
 {
-    // Route pour le portail candidat (toujours en premier)
+    // Portail candidat
     #[Route('/jobtracker', name: 'jobtracker')]
     public function showPortail(): Response
     {
@@ -29,9 +29,21 @@ final class CandidateController extends AbstractController
     //root du post login 
 
 
+    // Dashboard candidat
+    #[Route('/dashboard', name: 'candidate_dashboard')]
+   // #[IsGranted('ROLE_CANDIDATE')]
+    public function dashboard(CandidateRepository $candidateRepository): Response
+    {
+        $user = $this->getUser();
+        
+        return $this->render('candidate/dashboard_candidate.html.twig', [
+            'candidateStats' => $candidateRepository->findStats($user),
+        ]);
+    }
 
-    // CRUD classique
-    #[Route(name: 'app_candidate_index', methods: ['GET'])]
+    // Liste des candidats
+    #[Route('/', name: 'app_candidate_index', methods: ['GET'])]
+    //#[IsGranted('ROLE_ADMIN')]
     public function index(CandidateRepository $candidateRepository): Response
     {
         return $this->render('candidate/index.html.twig', [
@@ -47,6 +59,7 @@ final class CandidateController extends AbstractController
 
 
 
+    // Création d'un candidat
     #[Route('/new', name: 'app_candidate_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -58,7 +71,8 @@ final class CandidateController extends AbstractController
             $entityManager->persist($candidate);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_candidate_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Candidature créée avec succès!');
+            return $this->redirectToRoute('candidate_dashboard');
         }
 
         return $this->render('candidate/new.html.twig', [
@@ -67,6 +81,7 @@ final class CandidateController extends AbstractController
         ]);
     }
 
+    // Affichage d'un candidat
     #[Route('/{id}', name: 'app_candidate_show', methods: ['GET'])]
     public function show(Candidate $candidate): Response
     {
@@ -75,6 +90,7 @@ final class CandidateController extends AbstractController
         ]);
     }
 
+    // Édition d'un candidat
     #[Route('/{id}/edit', name: 'app_candidate_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Candidate $candidate, EntityManagerInterface $entityManager): Response
     {
@@ -83,8 +99,8 @@ final class CandidateController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
-            return $this->redirectToRoute('app_candidate_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Candidature mise à jour!');
+            return $this->redirectToRoute('candidate_dashboard');
         }
 
         return $this->render('candidate/edit.html.twig', [
@@ -93,15 +109,17 @@ final class CandidateController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_candidate_delete', methods: ['POST'])]
+    // Suppression d'un candidat
+    #[Route('/{id}/delete', name: 'app_candidate_delete', methods: ['POST'])]
     public function delete(Request $request, Candidate $candidate, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $candidate->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($candidate);
             $entityManager->flush();
+            $this->addFlash('success', 'Candidature supprimée!');
         }
 
-        return $this->redirectToRoute('app_candidate_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('candidate_dashboard');
     }
     #[Route('/candidate_profil', name: 'app_candidate_add', methods: ['POST'])]
     public function AddCandidate(Request $request, Candidate $candidate, CandidateRepository $candidateRepository): Response
