@@ -2,83 +2,95 @@
 
 namespace App\Controller;
 
-use App\Entity\Users;
+use App\Entity\JobOffer;
 use App\Repository\JobOfferRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\Request;
-use App\Repository\CompanyRepository;
-use App\Repository\UsersRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 
+final class JobOfferController extends AbstractController
+{
+    private $entityManager;
+    private $jobOfferRepository;
 
-final class JobOfferController extends AbstractController{
-
-    #[Route('/job/offer/form', name: 'app_job_offer_form')]
-    public function form(JobOfferRepository $jobOfferRepository): Response{
-        return $this->render('candidate/_form.html.twig');
-
-    }
-
-    #[Route('/job/offer/insert', name: 'app_job_offer_insert', methods: ['POST'])]
-    public function insertJob(Request $request,JobOfferRepository $jobOfferRepository,UsersRepository $usersRepository
-    ): Response {
-        $offerType   = $request->request->get('offerType');
-        $description = $request->request->get('description');
-        $dateCreation = new \DateTime($request->request->get('date_creation'));
-        $deadline    = new \DateTime($request->request->get('dealine'));
-        $companyName = $request->request->get('companyName');
-
-        $company = $usersRepository->findOneBy(['id' => $companyName]);
-        $erreur=null;
-        if(isset($company) && !empty($company)
-            && isset($offerType) && !empty($offerType)
-            &&isset($description) && !empty($description)
-            &&isset($deadline) && !empty($deadline)){
-                $jobOfferRepository->insertJob($offerType,$description,$dateCreation,$deadline,$company);
-                return $this->redirectToRoute('app_job_portail');
-        }else{
-            $erreur="un ou plusieur(s) champ sont vides";
-            return $this->render('candidate/_form.html.twig', ['datas' => $erreur]);
-        }
-    }
-
-
-    #[Route('/job/offer/all', name: 'app_job_offer')]
-    public function findAllJobController(JobOfferRepository $jobOfferRepository): Response{
-        $jobDatas = $jobOfferRepository->findAllJob();
-        return $this->render('job_offer/index.html.twig', ['datas' => $jobDatas]);
-    }
-    //portail
-    #[Route('/portail', name: 'app_job_portail')]
-    public function portail(JobOfferRepository $jobOfferRepository): Response{
-        $jobDatas = $jobOfferRepository->findAllJob();
-        return $this->render('candidate/Portail_candidate.html.twig', ['datas' => $jobDatas,]);
-    }
-
-    #[Route('/portail/{offertype}', name: 'app_job_portail')]
-    public function portai(JobOfferRepository $jobOfferRepository, string $offertype = null): Response
+    // Injection des dépendances dans le constructeur
+    public function __construct(EntityManagerInterface $entityManager, JobOfferRepository $jobOfferRepository)
     {
-    if ($offertype === null || $offertype === 'Toutes les offres') {
-        $jobDatas = $jobOfferRepository->findAllJob();
-    } else {
-        $jobDatas = $jobOfferRepository->findAllJobByOfferType($offertype);
+        $this->entityManager = $entityManager;
+        $this->jobOfferRepository = $jobOfferRepository;
     }
 
-    return $this->render('candidate/Portail_candidate.html.twig', [
-        'datas' => $jobDatas,
-        'selectedType' => $offertype,
-    ]);
-}
+    #[Route('/portail', name: 'app_job_portail_default')]
+    public function portailDefault(Request $request): Response
+    {
+        // Récupérer les filtres depuis la requête GET (formulaire de recherche)
+        $keyword = $request->query->get('keyword', '');
+        $companyId = $request->query->get('company', '');
+        $departmentId = $request->query->get('department', '');
+        $offerType = $request->query->get('offerType', '');
 
 
-    #[Route('/job/offer/all/test', name: 'app_job_offer_test')]
-    public function findAllJobTest(JobOfferRepository $jobOfferRepository): Response {
-    $jobDatas = $jobOfferRepository->findAllJob();
-    return $this->render('job_offer/test.html.twig', [
-        'datas' => $jobDatas,
-    ]);
-}
+        $jobOffers = $this->jobOfferRepository->findAllByFilter($keyword, $companyId, $departmentId, $offerType);
+        $companyNames = $this->jobOfferRepository->findAllCompanyName();
+        $departmentNames = $this->jobOfferRepository->findAllDepartmentName();
+        $offerTypes = $this->jobOfferRepository->findAllOfferTypes();
 
+        // Retourner la vue avec les résultats et les filtres
+        return $this->render('candidate/Portail_candidate.html.twig', [
+            'companyNames' => $companyNames,
+            'departmentNames' => $departmentNames,
+            'offerTypes' => $offerTypes,
+            'jobOffers' => $jobOffers,
+            'keyword' => $keyword,
+            'selectedCompany' => $companyId,
+            'selectedDepartment' => $departmentId,
+            'selectedOfferType' => $offerType,
+        ]);
+    }
+
+    #[Route('/portail/{offerType}', name: 'app_job_portail_by_type')]
+    public function portailByType(string $offerType): Response
+    {
+        // Récupérer les entreprises, départements et offres par type
+        $companyNames = $this->jobOfferRepository->findAllCompanyName();
+        $departmentNames = $this->jobOfferRepository->findAllDepartmentName();
+        $findAllJobOffersByType = $this->jobOfferRepository->findAllByOfferType($offerType);
+
+        return $this->render('candidate/Portail_candidate.html.twig', [
+            'companyNames' => $companyNames,
+            'departmentNames' => $departmentNames,
+            'jobOffers' => $findAllJobOffersByType,
+        ]);
+    }
+
+    #[Route('/job/offers', name: 'app_job_offer')]
+    public function showAllOffers(Request $request, PaginatorInterface $paginator): Response
+    {
+
+        $query = $this->jobOfferRepository->createQueryBuilder('o')
+            ->orderBy('o.dateCreation', 'DESC')
+            ->getQuery();
+
+        // Pagination
+        $jobOffers = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            20
+        );
+
+        return $this->render('job_offer/ShowAlljob.html.twig', [
+            'jobOffers' => $jobOffers,
+        ]);
+    }
+    // Affichage des détails d'une offre
+    #[Route('/job/offer/{id}', name: 'job_offer_show')]
+    public function showJobOfferDetails(JobOffer $jobOffer): Response
+    {
+        return $this->render('job_offer/showJobSkill.html.twig', [
+            'jobOffer' => $jobOffer,
+        ]);
+    }
 }

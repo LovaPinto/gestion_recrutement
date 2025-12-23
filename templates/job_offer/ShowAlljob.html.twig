@@ -1,0 +1,36 @@
+
+
+
+{% block stylesheets %}
+ 
+    <link rel="stylesheet" href="{{ asset('styles/AllJob.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1 class="page-title">Liste des Offres d'Emploi</h1>
+
+        <!-- Barre de recherche -->
+        <form method="get" action="{{ path('app_job_offer') }}" class="search-form">
+            <input type="text" name="keyword" placeholder="Rechercher un emploi..." value="{{ app.request.query.get('keyword') }}" class="search-input">
+            <button type="submit" class="search-button">Rechercher</button>
+        </form>
+
+        <!-- Liste des offres d'emploi -->
+        <div class="job-list">
+            {% for job in jobOffers %}
+                <div class="job-card">
+                    <h3 class="job-title"><a href="{{ path('job_offer_show', { 'id': job.id }) }}">{{ job.title }}</a></h3>
+                    <p class="company"><strong>Entreprise:</strong> {{ job.company.companyName }}</p>
+                    <p class="deadline"><strong>Deadline:</strong> {{ job.deadline|date('d-m-Y') }}</p>
+                    <p class="type"><strong>Type:</strong> {{ job.offerType }}</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            {{ knp_pagination_render(jobOffers) }}
+        </div>
+    </div>
+{% endblock %}
