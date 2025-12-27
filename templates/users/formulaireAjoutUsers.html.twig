@@ -1,0 +1,43 @@
+{% extends 'layout/layout_frontend/sidebar.html.twig' %}
+
+{% set menus = ['dashboard', 'offre','utilisateur','departement','candidat'] %}
+{% block body %}
+<div class="container mt-4">
+    <h2>Ajouter un utilisateur</h2>
+    <p>Remplissez les informations pour créer un nouvel utilisateur</p>
+
+    {{ form_start(form) }}
+
+    <div class="mb-3">
+        {{ form_label(form.firstName) }}
+        {{ form_widget(form.firstName, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.lastName) }}
+        {{ form_widget(form.lastName, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.email) }}
+        {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.password) }}
+        {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.role) }}
+        {{ form_widget(form.role, {'attr': {'class': 'form-select'}}) }}
+    </div>
+    <div class ="bouton-users">
+        <button class ="btn-annuler">  Annuler</button>
+        <button class="btn-creer">Ajouter</button>
+    </div>
+  
+
+    {{ form_end(form) }}
+</div>
+{% endblock %}

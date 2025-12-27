@@ -1,0 +1,53 @@
+
+{% extends 'layout/layout_frontend/sidebar.html.twig' %}
+{% set menus = ['dashboard','recrutement', 'offre','utilisateur','departement','candidat'] %}
+
+{% block title %}Gestion des départements{% endblock %}
+
+{% block body %}
+  <div class="page-header">
+      <nav class="breadcrumb">
+        <span>Accueil</span> &gt; <span>Gestion de département</span>
+      </nav>
+  </div>
+
+    <div class="page-actions">
+    <h2>Gestion de département</h2>
+      <button class="bton bton-primary" onclick="window.location.href='{{ path('formulaire_departement') }}'">Ajouter un département
+      </button>
+    </div>
+ 
+
+  {% if departements is not empty %}
+      <div class="departement-list">
+          {% for departement in departements %}
+              <div class="departement-card"
+                  data-delete-url="{{ path('departement_delete', {id: departement.id}) }}">
+
+                  <h2>
+                      <i class="bi bi-building"></i>
+                      Département {{ departement.departmentName }}
+                  </h2>
+
+                   <a href="{{ path('departement_edit', { id: departement.id }) }}"
+                        class="bton bton-warning bton-sm">
+                        <i class="bi bi-pencil-square">Modifier</i>
+                    </a>
+
+                  <a href="#"
+                    class="bton bton-sm bton-danger"
+                    onclick="deleteDepartement(event, this, '{{ csrf_token('delete' ~ departement.id) }}')">
+                      <i class="bi bi-trash"></i>
+                  </a>
+              </div>
+          {% endfor %}
+      </div>
+  {% else %}
+      <div class="alert alert-info text-center mt-4">
+          <i class="bi bi-info-circle"></i>
+          Aucun département trouvé
+      </div>
+      
+  {% endif %}
+
+  {% endblock %}

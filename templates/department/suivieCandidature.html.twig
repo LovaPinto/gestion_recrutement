@@ -1,0 +1,56 @@
+{% extends 'layout/layout_frontend/sidebar.html.twig' %}
+{% set menus = ['dashboard', 'offre','utilisateur','recrutement','departement','candidat'] %}
+{% block title %}Suivi des candidatures{% endblock %}
+
+{% block body %}
+
+<h1 class="page-title">Suivi des candidatures</h1>
+<p class="page-subtitle">
+    Gérez et suivez toutes vos candidatures avec la vue Kanban
+</p>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+    <select>
+        <option>Toutes les offres</option>
+    </select>
+
+    <div class="view-switch">
+        <button class="btn-outline">Liste</button>
+        <button class="btn-primary">Kanban</button>
+    </div>
+</div>
+
+<!-- KANBAN -->
+<div class="kanban">
+
+    <div class="kanban-column yellow">
+        <div class="kanban-header">
+            ⏳ En cours d'évaluation <span>0</span>
+        </div>
+        <div class="kanban-body">
+            <p>Aucune candidature</p>
+        </div>
+    </div>
+
+    <div class="kanban-column red">
+        <div class="kanban-header">
+            ❌ Non qualifié <span>0</span>
+        </div>
+        <div class="kanban-body">
+            <p>Aucune candidature</p>
+        </div>
+    </div>
+
+    <div class="kanban-column blue">
+        <div class="kanban-header">
+            ✔️ Qualifié <span>0</span>
+        </div>
+        <div class="kanban-body">
+            <p>Aucune candidature</p>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

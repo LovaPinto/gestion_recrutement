@@ -27,11 +27,24 @@ class Users
     #[ORM\Column(length: 50)]
     private ?string $password = null;
 
-    #[ORM\ManyToOne]
-    private ?Role $Role = null;
+    #[ORM\ManyToOne(targetEntity: Role::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Role $role = null;
+
 
     #[ORM\ManyToOne(targetEntity: Department::class)]
     private ?Department $department = null;
+
+    public function getRole(): ?Role
+    {
+        return $this->role;
+    }
+
+    public function setRole(?Role $role): self
+    {
+        $this->role = $role;
+        return $this;
+    }
 
     // --- getters/setters ---
     public function getDepartment(): ?Department
@@ -105,15 +118,5 @@ class Users
         return $this;
     }
 
-    public function getRole(): ?Role
-    {
-        return $this->Role;
-    }
-
-    public function setRole(?Role $Role): static
-    {
-        $this->Role = $Role;
-
-        return $this;
-    }
+    
 }

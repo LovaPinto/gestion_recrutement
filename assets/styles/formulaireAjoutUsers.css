@@ -1,0 +1,103 @@
+.container-user {
+    max-width: 1000px;
+    margin: 40px auto;
+}
+
+h1 {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.subtitle {
+    color: #6b7280;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 15px;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.btn-creer {
+    background: #2563eb;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-annuler {
+    background: #cdcecf;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-creer:hover {
+    background: #1e40af;
+}
+
+.btn-annuler:hover {
+    background: #313234a2;
+}
+
+.content {
+    margin-left: 250px;
+}
+
+.bouton-users {
+    display: inline-flex;
+    margin-left: 700px;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.btn-add-users {
+    color: #f3f4f4;
+    text-decoration: none;
+    background-color: #020202;
+    border-radius: 4px;
+     padding: 18px 18px;
+    margin-left: 280px;
+    font-size: 18px;
+
+}

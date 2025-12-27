@@ -1,0 +1,57 @@
+.page-containerOffre {
+    padding: 30px;
+    background: #f8fafc;
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Header */
+.page-headerOffre {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.page-headerOffre h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    color: #0f172a;
+}
+
+.page-headerOffre p {
+    margin-top: 5px;
+    color: #64748b;
+}
+
+/* Button */
+.nouvelleDemande {
+    background: #0f172a;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nouvelleDemande span {
+    font-size: 18px;
+}
+
+.nouvelleDemande:hover {
+    background: #020617;
+}
+
+/* Empty card */
+.empty-cardi {
+    background: white;
+    border-radius: 16px;
+    padding: 60px;
+    text-align: center;
+    color: #64748b;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
