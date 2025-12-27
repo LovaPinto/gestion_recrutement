@@ -12,11 +12,11 @@ class DepartmentType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('departmentName', TextType::class, [
-    'label' => 'Nom du département',
-    'attr' => [
-        'placeholder' => 'Ex : Informatique, Ressources Humaines, Marketing...',
-    ],
-]);
+            'label' => 'Nom du département',
+            'attr'  => [
+                'placeholder' => 'Ex : Informatique, Ressources Humaines, Marketing...',
+            ],
+        ]);
 
     }
 

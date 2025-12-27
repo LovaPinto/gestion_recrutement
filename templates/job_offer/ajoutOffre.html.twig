@@ -1,0 +1,26 @@
+{% extends 'layout/layout_frontend/sidebar.html.twig' %}
+{% set menus = ['dashboard', 'offre','candidat'] %}
+{% block title %}Demandes de recrutement{% endblock %}
+
+{% block body %}
+<div class="page-containerOffre">
+
+    <!-- Header -->
+    <div class="page-headerOffre">
+        <div>
+            <h1>Demandes de recrutement</h1>
+            <p>Gérez vos demandes de recrutement</p>
+        </div>
+
+        <a href="#" class="nouvelleDemande">
+            <span>+</span> Nouvelle demande
+        </a>
+    </div>
+
+    <!-- Empty content -->
+    <div class="empty-cardi">
+        <p>Aucune demande de recrutement pour le moment.</p>
+    </div>
+
+</div>
+{% endblock %}
