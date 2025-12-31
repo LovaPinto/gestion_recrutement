@@ -1,8 +1,11 @@
 {% extends 'layout/layout_frontend/sidebar.html.twig' %}
-
+{% set menus = ['dashboard', 'offre','candidat'] %}
 {% block title %}manager{% endblock %}
 
 {% block body %}
-
-
+  <div class="page-header">
+      <nav class="breadcrumb">
+        <span><a href="{{ path('connexionDepart') }}"><i class="bi bi-house"></i>Accueil</a></span> &gt; <span>Gestion du manager</span>
+      </nav>
+  </div>
 {% endblock %}
