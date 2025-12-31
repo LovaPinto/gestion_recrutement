@@ -1,0 +1,49 @@
+/* Style pour l'accordéon */
+.accordion-item {
+    margin-bottom: 20px;
+}
+
+.accordion {
+    background-color: #0056b3;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+    width: 100%;
+    text-align: left;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    transition: 0.4s;
+    border-radius: 5px;
+}
+
+.accordion:hover {
+    background-color: #003f7f;
+}
+
+.panel {
+    padding: 0 18px;
+    background-color: #f1f1f1;
+    display: none;
+    overflow: hidden;
+    font-size: 16px;
+    color: #333;
+}
+
+.back-button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.back-button {
+    padding: 10px 20px;
+    background-color: #0056b3;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+.back-button:hover {
+    background-color: #003f7f;
+}

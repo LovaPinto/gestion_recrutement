@@ -1,6 +1,6 @@
 {# templates/departement/new.html.twig #}
 {% extends 'layout/layout_frontend/sidebar.html.twig' %}
-
+{% set menus = ['dashboard', 'offre','utilisateur','departement','candidat'] %}
 {% block title %}Créer un département{% endblock %}
 
 {% block body %}
@@ -38,7 +38,7 @@
             </div>
 
        
-            <div class="form-actions">
+            <div class="form-actions-depart">
                 <a href="{{ path('app_department_ajout') }}" class="btn btn-ghost">Annuler</a>
                 <button type="submit" class="btn btn-primary">
                     <span class="check">✔</span> Créer le département

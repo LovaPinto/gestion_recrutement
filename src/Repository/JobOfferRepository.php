@@ -3,112 +3,98 @@
 namespace App\Repository;
 
 use App\Entity\JobOffer;
-use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<JobOffer>
  */
-class JobOfferRepository extends ServiceEntityRepository{
+class JobOfferRepository extends ServiceEntityRepository
+{
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, JobOffer::class);
     }
 
- public function findAllJob(): array
-{
-    return $this->createQueryBuilder('j')
-        // relation JobOffer → User
-        ->innerJoin('j.user', 'u')
-        ->addSelect('u')
+    // Méthode pour récupérer les noms des entreprises
+    public function findAllCompanyName(): array
+    {
+        // Récupère à la fois l'ID et le nom de l'entreprise
+        return $this->createQueryBuilder('j')
+            ->select(' DISTINCT c.id, c.companyName')  // Sélectionne l'ID et le nom de l'entreprise
+            ->join('j.company', 'c')        // Jointure avec l'entité 'Company'
+            ->getQuery()
+            ->getResult();
+    }
+    public function findAllDepartmentName(): array
+    {
+        // Récupère à la fois l'ID et le nom du département
+        return $this->createQueryBuilder('j')
+            ->select(' DISTINCT d.id, d.departmentName')  // Sélectionne l'ID et le nom du département
+            ->join('j.department', 'd')        // Jointure avec l'entité 'Department'
+            ->getQuery()
+            ->getResult();
+    }
 
-        // relation User → Department
-        ->innerJoin('u.department', 'd')
-        ->addSelect('d')
+    // Méthode pour récupérer les types d'offres distincts
+    public function findAllOfferTypes(): array
+    {
+        return $this->createQueryBuilder('j')
+            ->select('DISTINCT j.offerType')
+            ->getQuery()
+            ->getResult();
+    }
 
-        // relation Department → Company
-        ->innerJoin('d.company', 'c')
-        ->addSelect('c')
+    public function findAllJobOffer()
+    {
+        return $this->createQueryBuilder('j')
+            ->select('j.id, j.title, j.offerType, c.companyName, d.departmentName')
+            ->join('j.company', 'c')
+            ->join('j.department', 'd')
+            ->getQuery()
+            ->getResult();
+    }
 
+    public function findAllByFilter($keyword, $companyId, $departmentId, $offerType)
+    {
+        $qb = $this->createQueryBuilder('j')
+            ->select('j.id', 'j.title', 'j.offerType', 'c.companyName', 'd.departmentName')
+            ->join('j.company', 'c')
+            ->join('j.department', 'd');
 
-        ->orderBy('j.dateCreation', 'DESC')
-        ->setMaxResults(10)
-        ->getQuery()
-        ->getResult();
-}
-//maka a partir de offerType
- public function findAllJobByOfferType($offerType): array
-{
-    return $this->createQueryBuilder('j')
-        // relation JobOffer → User
-        ->innerJoin('j.user', 'u')
-        ->addSelect('u')
+        // Filtrage par mot-clé dans le titre
+        if ($keyword) {
+            $qb->andWhere('j.title LIKE :keyword')
+                ->setParameter('keyword', '%' . $keyword . '%');
+        }
 
-        // relation User → Department
-        ->innerJoin('u.department', 'd')
-        ->addSelect('d')
+        // Filtrage par ID de l'entreprise
+        if ($companyId) {
+            $qb->andWhere('c.id = :companyId')
+                ->setParameter('companyId', $companyId);
+        }
 
-        // relation Department → Company
-        ->innerJoin('d.company', 'c')
-        ->addSelect('c')
+        // Filtrage par ID du département
+        if ($departmentId) {
+            $qb->andWhere('d.id = :departmentId')
+                ->setParameter('departmentId', $departmentId);
+        }
+        // Filtrage par type d'offre
+        if ($offerType) {
+            $qb->andWhere('j.offerType = :offerType')
+                ->setParameter('offerType', $offerType);
+        }
 
-        ->andWhere('j.offerType = :offerType')
-        ->setParameter('offerType',$offerType)
-
-        ->orderBy('j.dateCreation', 'DESC')
-        ->setMaxResults(10)
-        ->getQuery()
-        ->getResult();
-}
-
-
-
-
-  public function insertJob(
-    string $offerType,
-    string $description,
-    \DateTimeInterface $dateCreation,
-    \DateTimeInterface $deadline,
-    Users $user
-): void {
-    $job = new JobOffer();
-    $job->setOfferType($offerType);
-    $job->setDescription($description);
-    $job->setDateCreation($dateCreation);
-    $job->setDeadline($deadline);
-    $job->setUser($user);
-
-    $em = $this->getEntityManager();
-    $em->persist($job);
-    $em->flush();
-}
+        // Exécution de la requête et retour des résultats
+        return $qb->getQuery()->getResult();
+    }
 
 
-
-
-    //    /**
-    //     * @return JobOffer[] Returns an array of JobOffer objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('j')
-    //            ->andWhere('j.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('j.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?JobOffer
-    //    {
-    //        return $this->createQueryBuilder('j')
-    //            ->andWhere('j.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    //afficher toutes les offres d'emploi
+    public function findAll(): array
+    {
+        return $this->createQueryBuilder('j')
+            ->getQuery()
+            ->getResult();
+    }
 }
