@@ -1,0 +1,28 @@
+{% extends 'layout/layout_frontend/sidebar.html.twig' %}
+
+{% block title %}Gestion des départements{% endblock %}
+
+{% block body %}
+  <div class="page-header">
+      <nav class="breadcrumb">
+        <span>Accueil</span> &gt; <span>Gestion de département</span>
+      </nav>
+    <div class="page-actions">
+      <button class="btn btn-primary" onclick="window.location.href='{{ path('formulaire_departement') }}'">Ajouter un département
+      </button>
+    </div>
+  </div>
+
+<div class="departement-list">
+  {% for departement in departements %}
+    <div class="departement-card">
+      <h2><i class="bi bi-building"></i> Département {{ departement.departmentName }}</h2>
+      <a href="#" class="btn btn-sm">Modifier</a>
+      <a href="#" class="btn btn-sm btn-danger">Supprimer</a>
+    </div>
+  {% else %}
+    <p>Aucun département enregistré.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

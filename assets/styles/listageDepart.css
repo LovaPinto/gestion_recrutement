@@ -1,0 +1,60 @@
+/* Conteneur principal */
+.departement-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+  padding: 0 10px;
+}
+
+/* Carte individuelle */
+.departement-card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 30px 40px;
+  padding-right: 2px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+
+.departement-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Titre du département */
+.departement-card h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+/* Boutons */
+.btn {
+  display: inline-block;
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-right: 10px;
+  transition: background-color 0.1s ease;
+}
+
+.btn-sm {
+  background-color: #b9c0ce29;
+  color: rgb(4, 4, 4);
+}
+
+.btn-sm:hover {
+  background-color: #aeb2bd26;
+}
+
+.btn-danger {
+  background-color: #dc262628;
+  color: rgb(8, 8, 8);
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c31;
+}

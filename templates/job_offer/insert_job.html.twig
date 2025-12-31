@@ -1,0 +1,194 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une offre d'emploi{% endblock %}
+
+{% block body %}
+<style>
+body {
+    background: #0f172a;
+    color: #ffffff;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
+.wizard-container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #1e293b;
+    border-radius: 14px;
+    border: 1px solid #2563eb;
+    padding: 32px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+/* Steps */
+.steps { display: flex; justify-content: space-between; margin-bottom: 35px; position: relative; }
+.steps::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 3px; background: #334155; }
+.step { background: #0f172a; border: 2px solid #2563eb; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; z-index: 1; }
+.step.completed { background: #2563eb; }
+.step.active { background: #ffffff; color: #2563eb; }
+/* Form */
+h2 { margin-bottom: 22px; font-weight: 700; }
+.form-group { margin-bottom: 22px; }
+label { font-weight: 600; margin-bottom: 6px; display: block; color: #e5e7eb; }
+input, select, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ffffff; background: #ffffff; color: #0f172a; font-size: 14px; }
+textarea.large { min-height: 220px; resize: vertical; }
+.actions { display: flex; justify-content: space-between; margin-top: 35px; }
+.btn { padding: 12px 26px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; }
+.btn-primary { background: #2563eb; color: #fff; }
+.btn-secondary { background: transparent; color: #fff; border: 1px solid #fff; text-decoration: none; }
+/* Skills preview */
+.skills-preview div::before { content: "o* "; color: #2563eb; font-weight: bold; }
+</style>
+
+<div class="wizard-container">
+
+    <!-- STEPS -->
+    <div class="steps">
+        {% for i in 1..5 %}
+            <div class="step {{ step > i ? 'completed' : '' }} {{ step == i ? 'active' : '' }}">
+                {{ i }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <form method="post">
+
+        {# ===== STEP 1: Informations principales ===== #}
+        {% if step == 1 %}
+            <h2>Informations principales</h2>
+
+            <div class="form-group">
+                <label>Titre du poste</label>
+                <input type="text" name="title" value="{{ jobOffer.title ?? '' }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Entreprise</label>
+                <select name="company" required>
+                    <option value="">Sélectionner</option>
+                    {% for company in companies %}
+                      <option value="{{ company.id }}" 
+    {% if jobOffer.company and jobOffer.company.id == company.id %}selected{% endif %}>
+    {{ company.companyName }}
+</option>
+
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Département</label>
+                <select name="department" required>
+                    <option value="">Sélectionner</option>
+                    {% for department in departments %}
+                        <option value="{{ department.id }}" 
+                            {% if jobOffer.department and jobOffer.department.id == department.id %}selected{% endif %}>
+                  {{ department.departmentName }}
+
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+        {# ===== STEP 2: Description ===== #}
+        {% elseif step == 2 %}
+            <h2>Description du poste</h2>
+            <div class="form-group">
+                <label>Description complète</label>
+                <textarea name="description" class="large">{{ jobOffer.description ?? '' }}</textarea>
+            </div>
+
+        {# ===== STEP 3: Compétences ===== #}
+        {% elseif step == 3 %}
+            <h2>Compétences requises</h2>
+            <div class="form-group">
+                <label>1 compétence par ligne</label>
+                <textarea name="skills" class="large"
+                    placeholder="PHP
+Symfony
+MySQL">{{ jobOffer.jobSkills is defined ? jobOffer.jobSkills|join("\n") : '' }}</textarea>
+            </div>
+            {% if jobOffer.jobSkills is defined %}
+                <div class="skills-preview">
+                    {% for skill in jobOffer.jobSkills %}
+                        <div>{{ skill }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        {# ===== STEP 4: Détails ===== #}
+        {% elseif step == 4 %}
+            <h2>Détails de l’offre</h2>
+
+            <div class="form-group">
+                <label>Type d’offre</label>
+                <select name="offer_type" required>
+                    <option value="">Sélectionner</option>
+                    {% for type in offerTypes %}
+                        {# Assurer que type est une chaîne #}
+                        {% set typeValue = type is iterable ? type.offerType : type %}
+                        <option value="{{ typeValue }}" {% if jobOffer.offerType == typeValue %}selected{% endif %}>
+                            {{ typeValue }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Date limite</label>
+                <input type="date" name="deadline" value="{{ jobOffer.deadline ? jobOffer.deadline|date('Y-m-d') }}">
+            </div>
+
+            <div class="form-group">
+                <label>Niveau d’expérience</label>
+                <select name="experience_level">
+                    <option value="">Sélectionner</option>
+                    <option value="Junior" {% if jobOffer.experienceLevel == 'Junior' %}selected{% endif %}>Junior</option>
+                    <option value="Intermédiaire" {% if jobOffer.experienceLevel == 'Intermédiaire' %}selected{% endif %}>Intermédiaire</option>
+                    <option value="Senior" {% if jobOffer.experienceLevel == 'Senior' %}selected{% endif %}>Senior</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Statut</label>
+                <select name="status">
+                    <option value="active" {% if jobOffer.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if jobOffer.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+
+        {# ===== STEP 5: Récapitulatif ===== #}
+        {% elseif step == 5 %}
+            <h2>Récapitulatif</h2>
+            <p><strong>Titre :</strong> {{ jobOffer.title }}</p>
+<p><strong>Entreprise :</strong> {{ jobOffer.company ? jobOffer.company.companyName : '' }}</p>
+
+          <p><strong>Département :</strong> {{ jobOffer.department ? jobOffer.department.departmentName : '' }}</p>
+
+       <p><strong>Type :</strong> {{ jobOffer.offerType }}</p>
+            <p><strong>Description :</strong> {{ jobOffer.description }}</p>
+            <p><strong>Deadline :</strong> {{ jobOffer.deadline ? jobOffer.deadline|date('d/m/Y') }}</p>
+
+            <div class="skills-preview">
+                {% for skill in jobOffer.jobSkills %}
+                    <div>{{ skill }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="actions">
+            {% if step > 1 %}
+                <a href="{{ path('job_offer_create', { step: step - 1 }) }}" class="btn btn-secondary">
+                    ← Précédent
+                </a>
+            {% else %}
+                <span></span>
+            {% endif %}
+
+            <button class="btn btn-primary" type="submit">
+                {{ step < 5 ? 'Suivant →' : 'Confirmer et publier' }}
+            </button>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

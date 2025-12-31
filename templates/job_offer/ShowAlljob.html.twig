@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/AllJob.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="job-page">
+
+    <h1 class="page-title">Offres d'emploi disponibles</h1>
+
+    <!-- Barre de recherche -->
+    <form method="get" action="{{ path('app_job_offer') }}" class="search-form">
+       <div class="search-wrapper">
+    <input type="text" placeholder="Rechercher un emploi..." />
+    <span class="search-icon">
+        🔍
+    </span>
+</div>
+
+
+    </form>
+
+    <!-- Liste des offres -->
+    <div class="job-list">
+        {% for job in jobOffers %}
+            <div class="job-card">
+
+                <!-- TITRE (CLIC = PAGE DETAIL) -->
+                <h3 class="job-title">
+                    <a href="{{ path('job_offer_show', {'id': job.id}) }}">
+                        {{ job.title }}
+                    </a>
+                </h3>
+
+                <!-- INFOS -->
+                <div class="job-info">
+                    <span>📍 Madagascar</span>
+                    <span>⏱ Publiée le {{ job.dateCreation|date('d/m/Y') }}</span>
+                </div>
+
+                <!-- META -->
+                <div class="job-meta">
+                    <span>📅 Date limite : {{ job.deadline|date('d-m-Y') }}</span>
+                    <span>📄 Contrat : {{ job.offerType }}</span>
+                </div>
+
+                <!-- LIGNE NOIRE -->
+                <hr class="job-divider">
+
+                <!-- DESCRIPTION -->
+                <p class="job-description">
+                    {{ job.description|slice(0, 130) }}...
+                </p>
+
+            </div>
+        {% else %}
+            <p class="no-result">Aucune offre trouvée.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        {{ knp_pagination_render(jobOffers) }}
+    </div>
+
+</div>
+{% endblock %}
