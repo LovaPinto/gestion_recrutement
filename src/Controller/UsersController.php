@@ -34,14 +34,12 @@ class UsersController extends AbstractController
     #[Route('/authentification', name: 'app_authentification', methods: ['POST'])]
     public function authentification(Request $request, UsersRepository $UsersRepository): Response
     {
-        $firstname = $request->request->get('first_name');
-        $lastname  = $request->request->get('last_name');
-        $email     = $request->request->get('email');
-        $password  = $request->request->get('password');
+
+        $email    = $request->request->get('email');
+        $password = $request->request->get('password');
 
         $erreur = null;
 
-        // Vérification des champs vides
         if (empty($email) || empty($password)) {
             $erreur = "Un ou plusieurs champs sont vides.";
             return $this->render('candidate/_form.html.twig', [
@@ -49,7 +47,6 @@ class UsersController extends AbstractController
             ]);
         }
 
-        // Recherche de l'utilisateur
         $user = $UsersRepository->findOneBy(['email' => $email]);
 
         if (! $user) {
@@ -59,7 +56,6 @@ class UsersController extends AbstractController
             ]);
         }
 
-        // Comparaison simple du mot de passe
         if ($user->getPassword() !== $password) {
             $erreur = "Mot de passe incorrect.";
             return $this->render('candidate/_form.html.twig', [
@@ -67,11 +63,8 @@ class UsersController extends AbstractController
             ]);
         }
 
-        // Connexion réussie
         return $this->redirectToRoute('candidate_dashboard');
     }
-
-    ## fonction insertion d'user
 
     #[Route('/insert-user', name: 'app_insert_user', methods: ['POST'])]
     public function insertUser(
@@ -93,7 +86,6 @@ class UsersController extends AbstractController
             return $this->redirectToRoute('app_user_login');
         }
 
-        // Si erreur
         $erreur = "Un ou plusieurs champs sont vides";
 
         return $this->render('candidate/form_user.html.twig', [
@@ -155,18 +147,15 @@ class UsersController extends AbstractController
             $email    = $request->request->get('email');
             $password = $request->request->get('password');
 
-            // Chercher l'utilisateur avec email
             $user = $em->getRepository(Users::class)->findOneBy(['email' => $email]);
 
-            // Vérification simple du mot de passe en clair
             if ($user && $user->getPassword() === $password) {
-                // Stockage des infos en session
+
                 $session = $request->getSession();
                 $session->set('user_id', $user->getId());
                 $session->set('email', $user->getEmail());
                 $session->set('role', $user->getRole()->getType());
 
-                // Redirection selon rôle
                 if ($user->getRole()->getType() === 'RH') {
                     return $this->redirectToRoute('RH_Department');
                 } elseif ($user->getRole()->getType() === 'Manager') {
