@@ -1,0 +1,7 @@
+{% if app.user %}
+    Connecté en tant que : {{ app.user.email }}
+    <br>
+    ID utilisateur : {{ app.user.id }}
+{% else %}
+    Non connecté
+{% endif %}
