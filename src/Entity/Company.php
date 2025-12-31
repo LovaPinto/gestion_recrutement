@@ -15,18 +15,18 @@ class Company
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $companyName = null;
+  #[ORM\Column(length: 50, nullable: true)]
+private ?string $companyName = null;
 
-    #[ORM\Column(length: 100)]
+
+    #[ORM\Column(length: 100, nullable: true)]
     private ?string $localisation = null;
 
-       /**
+    /**
      * @var Collection<int, Department>
      */
     #[ORM\OneToMany(targetEntity: Department::class, mappedBy: 'company')]
     private Collection $departments;
-
 
     public function __construct()
     {
@@ -41,7 +41,6 @@ class Company
     public function setId(?int $id): static
     {
         $this->id = $id;
-
         return $this;
     }
 
@@ -53,10 +52,9 @@ class Company
     public function setCompanyName(string $companyName): static
     {
         $this->companyName = $companyName;
-
         return $this;
     }
-    
+
     public function getLocalisation(): ?string
     {
         return $this->localisation;
@@ -65,7 +63,6 @@ class Company
     public function setLocalisation(string $localisation): static
     {
         $this->localisation = $localisation;
-
         return $this;
     }
 
@@ -83,19 +80,16 @@ class Company
             $this->departments->add($department);
             $department->setCompany($this);
         }
-
         return $this;
     }
 
     public function removeDepartment(Department $department): static
     {
         if ($this->departments->removeElement($department)) {
-            // set the owning side to null (unless already changed)
             if ($department->getCompany() === $this) {
                 $department->setCompany(null);
             }
         }
-
         return $this;
     }
 }
