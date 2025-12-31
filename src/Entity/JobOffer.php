@@ -58,6 +58,12 @@ private ?Company $company = null;
 
     /* ================= GETTERS & SETTERS ================= */
 
+
+    
+
+
+    /////
+
     public function getId(): ?int
     {
         return $this->id;

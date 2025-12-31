@@ -1,36 +1,68 @@
-
-
+{% extends 'base.html.twig' %}
 
 {% block stylesheets %}
- 
     <link rel="stylesheet" href="{{ asset('styles/AllJob.css') }}">
 {% endblock %}
 
 {% block body %}
-    <div class="container">
-        <h1 class="page-title">Liste des Offres d'Emploi</h1>
+<div class="job-page">
 
-        <!-- Barre de recherche -->
-        <form method="get" action="{{ path('app_job_offer') }}" class="search-form">
-            <input type="text" name="keyword" placeholder="Rechercher un emploi..." value="{{ app.request.query.get('keyword') }}" class="search-input">
-            <button type="submit" class="search-button">Rechercher</button>
-        </form>
+    <h1 class="page-title">Offres d'emploi disponibles</h1>
 
-        <!-- Liste des offres d'emploi -->
-        <div class="job-list">
-            {% for job in jobOffers %}
-                <div class="job-card">
-                    <h3 class="job-title"><a href="{{ path('job_offer_show', { 'id': job.id }) }}">{{ job.title }}</a></h3>
-                    <p class="company"><strong>Entreprise:</strong> {{ job.company.companyName }}</p>
-                    <p class="deadline"><strong>Deadline:</strong> {{ job.deadline|date('d-m-Y') }}</p>
-                    <p class="type"><strong>Type:</strong> {{ job.offerType }}</p>
+    <!-- Barre de recherche -->
+    <form method="get" action="{{ path('app_job_offer') }}" class="search-form">
+       <div class="search-wrapper">
+    <input type="text" placeholder="Rechercher un emploi..." />
+    <span class="search-icon">
+        🔍
+    </span>
+</div>
+
+
+    </form>
+
+    <!-- Liste des offres -->
+    <div class="job-list">
+        {% for job in jobOffers %}
+            <div class="job-card">
+
+                <!-- TITRE (CLIC = PAGE DETAIL) -->
+                <h3 class="job-title">
+                    <a href="{{ path('job_offer_show', {'id': job.id}) }}">
+                        {{ job.title }}
+                    </a>
+                </h3>
+
+                <!-- INFOS -->
+                <div class="job-info">
+                    <span>📍 Madagascar</span>
+                    <span>⏱ Publiée le {{ job.dateCreation|date('d/m/Y') }}</span>
                 </div>
-            {% endfor %}
-        </div>
 
-        <!-- Pagination -->
-        <div class="pagination">
-            {{ knp_pagination_render(jobOffers) }}
-        </div>
+                <!-- META -->
+                <div class="job-meta">
+                    <span>📅 Date limite : {{ job.deadline|date('d-m-Y') }}</span>
+                    <span>📄 Contrat : {{ job.offerType }}</span>
+                </div>
+
+                <!-- LIGNE NOIRE -->
+                <hr class="job-divider">
+
+                <!-- DESCRIPTION -->
+                <p class="job-description">
+                    {{ job.description|slice(0, 130) }}...
+                </p>
+
+            </div>
+        {% else %}
+            <p class="no-result">Aucune offre trouvée.</p>
+        {% endfor %}
     </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        {{ knp_pagination_render(jobOffers) }}
+    </div>
+
+</div>
 {% endblock %}
