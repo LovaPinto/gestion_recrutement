@@ -12,43 +12,84 @@
     <h2 class="profile-title">Mon profil</h2>
 
     {% for message in app.flashes('success') %}
-        <div class="alert alert-success text-center">{{ message }}</div>
+        <div class="alert alert-success">{{ message }}</div>
     {% endfor %}
 
     <div class="profile-card">
         <h4 class="profile-subtitle">Mes informations</h4>
-
-        {# Démarrage du formulaire #}
-        {{ form_start(form) }}
-
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">{{ form_row(form.nom) }}</div>
-            <div class="col-md-6">{{ form_row(form.prenom) }}</div>
-        </div>
-
-        <div class="mb-3">{{ form_row(form.email) }}</div>
-        <div class="mb-3">{{ form_row(form.telephone) }}</div>
-        <div class="mb-3">{{ form_row(form.adresse) }}</div>
+        
+        {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
 
         <div class="row g-3 mb-3">
-            <div class="col-md-6">{{ form_row(form.nationalite) }}</div>
-            <div class="col-md-6">{{ form_row(form.genre) }}</div>
+            <div class="col-md-6">
+                {{ form_row(form.nom) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.prenom) }}
+            </div>
         </div>
 
-        <div class="mb-3">{{ form_row(form.dateNaissance) }}</div>
-        <div class="mb-3">{{ form_row(form.linkedin) }}</div>
-        <div class="mb-3">{{ form_row(form.facebook) }}</div>
-        <div class="mb-3">{{ form_row(form.status) }}</div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                {{ form_row(form.email) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.telephone) }}
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-12">
+                {{ form_row(form.adresse) }}
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                {{ form_row(form.nationalite) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.genre) }}
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                {{ form_row(form.dateNaissance) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.status) }}
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                {{ form_row(form.linkedin) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.facebook) }}
+            </div>
+        </div>
 
         <hr class="form-separator">
 
         <h5 class="form-section-title">Documents</h5>
-        <div class="mb-3">{{ form_row(form.cvFile) }}</div>
-        <div class="mb-3">{{ form_row(form.lmFile) }}</div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                {{ form_row(form.cvFile) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.lmFile) }}
+            </div>
+        </div>
 
-        <button type="submit" class="btn profile-btn w-100">Enregistrer</button>
+        {{ form_rest(form) }}
 
-        {# Fin du formulaire #}
+        <div class="form-actions">
+            <a href="{{ path('app_candidate_dashboard') }}" class="btn btn-cancel">Annuler</a>
+            <button type="submit" class="btn btn-save">Enregistrer les modifications</button>
+        </div>
+
         {{ form_end(form) }}
     </div>
 </div>

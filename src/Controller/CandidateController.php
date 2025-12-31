@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Candidate;
 use App\Form\CandidateType;
 use App\Repository\CandidateRepository;
+use App\Repository\CandidacyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use phpDocumentor\Reflection\Types\Nullable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 
 #[Route('/candidate')]
@@ -24,27 +26,20 @@ final class CandidateController extends AbstractController
         return $this->render('candidate/Portail_candidate.html.twig');
     }
 
-    #[Route('/login', name: 'app_candidate_login', methods: ['GET'])]
-    public function login(): Response
-    {
-        return $this->render('candidate/login_candidate.html.twig');
-    }
 
+#[Route('/dashboard', name: 'app_candidate_dashboard')]
+public function dashboard(
+    CandidateRepository $candidateRepository
+): Response {
+    $candidate = $candidateRepository->findOneBy([
+        'user' => $this->getUser()
+    ]);
 
-    #[Route('/dashboard', name: 'app_candidate_dashboard', methods: ['GET'])]
-    public function dashboard(EntityManagerInterface $entityManager): Response
-    {
-        $candidate = $entityManager->getRepository(Candidate::class)->find(1);
+    return $this->render('candidate/dashboard.html.twig', [
+        'candidate' => $candidate,
+    ]);
+}
 
-
-        if (!$candidate) {
-            throw $this->createNotFoundException('Candidat non trouvéec.');
-        }
-
-        return $this->render('candidate/dashboard.html.twig', [
-            'candidate' => $candidate,
-        ]);
-    }
 
 
     #[Route('/profil/{id}', name: 'app_candidate_profil', methods: ['GET', 'POST'])]
@@ -110,6 +105,26 @@ final class CandidateController extends AbstractController
 
         return $this->render('candidate/new.html.twig', [
             'form' => $form->createView(),
+        ]);
+    }
+
+        #[Route('/login', name: 'app_login')]
+    public function login(AuthenticationUtils $authenticationUtils): Response
+    {
+        // Si l'utilisateur est déjà connecté, rediriger vers le dashboard
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_candidate_dashboard');
+        }
+
+        // Récupérer l'erreur de connexion s'il y en a une
+        $error = $authenticationUtils->getLastAuthenticationError();
+        
+        // Dernier nom d'utilisateur saisi
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        return $this->render('security/login_candidate.html.twig', [
+            'last_username' => $lastUsername,
+            'error' => $error,
         ]);
     }
 

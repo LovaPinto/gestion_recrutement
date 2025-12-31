@@ -2,7 +2,10 @@
 
 namespace App\Entity;
 
+use App\Entity\Users;
 use App\Repository\CandidateRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -26,11 +29,22 @@ class Candidate
     #[Assert\Email]
     private ?string $email = null;
 
+    #[ORM\OneToOne(inversedBy: 'candidate')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Users $user = null;
+
+
     #[ORM\Column(type: Types::STRING, length: 20, nullable: true)]
     private ?string $telephone = null;
 
     #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $adresse = null;
+
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
+    private ?string $ville = null;
+
+    #[ORM\Column(type: Types::STRING, length: 20, nullable: true)]
+    private ?string $codePostal = null;
 
     #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $linkedin = null;
@@ -60,6 +74,25 @@ class Candidate
     private ?string $password = null;
 
     // =====================
+    // Relations
+    // =====================
+
+    #[ORM\OneToMany(mappedBy: 'candidate', targetEntity: Candidacy::class, orphanRemoval: true)]
+    private Collection $candidacies;
+
+    #[ORM\ManyToMany(targetEntity: JobOffer::class, mappedBy: 'candidates')]
+    private Collection $jobOffers;
+
+    // =====================
+    // Constructor
+    // =====================
+    public function __construct()
+    {
+        $this->candidacies = new ArrayCollection();
+        $this->jobOffers = new ArrayCollection();
+    }
+
+    // =====================
     // Getters & Setters
     // =====================
 
@@ -77,6 +110,18 @@ class Candidate
         $this->nom = $nom;
         return $this;
     }
+
+    public function getUser(): ?Users
+    {
+    return $this->user;
+}
+
+public function setUser(Users $user): self
+{
+    $this->user = $user;
+    return $this;
+}
+
 
     public function getPrenom(): ?string
     {
@@ -115,6 +160,26 @@ class Candidate
     public function setAdresse(?string $adresse): static
     {
         $this->adresse = $adresse;
+        return $this;
+    }
+
+    public function getVille(): ?string
+    {
+        return $this->ville;
+    }
+    public function setVille(?string $ville): static
+    {
+        $this->ville = $ville;
+        return $this;
+    }
+
+    public function getCodePostal(): ?string
+    {
+        return $this->codePostal;
+    }
+    public function setCodePostal(?string $codePostal): static
+    {
+        $this->codePostal = $codePostal;
         return $this;
     }
 
@@ -205,6 +270,64 @@ class Candidate
     public function setPassword(string $password): static
     {
         $this->password = $password;
+        return $this;
+    }
+
+    // =====================
+    // Candidacies Relation
+    // =====================
+    /**
+     * @return Collection|Candidacy[]
+     */
+    public function getCandidacies(): Collection
+    {
+        return $this->candidacies;
+    }
+
+    public function addCandidacy(Candidacy $candidacy): static
+    {
+        if (!$this->candidacies->contains($candidacy)) {
+            $this->candidacies->add($candidacy);
+            $candidacy->setCandidate($this);
+        }
+        return $this;
+    }
+
+    public function removeCandidacy(Candidacy $candidacy): static
+    {
+        if ($this->candidacies->removeElement($candidacy)) {
+            if ($candidacy->getCandidate() === $this) {
+                $candidacy->setCandidate(null);
+            }
+        }
+        return $this;
+    }
+
+    // =====================
+    // JobOffers Relation
+    // =====================
+    /**
+     * @return Collection|JobOffer[]
+     */
+    public function getJobOffers(): Collection
+    {
+        return $this->jobOffers;
+    }
+
+    public function addJobOffer(JobOffer $jobOffer): static
+    {
+        if (!$this->jobOffers->contains($jobOffer)) {
+            $this->jobOffers->add($jobOffer);
+            $jobOffer->addCandidate($this);
+        }
+        return $this;
+    }
+
+    public function removeJobOffer(JobOffer $jobOffer): static
+    {
+        if ($this->jobOffers->removeElement($jobOffer)) {
+            $jobOffer->removeCandidate($this);
+        }
         return $this;
     }
 }
