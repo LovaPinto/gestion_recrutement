@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\JobOffer;
 use App\Entity\Company;
 use App\Entity\Department;
+use App\Entity\Users;
 use App\Repository\JobOfferRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -12,7 +13,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Entity\Users;   
 
 final class JobOfferController extends AbstractController
 {
@@ -26,7 +26,6 @@ final class JobOfferController extends AbstractController
     }
 
     /* ===================== PORTAIL ===================== */
-
     #[Route('/portail', name: 'app_job_portail_default')]
     public function portailDefault(Request $request): Response
     {
@@ -51,7 +50,6 @@ final class JobOfferController extends AbstractController
     }
 
     /* ===================== LISTE OFFRES ===================== */
-
     #[Route('/job/offers', name: 'app_job_offer')]
     public function showAllOffers(Request $request, PaginatorInterface $paginator): Response
     {
@@ -68,7 +66,6 @@ final class JobOfferController extends AbstractController
     }
 
     /* ===================== DÉTAIL OFFRE ===================== */
-
     #[Route('/job/offer/{id}', name: 'job_offer_show')]
     public function showJobOfferDetails(JobOffer $jobOffer): Response
     {
@@ -78,8 +75,7 @@ final class JobOfferController extends AbstractController
     }
 
     /* ===================== CRÉATION OFFRE (WIZARD 5 STEPS) ===================== */
-
-      #[Route('/create_job/{step}', name: 'job_offer_create', defaults: ['step' => 1], requirements: ['step' => '\d+'])]
+    #[Route('/create_job/{step}', name: 'job_offer_create', defaults: ['step' => 1], requirements: ['step' => '\d+'])]
     public function create(Request $request, int $step): Response
     {
         $session = $request->getSession();
@@ -90,11 +86,11 @@ final class JobOfferController extends AbstractController
                 case 1:
                     $jobOffer->setTitle($request->request->get('title'));
 
-                    $companyId = (int)$request->request->get('company');
-                    $departmentId = (int)$request->request->get('department');
-
-                    $company = $this->entityManager->getRepository(Company::class)->find($companyId);
-                    $department = $this->entityManager->getRepository(Department::class)->find($departmentId);
+                    // Récupérer les entités existantes
+                    $company = $this->entityManager->getRepository(Company::class)
+                        ->find((int) $request->request->get('company'));
+                    $department = $this->entityManager->getRepository(Department::class)
+                        ->find((int) $request->request->get('department'));
 
                     if (!$company || !$department) {
                         throw new \Exception('Entreprise ou département introuvable.');
@@ -125,22 +121,23 @@ final class JobOfferController extends AbstractController
                     $jobOffer->setStatus($request->request->get('status'));
                     break;
 
-             case 5:
-    $jobOffer->setDateCreation(new \DateTime());
+                case 5:
+                    $jobOffer->setDateCreation(new \DateTime());
 
-    // 🟢 Ajout du user_id 1
-    $user = $this->entityManager->getRepository(Users::class)->find(1);
-    $jobOffer->setUser($user);
+                    // Utilisateur créateur (id = 1 pour exemple)
+                    $user = $this->entityManager->getRepository(Users::class)->find(1);
+                    $jobOffer->setUser($user);
 
-    $this->entityManager->persist($jobOffer);
-    $this->entityManager->flush();
+                    $this->entityManager->persist($jobOffer);
+                    $this->entityManager->flush();
 
-    $session->remove('job_offer');
-    return $this->redirectToRoute('app_job_portail_default');
-
+                    $session->remove('job_offer');
+                    return $this->redirectToRoute('app_job_portail_default');
             }
 
+            // Sauvegarder dans la session pour le wizard
             $session->set('job_offer', $jobOffer);
+
             return $this->redirectToRoute('job_offer_create', ['step' => $step + 1]);
         }
 

@@ -35,17 +35,16 @@ class JobOffer
     #[ORM\JoinColumn(nullable: false)]
     private ?Users $user = null;
 
-    // 🏢 Company
-
-#[ORM\ManyToOne(targetEntity: Company::class)]
+// Company
+#[ORM\ManyToOne(targetEntity: Company::class, cascade: ['persist'])]
 #[ORM\JoinColumn(nullable: false)]
 private ?Company $company = null;
 
+// Department
+#[ORM\ManyToOne(targetEntity: Department::class, cascade: ['persist'])]
+#[ORM\JoinColumn(nullable: false)]
+private ?Department $department = null;
 
-    // 🏬 Department
-    #[ORM\ManyToOne(targetEntity: Department::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Department $department = null;
 
     #[ORM\Column]
     private array $job_skills = [];
