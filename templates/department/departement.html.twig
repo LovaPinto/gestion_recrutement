@@ -1,0 +1,11 @@
+{% extends 'layout/layout_frontend/sidebar.html.twig' %}
+{% set menus = ['dashboard', 'offre','utilisateur','recrutement','departement','candidat'] %}
+{% block title %}Departement{% endblock %}
+
+{% block body %}
+  <div class="page-header">
+      <nav class="breadcrumb">
+        <span><a href="{{ path('connexionDepart') }}"><i class="bi bi-house"></i>Accueil</a></span> &gt; <span>Gestion du departement</span>
+      </nav>
+  </div>
+{% endblock %}

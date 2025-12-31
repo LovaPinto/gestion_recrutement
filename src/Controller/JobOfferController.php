@@ -15,11 +15,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use app\Repository\CompanyRepository;
+use app\Repository\DepartmentRepository;
 
 final class JobOfferController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
     private JobOfferRepository $jobOfferRepository;
+    private CompanyRepository $companyRepository;
+    private DepartmentRepository $departmentRepository;
     private CompanyRepository $companyRepository;
     private DepartmentRepository $departmentRepository;
 
@@ -37,12 +41,12 @@ final class JobOfferController extends AbstractController
 
     /* ===================== PORTAIL CANDIDAT ===================== */
     #[Route('/portail', name: 'app_job_portail_default')]
-    public function portailDefault(Request $request): Response
+    public function portail(Request $request): Response
     {
-        $keyword = $request->query->get('keyword', '');
-        $companyId = $request->query->get('company', '');
+        $keyword      = $request->query->get('keyword', '');
+        $companyId    = $request->query->get('company', '');
         $departmentId = $request->query->get('department', '');
-        $offerType = $request->query->get('offerType', '');
+        $offerType    = $request->query->get('offerType', '');
 
         $jobOffers = $this->jobOfferRepository
             ->findAllByFilter($keyword, $companyId, $departmentId, $offerType);
@@ -65,9 +69,12 @@ final class JobOfferController extends AbstractController
     }
 
     /* ===================== LISTE DES OFFRES (ADMIN) ===================== */
+    /* ===================== LISTE DES OFFRES (ADMIN) ===================== */
     #[Route('/job/offers', name: 'app_job_offer')]
-    public function showAllOffers(Request $request, PaginatorInterface $paginator): Response
-    {
+    public function showAllOffers(
+        Request $request,
+        PaginatorInterface $paginator
+    ): Response {
         $query = $this->jobOfferRepository
             ->createQueryBuilder('o')
             ->orderBy('o.dateCreation', 'DESC')
@@ -85,6 +92,7 @@ final class JobOfferController extends AbstractController
     }
 
     /* ===================== DÉTAIL D’UNE OFFRE ===================== */
+    /* ===================== DÉTAIL D’UNE OFFRE ===================== */
     #[Route('/job/offer/{id}', name: 'job_offer_show')]
     public function showJobOfferDetails(JobOffer $jobOffer): Response
     {
@@ -100,18 +108,33 @@ final class JobOfferController extends AbstractController
         defaults: ['step' => 1],
         requirements: ['step' => '\d+']
     )]
+    /* ===================== CRÉATION OFFRE (WIZARD 5 ÉTAPES) ===================== */
+    #[Route(
+        '/create_job/{step}',
+        name: 'job_offer_create',
+        defaults: ['step' => 1],
+        requirements: ['step' => '\d+']
+    )]
     public function create(Request $request, int $step): Response
     {
-        $session = $request->getSession();
+        $session  = $request->getSession();
         $jobOffer = $session->get('job_offer', new JobOffer());
 
         if ($request->isMethod('POST')) {
 
+
             switch ($step) {
+
 
                 case 1:
                     $jobOffer->setTitle($request->request->get('title'));
 
+                    $company = $this->companyRepository->find(
+                        (int) $request->request->get('company')
+                    );
+                    $department = $this->departmentRepository->find(
+                        (int) $request->request->get('department')
+                    );
                     $company = $this->companyRepository->find(
                         (int) $request->request->get('company')
                     );
@@ -128,6 +151,9 @@ final class JobOfferController extends AbstractController
                     break;
 
                 case 2:
+                    $jobOffer->setDescription(
+                        $request->request->get('description')
+                    );
                     $jobOffer->setDescription(
                         $request->request->get('description')
                     );
@@ -173,6 +199,8 @@ final class JobOfferController extends AbstractController
 
                     $this->entityManager->persist($jobOffer);
                     $this->entityManager->flush();
+                    $this->entityManager->persist($jobOffer);
+                    $this->entityManager->flush();
 
                     $session->remove('job_offer');
 
@@ -181,6 +209,9 @@ final class JobOfferController extends AbstractController
 
             $session->set('job_offer', $jobOffer);
 
+            return $this->redirectToRoute('job_offer_create', [
+                'step' => $step + 1
+            ]);
             return $this->redirectToRoute('job_offer_create', [
                 'step' => $step + 1
             ]);

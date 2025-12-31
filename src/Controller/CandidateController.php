@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Controller;
 
 use App\Entity\Candidate;
@@ -30,11 +29,11 @@ final class CandidateController extends AbstractController
 
     // Dashboard candidat
     #[Route('/dashboard', name: 'candidate_dashboard')]
-   // #[IsGranted('ROLE_CANDIDATE')]
+    // #[IsGranted('ROLE_CANDIDATE')]
     public function dashboard(CandidateRepository $candidateRepository): Response
     {
         $user = $this->getUser();
-        
+
         return $this->render('candidate/dashboard_candidate.html.twig', [
             'candidateStats' => $candidateRepository->findStats($user),
         ]);
@@ -52,10 +51,10 @@ final class CandidateController extends AbstractController
 
     // Création d'un candidat
     #[Route('/new', name: 'app_candidate_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new (Request $request, EntityManagerInterface $entityManager): Response
     {
         $candidate = new Candidate();
-        $form = $this->createForm(CandidateType::class, $candidate);
+        $form      = $this->createForm(CandidateType::class, $candidate);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -68,7 +67,7 @@ final class CandidateController extends AbstractController
 
         return $this->render('candidate/new.html.twig', [
             'candidate' => $candidate,
-            'form' => $form,
+            'form'      => $form,
         ]);
     }
 
@@ -96,7 +95,7 @@ final class CandidateController extends AbstractController
 
         return $this->render('candidate/edit.html.twig', [
             'candidate' => $candidate,
-            'form' => $form,
+            'form'      => $form,
         ]);
     }
 
@@ -104,7 +103,7 @@ final class CandidateController extends AbstractController
     #[Route('/{id}/delete', name: 'app_candidate_delete', methods: ['POST'])]
     public function delete(Request $request, Candidate $candidate, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$candidate->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $candidate->getId(), $request->request->get('_token'))) {
             $entityManager->remove($candidate);
             $entityManager->flush();
             $this->addFlash('success', 'Candidature supprimée!');
