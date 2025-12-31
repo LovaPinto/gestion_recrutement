@@ -15,8 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use app\Repository\CompanyRepository;
-use app\Repository\DepartmentRepository;
+
 
 final class JobOfferController extends AbstractController
 {
@@ -24,8 +23,7 @@ final class JobOfferController extends AbstractController
     private JobOfferRepository $jobOfferRepository;
     private CompanyRepository $companyRepository;
     private DepartmentRepository $departmentRepository;
-    private CompanyRepository $companyRepository;
-    private DepartmentRepository $departmentRepository;
+
 
     public function __construct(
         EntityManagerInterface $entityManager,
