@@ -124,7 +124,7 @@ h2 {
     flex: 1 1 45%;
 }
 
-/* Flash messages */
+
 .flash {
     padding: 12px 20px;
     border-radius: 10px;
@@ -135,7 +135,7 @@ h2 {
 .flash.success { background-color: #4caf50; color: #fff; }
 .flash.error { background-color: #f44336; color: #fff; }
 
-/* Champ date moderne */
+
 .update-form input[type="date"] {
     background: #757272ff;       
     color: #fff;              
@@ -149,7 +149,6 @@ h2 {
     margin-right: 10%;
 }
 
-/* Hover / focus */
 .update-form input[type="date"]:hover,
 .update-form input[type="date"]:focus {
     border-color: #2563eb;   
@@ -157,7 +156,6 @@ h2 {
     outline: none;
 }
 
-/* Placeholder visible en gris */
 .update-form input[type="date"]::placeholder {
     color: #aaa;
     opacity: 1;
@@ -170,19 +168,18 @@ h2 {
     border: 1px solid #ccc;
     padding: 8px 10px;
     font-size: 14px;
-    width: 100%; /* pour aligner avec le select */
+    width: 100%; 
     box-sizing: border-box;
 }
 
-/* rendre le input date plus court */
 .update-form input[name="interview_date"] {
-    width: 150px; /* ou la taille que tu souhaites */
+    width: 150px; 
 }
 
-/* textarea pour décision RH */
+
 .update-form textarea[name="recruiter_note"] {
-    width: 100%; /* même largeur que le select */
-    resize: vertical; /* permet de redimensionner en hauteur seulement */
+    width: 100%; 
+    resize: vertical; 
     min-height: 80px;
 }
 
@@ -197,7 +194,7 @@ h2 {
         {% endfor %}
     {% endfor %}
 
-    <h2>Détail de la candidature n°{{ candidacy.id }} pour l'offre : <span style="color: #295cc4ff;">{{ candidacy.jobOffer.title }}</span></h2>
+    <h2>Détail de la candidature n°{{ candidacy.id }} pour l'offre : <span style="color: #1258e2ff;">{{ candidacy.jobOffer.title }}</span></h2>
 
     <div class="info-row">
         <div>
