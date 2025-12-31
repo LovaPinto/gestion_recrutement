@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\JobOfferRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,7 +16,6 @@ class JobOffer
     #[ORM\Column]
     private ?int $id = null;
 
-    // 🆕 Titre du job
     #[ORM\Column(length: 100)]
     private ?string $title = null;
 
@@ -27,26 +28,23 @@ class JobOffer
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $dateCreation = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $deadline = null;
 
-    // 👤 Créateur de l'offre
     #[ORM\ManyToOne(targetEntity: Users::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?Users $user = null;
 
-// Company
-#[ORM\ManyToOne(targetEntity: Company::class, cascade: ['persist'])]
-#[ORM\JoinColumn(nullable: false)]
-private ?Company $company = null;
+    // ✅ Correction : cascade persist pour éviter l'erreur Doctrine
+    #[ORM\ManyToOne(targetEntity: Company::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
 
-// Department
-#[ORM\ManyToOne(targetEntity: Department::class, cascade: ['persist'])]
-#[ORM\JoinColumn(nullable: false)]
-private ?Department $department = null;
+    #[ORM\ManyToOne(targetEntity: Department::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Department $department = null;
 
-
-    #[ORM\Column]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private array $job_skills = [];
 
     #[ORM\Column(length: 255)]
@@ -55,13 +53,19 @@ private ?Department $department = null;
     #[ORM\Column(length: 255)]
     private ?string $experience_level = null;
 
+    /**
+     * @var Collection<int, Candidacy>
+     */
+    #[ORM\OneToMany(targetEntity: Candidacy::class, mappedBy: 'jobOffer')]
+    private Collection $candidacies;
+
+    public function __construct()
+    {
+        $this->candidacies = new ArrayCollection();
+        $this->job_skills = []; // initialisation sécurisée
+    }
+
     /* ================= GETTERS & SETTERS ================= */
-
-
-    
-
-
-    /////
 
     public function getId(): ?int
     {
@@ -117,7 +121,7 @@ private ?Department $department = null;
         return $this->deadline;
     }
 
-    public function setDeadline(\DateTime $deadline): static
+    public function setDeadline(?\DateTime $deadline): static
     {
         $this->deadline = $deadline;
         return $this;
@@ -156,15 +160,16 @@ private ?Department $department = null;
         return $this;
     }
 
+    // 🔹 JOB SKILLS : getter sécurisé
     public function getJobSkills(): array
     {
-        return $this->job_skills;
+        return $this->job_skills ?? [];
     }
 
-    public function setJobSkills(array $job_skills): static
+    // 🔹 JOB SKILLS : setter sécurisé
+    public function setJobSkills(?array $job_skills): static
     {
-        $this->job_skills = $job_skills;
-
+        $this->job_skills = $job_skills ?? [];
         return $this;
     }
 
@@ -176,7 +181,6 @@ private ?Department $department = null;
     public function setStatus(string $status): static
     {
         $this->status = $status;
-
         return $this;
     }
 
@@ -188,7 +192,33 @@ private ?Department $department = null;
     public function setExperienceLevel(string $experience_level): static
     {
         $this->experience_level = $experience_level;
+        return $this;
+    }
 
+    /**
+     * @return Collection<int, Candidacy>
+     */
+    public function getCandidacies(): Collection
+    {
+        return $this->candidacies;
+    }
+
+    public function addCandidacy(Candidacy $candidacy): static
+    {
+        if (!$this->candidacies->contains($candidacy)) {
+            $this->candidacies->add($candidacy);
+            $candidacy->setJobOffer($this);
+        }
+        return $this;
+    }
+
+    public function removeCandidacy(Candidacy $candidacy): static
+    {
+        if ($this->candidacies->removeElement($candidacy)) {
+            if ($candidacy->getJobOffer() === $this) {
+                $candidacy->setJobOffer(null);
+            }
+        }
         return $this;
     }
 }

@@ -1,0 +1,278 @@
+
+{% block body %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@500;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+     background: url('/images/mise-plat-du-poste-travail-espace-copie-ordinateur-portable_23-2148430879.avif') no-repeat center center fixed;
+    background-size: cover;
+    color: #ffffffff;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 950px;
+    margin: 60px auto;
+    background: transparent background-color: #e2d8d8ff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+}
+
+h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 28px;
+    color: #ffffffff;
+    text-align: center;
+    margin-bottom: 35px;
+    letter-spacing: 0.5px;
+}
+
+.field-label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    color: #000000ff;
+}
+
+.file-link {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 10px 16px;
+    background: #1e1e1e;
+    color: #fff;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: 0.3s;
+    font-weight: 600;
+}
+.file-link:hover {
+    background: #2563eb;
+}
+
+.file-preview {
+    margin-top: 10px;
+    max-width: 100%;
+    max-height: 450px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+.update-form {
+    margin-top: 40px;
+    padding: 25px;
+    background: #444444ff;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.update-form div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.update-form label {
+    color: #fffafaff;
+    font-weight: 600;
+}
+
+.update-form input,
+.update-form textarea,
+.update-form select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    background: #f7f4f4ff;
+    color: #0f0f0fff;
+}
+
+.update-form button {
+    padding: 14px 20px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: 0.3s;
+    text-transform: uppercase;
+    margin-top: 10px;
+ display: block;
+    margin: 0 auto; 
+}
+.update-form button:hover {
+    background: #1d4ed8;
+    transform: scale(1.03);
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+.info-row div {
+    flex: 1 1 45%;
+}
+
+
+.flash {
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-align: center;
+}
+.flash.success { background-color: #4caf50; color: #fff; }
+.flash.error { background-color: #f44336; color: #fff; }
+
+
+.update-form input[type="date"] {
+    background: #757272ff;       
+    color: #fff;              
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 2px solid #444;   
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-right: 10%;
+}
+
+.update-form input[type="date"]:hover,
+.update-form input[type="date"]:focus {
+    border-color: #2563eb;   
+    background: #504e4eff;
+    outline: none;
+}
+
+.update-form input[type="date"]::placeholder {
+    color: #aaa;
+    opacity: 1;
+}
+.update-form select,
+.update-form textarea,
+.update-form input[type="text"],
+.update-form input[type="date"] {
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 8px 10px;
+    font-size: 14px;
+    width: 100%; 
+    box-sizing: border-box;
+}
+
+.update-form input[name="interview_date"] {
+    width: 150px; 
+}
+
+
+.update-form textarea[name="recruiter_note"] {
+    width: 100%; 
+    resize: vertical; 
+    min-height: 80px;
+}
+
+
+</style>
+
+<div class="container">
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash {{ label }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <h2>Détail de la candidature n°{{ candidacy.id }} pour l'offre : <span style="color: #1258e2ff;">{{ candidacy.jobOffer.title }}</span></h2>
+
+    <div class="info-row">
+        <div>
+            <span class="field-label">Date de candidature:</span> 
+            {{ candidacy.dateCandidacy ? candidacy.dateCandidacy|date('d/m/Y') : 'Non définie' }}
+        </div>
+        <div>
+            <span class="field-label">Statut:</span> {{ candidacy.status }}
+        </div>
+    </div>
+
+    <div>
+        <span class="field-label">Portfolio:</span> 
+        {% if candidacy.portfolioLink %}
+            <a href="{{ candidacy.portfolioLink }}" target="_blank">{{ candidacy.portfolioLink }}</a>
+        {% else %}
+            Non disponible
+        {% endif %}
+    </div>
+
+    <div class="cv-section">
+        <span class="field-label">CV :</span><br>
+        {% if candidacy.cvPath %}
+            <a class="file-link" href="{{ path('candidacy_file', {'id': candidacy.id, 'type':'cv'}) }}" target="_blank">
+                Voir / Télécharger le CV
+            </a>
+        {% else %}
+            Aucune CV
+        {% endif %}
+    </div>
+
+    <div class="attachement-section">
+        <span class="field-label">Pièce jointe :</span><br>
+        {% if candidacy.attachement %}
+            <a class="file-link" href="{{ path('candidacy_file', {'id': candidacy.id, 'type':'attachement'}) }}" target="_blank">
+                Voir / Télécharger
+            </a>
+        {% else %}
+            Aucune pièce jointe
+        {% endif %}
+    </div>
+
+    <div class="update-form">
+        <form method="POST" action="{{ path('candidacy_update', {'id': candidacy.id}) }}">
+            <div>
+                <label>Statut du candidature</label>
+                <select name="status">
+                    <option value="vue" {{ candidacy.status == 'vue' ? 'selected' : '' }}>vue</option>
+                    <option value="invité à une entretien" {{ candidacy.status == 'invité à une entretien' ? 'selected' : '' }}>Invité à une entretien</option>
+                    <option value="rejetée" {{ candidacy.status == 'rejetée' ? 'selected' : '' }}>Rejetée</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Note RH / Département</label>
+                <textarea name="recruiter_note" rows="4" placeholder="Ajouter une note...">{{ candidacy.recruiterNote }}</textarea>
+            </div>
+
+            <div>
+                <label>Date d'entretien</label>
+                <input type="text" id="interview_date" name="interview_date">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+flatpickr("#interview_date", {
+    dateFormat: "Y-m-d",
+    wrap: false,
+    allowInput: true,
+    defaultDate: "{{ candidacy.interviewDate ? candidacy.interviewDate|date('Y-m-d') : '' }}",
+    locale: "fr" 
+});
+</script>
+
+            </div>
+
+            <button type="submit">Mettre à jour la candidature</button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

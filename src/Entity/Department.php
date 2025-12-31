@@ -16,7 +16,8 @@ class Department
     #[ORM\Column(length: 50)]
     private ?string $departmentName = null;
 
-    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'departments')]
+    // ✅ Ajout cascade persist pour éviter l'erreur Doctrine
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'departments', cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
     
@@ -28,7 +29,6 @@ class Department
     public function setId(int $id): static
     {
         $this->id = $id;
-
         return $this;
     }
 
@@ -40,7 +40,6 @@ class Department
     public function setDepartmentName(string $departmentName): static
     {
         $this->departmentName = $departmentName;
-
         return $this;
     }
 
@@ -52,7 +51,6 @@ class Department
     public function setCompany(?Company $company): static
     {
         $this->company = $company;
-
         return $this;
     }
 }
