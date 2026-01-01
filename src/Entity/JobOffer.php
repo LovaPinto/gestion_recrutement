@@ -11,10 +11,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: JobOfferRepository::class)]
 class JobOffer
 {
-    /* =======================
-       ATTRIBUTS
-    ======================= */
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -35,23 +31,11 @@ class JobOffer
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $deadline = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $experience_level = null;
-
-    #[ORM\Column(type: Types::JSON, nullable: true)]
-    private array $job_skills = [];
-
-    /* =======================
-       RELATIONS
-    ======================= */
-
     #[ORM\ManyToOne(targetEntity: Users::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?Users $user = null;
 
+    // ✅ Correction : cascade persist pour éviter l'erreur Doctrine
     #[ORM\ManyToOne(targetEntity: Company::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
@@ -60,31 +44,43 @@ class JobOffer
     #[ORM\JoinColumn(nullable: false)]
     private ?Department $department = null;
 
-    #[ORM\OneToMany(mappedBy: 'jobOffer', targetEntity: Candidacy::class, orphanRemoval: true)]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private array $job_skills = [];
+
+    #[ORM\Column(length: 255)]
+    private ?string $status = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $experience_level = null;
+
+    /**
+     * @var Collection<int, Candidacy>
+     */
+    #[ORM\OneToMany(targetEntity: Candidacy::class, mappedBy: 'jobOffer')]
     private Collection $candidacies;
-
-    #[ORM\ManyToMany(targetEntity: Candidate::class, inversedBy: 'jobOffers')]
-    #[ORM\JoinTable(name: 'job_offer_candidate')]
-    private Collection $candidates;
-
-    /* =======================
-       CONSTRUCTEUR
-    ======================= */
 
     public function __construct()
     {
         $this->candidacies = new ArrayCollection();
-        $this->candidates  = new ArrayCollection();
-        $this->job_skills  = [];
+        $this->job_skills = []; // initialisation sécurisée
     }
 
-    /* =======================
-       GETTERS & SETTERS
-    ======================= */
+    /* ================= GETTERS & SETTERS ================= */
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
+        return $this;
     }
 
     public function getOfferType(): ?string
@@ -136,31 +132,72 @@ class JobOffer
         return $this->user;
     }
 
-    public function setUser(?Users $user): static
+    public function setUser(Users $user): static
     {
         $this->user = $user;
         return $this;
     }
 
-    /* =======================
-       JOB SKILLS
-    ======================= */
-
-    public function getJobSkills(): array
+    public function getCompany(): ?Company
     {
-        return $this->job_skills;
+        return $this->company;
     }
 
+    public function setCompany(Company $company): static
+    {
+        $this->company = $company;
+        return $this;
+    }
+
+    public function getDepartment(): ?Department
+    {
+        return $this->department;
+    }
+
+    public function setDepartment(Department $department): static
+    {
+        $this->department = $department;
+        return $this;
+    }
+
+    // 🔹 JOB SKILLS : getter sécurisé
+    public function getJobSkills(): array
+    {
+        return $this->job_skills ?? [];
+    }
+
+    // 🔹 JOB SKILLS : setter sécurisé
     public function setJobSkills(?array $job_skills): static
     {
         $this->job_skills = $job_skills ?? [];
         return $this;
     }
 
-    /* =======================
-       CANDIDACIES
-    ======================= */
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
 
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    public function getExperienceLevel(): ?string
+    {
+        return $this->experience_level;
+    }
+
+    public function setExperienceLevel(string $experience_level): static
+    {
+        $this->experience_level = $experience_level;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Candidacy>
+     */
     public function getCandidacies(): Collection
     {
         return $this->candidacies;
@@ -182,58 +219,6 @@ class JobOffer
                 $candidacy->setJobOffer(null);
             }
         }
-        return $this;
-    }
-
-    /* =======================
-       CANDIDATES
-    ======================= */
-
-    public function getCandidates(): Collection
-    {
-        return $this->candidates;
-    }
-
-    public function addCandidate(Candidate $candidate): static
-    {
-        if (!$this->candidates->contains($candidate)) {
-            $this->candidates->add($candidate);
-            $candidate->addJobOffer($this);
-        }
-        return $this;
-    }
-
-    public function removeCandidate(Candidate $candidate): static
-    {
-        if ($this->candidates->removeElement($candidate)) {
-            $candidate->removeJobOffer($this);
-        }
-        return $this;
-    }
-
-    /* =======================
-       STATUS & EXPERIENCE
-    ======================= */
-
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): static
-    {
-        $this->status = $status;
-        return $this;
-    }
-
-    public function getExperienceLevel(): ?string
-    {
-        return $this->experience_level;
-    }
-
-    public function setExperienceLevel(string $experience_level): static
-    {
-        $this->experience_level = $experience_level;
         return $this;
     }
 }

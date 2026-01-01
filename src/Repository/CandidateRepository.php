@@ -5,8 +5,6 @@ namespace App\Repository;
 use App\Entity\Candidate;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\NonUniqueResultException;
-use App\Entity\Users;
 
 /**
  * @extends ServiceEntityRepository<Candidate>
@@ -42,30 +40,4 @@ class CandidateRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
-    public function findStats(Users $user): array
-    {
-        $qb = $this->createQueryBuilder('c');
-
-        try {
-            // Exemple : compter le nombre de candidatures "Nouveau" pour ce candidat
-            $newApplications = $qb->select('COUNT(c.id)')
-                ->where('c.user = :user')
-                ->andWhere('c.status = :status')
-                ->setParameter('user', $user)
-                ->setParameter('status', 'Nouveau')
-                ->getQuery()
-                ->getSingleScalarResult();
-        } catch (NonUniqueResultException $e) {
-            $newApplications = 0;
-        }
-
-        // Tu peux ajouter d’autres stats ici, exemple "En attente", "Rejeté", etc.
-        $stats = [
-            'newApplications' => (int) $newApplications,
-            // 'pendingApplications' => ...,
-            // 'rejectedApplications' => ...,
-        ];
-
-        return $stats;
-    }
 }
