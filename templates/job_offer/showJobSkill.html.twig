@@ -236,7 +236,8 @@
     </div>
 
     <!-- BOUTON POSTULER -->
-    <a href="#" class="apply-btn">Postuler</a>
+<a href="{{ path('job_apply', {id: jobOffer.id}) }}" class="apply-btn">Postuler</a>
+
 
 </div>
 {% endblock %}

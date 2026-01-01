@@ -16,7 +16,6 @@ class JobOffer
     #[ORM\Column]
     private ?int $id = null;
 
-    // 🆕 Titre du job
     #[ORM\Column(length: 100)]
     private ?string $title = null;
 
@@ -29,31 +28,44 @@ class JobOffer
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $dateCreation = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $deadline = null;
 
-    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: 'jobOffers')]
+    #[ORM\ManyToOne(targetEntity: Users::class)]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Users $user = null;
 
-    #[ORM\OneToMany(mappedBy: 'jobOffer', targetEntity: Candidacy::class, orphanRemoval: true)]
+    // ✅ Correction : cascade persist pour éviter l'erreur Doctrine
+    #[ORM\ManyToOne(targetEntity: Company::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
+
+    #[ORM\ManyToOne(targetEntity: Department::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Department $department = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private array $job_skills = [];
+
+    #[ORM\Column(length: 255)]
+    private ?string $status = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $experience_level = null;
+
+    /**
+     * @var Collection<int, Candidacy>
+     */
+    #[ORM\OneToMany(targetEntity: Candidacy::class, mappedBy: 'jobOffer')]
     private Collection $candidacies;
 
-    #[ORM\ManyToMany(targetEntity: Candidate::class, inversedBy: 'jobOffers')]
-    #[ORM\JoinTable(name: 'job_offer_candidate')]
-    private Collection $candidates;
-
-    // =====================
-    // Constructor
-    // =====================
     public function __construct()
     {
         $this->candidacies = new ArrayCollection();
-        $this->candidates = new ArrayCollection();
+        $this->job_skills = []; // initialisation sécurisée
     }
 
-    // =====================
-    // Getters & Setters
-    // =====================
+    /* ================= GETTERS & SETTERS ================= */
 
     public function getId(): ?int
     {
@@ -98,7 +110,7 @@ class JobOffer
         return $this->deadline;
     }
 
-    public function setDeadline(\DateTime $deadline): static
+    public function setDeadline(?\DateTime $deadline): static
     {
         $this->deadline = $deadline;
         return $this;
@@ -145,6 +157,7 @@ class JobOffer
         return $this;
     }
 
+<<<<<<< HEAD
     // =====================
     // Candidates Relation
     // =====================
@@ -162,14 +175,42 @@ class JobOffer
             $this->candidates->add($candidate);
             $candidate->addJobOffer($this);
         }
+=======
+    // 🔹 JOB SKILLS : getter sécurisé
+    public function getJobSkills(): array
+    {
+        return $this->job_skills ?? [];
+    }
+
+    // 🔹 JOB SKILLS : setter sécurisé
+    public function setJobSkills(?array $job_skills): static
+    {
+        $this->job_skills = $job_skills;
+
+        return $this;
+    }
+
+    public function addCandidate(Candidate $candidate): static
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
+
         return $this;
     }
 
     public function removeCandidate(Candidate $candidate): static
     {
-        if ($this->candidates->removeElement($candidate)) {
-            $candidate->removeJobOffer($this);
-        }
+        return $this->experience_level;
+    }
+
+    public function setExperienceLevel(string $experience_level): static
+    {
+        $this->experience_level = $experience_level;
+
         return $this;
     }
 }
