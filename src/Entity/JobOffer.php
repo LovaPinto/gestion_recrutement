@@ -11,6 +11,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: JobOfferRepository::class)]
 class JobOffer
 {
+    /* =======================
+       ATTRIBUTS
+    ======================= */
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -31,34 +35,23 @@ class JobOffer
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $deadline = null;
 
-    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: 'jobOffers')]
-    private ?Users $user = null;
+    #[ORM\Column(length: 255)]
+    private ?string $status = null;
 
-    #[ORM\OneToMany(mappedBy: 'jobOffer', targetEntity: Candidacy::class, orphanRemoval: true)]
-    private Collection $candidacies;
+    #[ORM\Column(length: 255)]
+    private ?string $experience_level = null;
 
-    #[ORM\ManyToMany(targetEntity: Candidate::class, inversedBy: 'jobOffers')]
-    #[ORM\JoinTable(name: 'job_offer_candidate')]
-    private Collection $candidates;
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private array $job_skills = [];
 
-    // =====================
-    // Constructor
-    // =====================
-    public function __construct()
-    {
-        $this->candidacies = new ArrayCollection();
-        $this->candidates = new ArrayCollection();
-    }
-
-    // =====================
-    // Getters & Setters
-    // =====================
+    /* =======================
+       RELATIONS
+    ======================= */
 
     #[ORM\ManyToOne(targetEntity: Users::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?Users $user = null;
 
-    // ✅ Correction : cascade persist pour éviter l'erreur Doctrine
     #[ORM\ManyToOne(targetEntity: Company::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
@@ -67,28 +60,27 @@ class JobOffer
     #[ORM\JoinColumn(nullable: false)]
     private ?Department $department = null;
 
-    #[ORM\Column(type: Types::JSON, nullable: true)]
-    private array $job_skills = [];
-
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $experience_level = null;
-
-    /**
-     * @var Collection<int, Candidacy>
-     */
-    #[ORM\OneToMany(targetEntity: Candidacy::class, mappedBy: 'jobOffer')]
+    #[ORM\OneToMany(mappedBy: 'jobOffer', targetEntity: Candidacy::class, orphanRemoval: true)]
     private Collection $candidacies;
+
+    #[ORM\ManyToMany(targetEntity: Candidate::class, inversedBy: 'jobOffers')]
+    #[ORM\JoinTable(name: 'job_offer_candidate')]
+    private Collection $candidates;
+
+    /* =======================
+       CONSTRUCTEUR
+    ======================= */
 
     public function __construct()
     {
         $this->candidacies = new ArrayCollection();
-        $this->job_skills = []; // initialisation sécurisée
+        $this->candidates  = new ArrayCollection();
+        $this->job_skills  = [];
     }
 
-    /* ================= GETTERS & SETTERS ================= */
+    /* =======================
+       GETTERS & SETTERS
+    ======================= */
 
     public function getId(): ?int
     {
@@ -150,12 +142,25 @@ class JobOffer
         return $this;
     }
 
-    // =====================
-    // Candidacies Relation
-    // =====================
-    /**
-     * @return Collection|Candidacy[]
-     */
+    /* =======================
+       JOB SKILLS
+    ======================= */
+
+    public function getJobSkills(): array
+    {
+        return $this->job_skills;
+    }
+
+    public function setJobSkills(?array $job_skills): static
+    {
+        $this->job_skills = $job_skills ?? [];
+        return $this;
+    }
+
+    /* =======================
+       CANDIDACIES
+    ======================= */
+
     public function getCandidacies(): Collection
     {
         return $this->candidacies;
@@ -180,13 +185,10 @@ class JobOffer
         return $this;
     }
 
+    /* =======================
+       CANDIDATES
+    ======================= */
 
-    // =====================
-    // Candidates Relation
-    // =====================
-    /**
-     * @return Collection|Candidate[]
-     */
     public function getCandidates(): Collection
     {
         return $this->candidates;
@@ -198,33 +200,29 @@ class JobOffer
             $this->candidates->add($candidate);
             $candidate->addJobOffer($this);
         }
-
-    // 🔹 JOB SKILLS : getter sécurisé
-    public function getJobSkills(): array
-    {
-        return $this->job_skills ?? [];
-    }
-
-    // 🔹 JOB SKILLS : setter sécurisé
-    public function setJobSkills(?array $job_skills): static
-    {
-        $this->job_skills = $job_skills ?? [];
         return $this;
     }
 
     public function removeCandidate(Candidate $candidate): static
     {
-
         if ($this->candidates->removeElement($candidate)) {
             $candidate->removeJobOffer($this);
+        }
+        return $this;
+    }
 
+    /* =======================
+       STATUS & EXPERIENCE
+    ======================= */
+
+    public function getStatus(): ?string
+    {
         return $this->status;
     }
 
     public function setStatus(string $status): static
     {
         $this->status = $status;
-
         return $this;
     }
 
@@ -236,60 +234,6 @@ class JobOffer
     public function setExperienceLevel(string $experience_level): static
     {
         $this->experience_level = $experience_level;
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Candidacy>
-     */
-    public function getCandidacies(): Collection
-    {
-        return $this->candidacies;
-    }
-
-    public function addCandidacy(Candidacy $candidacy): static
-    {
-        if (!$this->candidacies->contains($candidacy)) {
-            $this->candidacies->add($candidacy);
-            $candidacy->setJobOffer($this);
-        }
-        return $this;
-    }
-
-    public function removeCandidacy(Candidacy $candidacy): static
-    {
-        if ($this->candidacies->removeElement($candidacy)) {
-            if ($candidacy->getJobOffer() === $this) {
-                $candidacy->setJobOffer(null);
-            }
-        }
-        return $this;
-    }
-
-    /* ================= CANDIDATES RELATION ================= */
-
-    /**
-     * @return Collection|Candidate[]
-     */
-    public function getCandidates(): Collection
-    {
-        return $this->candidates;
-    }
-
-    public function addCandidate(Candidate $candidate): static
-    {
-        if (!$this->candidates->contains($candidate)) {
-            $this->candidates->add($candidate);
-            $candidate->addJobOffer($this);
-        }
-        return $this;
-    }
-
-    public function removeCandidate(Candidate $candidate): static
-    {
-        if ($this->candidates->removeElement($candidate)) {
-            $candidate->removeJobOffer($this);
-        }
         return $this;
     }
 }
