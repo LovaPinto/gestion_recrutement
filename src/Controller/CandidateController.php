@@ -2,13 +2,16 @@
 namespace App\Controller;
 
 use App\Entity\Candidate;
+use App\Entity\Users;
 use App\Form\CandidateType;
 use App\Repository\CandidateRepository;
+use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 #[Route('/candidate')]
 final class CandidateController extends AbstractController
@@ -20,28 +23,57 @@ final class CandidateController extends AbstractController
         return $this->render('candidate/Portail_candidate.html.twig');
     }
 
-    // Login candidat
-    #[Route('/login', name: 'app_candidate_login')]
-    public function login(): Response
-    {
-        return $this->render('candidate/login_candidate.html.twig');
+   #[Route('/login', name: 'app_candidate_login', methods: ['GET','POST'])]
+public function login(Request $request, UsersRepository $usersRepository): Response
+{
+    $error = null;
+
+    if ($request->isMethod('POST')) {
+        $email    = $request->request->get('email');
+        $password = $request->request->get('password');
+
+        $user = $usersRepository->findOneBy(['email' => $email]);
+
+        if (!$user || $user->getPassword() !== $password) {
+            $error = "Email ou mot de passe incorrect";
+        } else {
+            // Stocke le candidat connecté dans la session
+            $session = $request->getSession();
+            $session->set('candidat', $user);
+
+            return $this->redirectToRoute('candidate_dashboard');
+        }
     }
+
+    return $this->render('candidate/login_candidate.html.twig', [
+        'error' => $error,
+    ]);
+}
 
     // Dashboard candidat
-    #[Route('/dashboard', name: 'candidate_dashboard')]
-    // #[IsGranted('ROLE_CANDIDATE')]
-    public function dashboard(CandidateRepository $candidateRepository): Response
-    {
-        $user = $this->getUser();
+#[Route('/dashboard', name: 'candidate_dashboard')]
+public function dashboard(CandidateRepository $candidateRepository, Request $request): Response
+{
+    $user = $this->getUserConnecte($request); // utilisateur connecté via session
 
-        return $this->render('candidate/dashboard_candidate.html.twig', [
-            'candidateStats' => $candidateRepository->findStats($user),
-        ]);
+    if (!$user) {
+        return $this->redirectToRoute('app_candidate_login');
     }
+
+    // Ici, tu peux récupérer le Candidate correspondant au Users connecté
+    $candidate = $candidateRepository->findOneBy(['id' => $user->getId()]); 
+
+    return $this->render('candidate/dashboard_candidate.html.twig', [
+        'candidateStats' => $candidateRepository->findStats($user),
+        'candidate' => $candidate,
+    ]);
+}
+
+
+
 
     // Liste des candidats
     #[Route('/', name: 'app_candidate_index', methods: ['GET'])]
-    //#[IsGranted('ROLE_ADMIN')]
     public function index(CandidateRepository $candidateRepository): Response
     {
         return $this->render('candidate/index.html.twig', [
@@ -51,10 +83,10 @@ final class CandidateController extends AbstractController
 
     // Création d'un candidat
     #[Route('/new', name: 'app_candidate_new', methods: ['GET', 'POST'])]
-    public function new (Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $candidate = new Candidate();
-        $form      = $this->createForm(CandidateType::class, $candidate);
+        $form = $this->createForm(CandidateType::class, $candidate);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -67,7 +99,7 @@ final class CandidateController extends AbstractController
 
         return $this->render('candidate/new.html.twig', [
             'candidate' => $candidate,
-            'form'      => $form,
+            'form' => $form,
         ]);
     }
 
@@ -95,7 +127,7 @@ final class CandidateController extends AbstractController
 
         return $this->render('candidate/edit.html.twig', [
             'candidate' => $candidate,
-            'form'      => $form,
+            'form' => $form,
         ]);
     }
 
@@ -111,4 +143,11 @@ final class CandidateController extends AbstractController
 
         return $this->redirectToRoute('candidate_dashboard');
     }
+    //userconnécté
+private function getUserConnecte(Request $request): ?\App\Entity\Users
+{
+    $session = $request->getSession();
+    return $session->get('candidat', null);
+}
+
 }
