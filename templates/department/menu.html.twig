@@ -1,50 +1,50 @@
 <aside class="sidebar">
-  <h2 class="brand">Nextwork</h2>
 
-  <div class="search-box">
-    <input type="text" placeholder="Search…" />
-    <i class="icon-search">🔍</i>
-  </div>
+<h2 class="brand">Nextwork</h2>
 
-  <nav class="menu">
+<nav class="menu">
+
+    {% if 'dashboard' in menus %}
     <a href="#">
-      <i class="bx bxs-dashboard"></i>
-      <span>Tableau de bord</span>
+        <i class="bx bxs-dashboard"></i>
+        <span>Tableau de bord</span>
     </a>
+    {% endif %}
 
-    <a href="#" class="active" aria-current="page">
-      <i class="bi bi-building"></i>
-      <span>Gestion des départements</span>
+    {% if 'departement' in menus %}
+    <a href="{{ path('app_department_ajout') }}">
+        <i class="bi bi-buildings-fill"></i>
+        <span>Gestion des départements</span>
     </a>
+    {% endif %}
 
+    {% if 'recrutement' in menus %}
     <a href="#">
-      <i class="bx bxs-user bx-flip-horizontal"></i>
-      <span>Gestion candidats</span>
+        <i class="bi bi-person-fill"></i>
+        <span>Demande de recrutement</span>
     </a>
+    {% endif %}
 
-    <a href="#">
-      <i class="bx bxs-briefcase-alt-2 bx-flip-horizontal"></i>
-      <span>Offres d’emploi</span>
+    {% if 'offre' in menus %}
+    <a href="ajoutOffre">
+        <i class="bx bxs-briefcase-alt-2"></i>
+        <span>Offres d’emploi</span>
     </a>
+    {% endif %}
 
-    <a href="#">
-      <i class="bx bxs-group bx-flip-horizontal"></i>
-      <span>Gestion des utilisateurs</span>
+    {% if 'utilisateur' in menus %}
+    <a href="{{ path('add_users') }}">
+        <i class="bx bxs-group"></i>
+        <span>Gestion des utilisateurs</span>
     </a>
+    {% endif %}
 
-    <a href="#">
-      <i class="bi bi-person-badge"></i>
-      <span>Demande de recrutement</span>
+     {% if 'candidat' in menus %}
+    <a href="{{ path('suivieCandidate') }}">
+        <i class="bi bi-person-lines-fill me-2"></i> 
+        <span>Gestion des candidats</span>
     </a>
+    {% endif %}
 
-    
-
-    
-
-    
-
-    
-
-    
-  </nav>
+</nav>
 </aside>

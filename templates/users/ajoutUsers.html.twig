@@ -1,0 +1,24 @@
+{% extends 'layout/layout_frontend/sidebar.html.twig' %}
+{% set menus = ['dashboard', 'offre','utilisateur','departement','candidat'] %}
+{% block title %} Gestion de companie {%  endblock %}
+
+{% block body %}
+    <div class="page-header">
+      <nav class="breadcrumb">
+        <span>Accueil</span> &gt; <span>Gestion d'utilisateur</span>
+      </nav>
+    </div>
+    <form class ="diff">
+        <div class="page-actions">
+            <h2> Gestion d'utilisateur</h2>
+            <a href="{{ path('users_add') }}" class="btn-add-users">Ajouter un utilisateur</a>
+
+        </div>
+    </form>
+     {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+ 
+{% endblock %}

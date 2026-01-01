@@ -27,18 +27,18 @@ final class CandidateController extends AbstractController
     }
 
 
-#[Route('/dashboard', name: 'app_candidate_dashboard')]
-public function dashboard(
-    CandidateRepository $candidateRepository
-): Response {
-    $candidate = $candidateRepository->findOneBy([
-        'user' => $this->getUser()
-    ]);
+    #[Route('/dashboard', name: 'app_candidate_dashboard')]
+    public function dashboard(
+        CandidateRepository $candidateRepository
+    ): Response {
+        $candidate = $candidateRepository->findOneBy([
+            'user' => $this->getUser()
+        ]);
 
-    return $this->render('candidate/dashboard.html.twig', [
-        'candidate' => $candidate,
-    ]);
-}
+        return $this->render('candidate/dashboard.html.twig', [
+            'candidate' => $candidate,
+        ]);
+    }
 
 
 
@@ -92,7 +92,7 @@ public function dashboard(
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $candidate = new Candidate();
-        $form = $this->createForm(CandidateType::class, $candidate);
+        $form      = $this->createForm(CandidateType::class, $candidate);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -108,7 +108,7 @@ public function dashboard(
         ]);
     }
 
-        #[Route('/login', name: 'app_login')]
+    #[Route('/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         // Si l'utilisateur est déjà connecté, rediriger vers le dashboard
@@ -118,7 +118,7 @@ public function dashboard(
 
         // Récupérer l'erreur de connexion s'il y en a une
         $error = $authenticationUtils->getLastAuthenticationError();
-        
+
         // Dernier nom d'utilisateur saisi
         $lastUsername = $authenticationUtils->getLastUsername();
 
@@ -159,6 +159,8 @@ public function dashboard(
             $entityManager->remove($candidate);
             $entityManager->flush();
             $this->addFlash('success', 'Candidat supprimé');
+        } else {
+            $this->addFlash('error', 'Jeton CSRF invalide');
         }
 
         return $this->redirectToRoute('app_candidate_index');

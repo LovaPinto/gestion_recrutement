@@ -21,11 +21,12 @@ class Company
     #[ORM\Column(length: 100)]
     private ?string $localisation = null;
 
-    /**
+       /**
      * @var Collection<int, Department>
      */
-    #[ORM\OneToMany(targetEntity: Department::class, mappedBy: 'Company')]
+    #[ORM\OneToMany(targetEntity: Department::class, mappedBy: 'company')]
     private Collection $departments;
+
 
     public function __construct()
     {
@@ -55,7 +56,7 @@ class Company
 
         return $this;
     }
-
+    
     public function getLocalisation(): ?string
     {
         return $this->localisation;

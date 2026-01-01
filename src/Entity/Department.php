@@ -16,9 +16,10 @@ class Department
     #[ORM\Column(length: 50)]
     private ?string $departmentName = null;
 
-    #[ORM\ManyToOne(inversedBy: 'departments')]
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'departments')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
-
+    
     public function getId(): ?int
     {
         return $this->id;

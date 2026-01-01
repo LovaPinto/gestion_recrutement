@@ -16,10 +16,14 @@ class JobOffer
     #[ORM\Column]
     private ?int $id = null;
 
+    // 🆕 Titre du job
+    #[ORM\Column(length: 100)]
+    private ?string $title = null;
+
     #[ORM\Column(length: 50)]
     private ?string $offerType = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]

@@ -7,7 +7,7 @@
 }
 
 :root{
-  /* Palette proche de la capture */
+  /* Palette */
   --bg-app: #f5f6fa;
   --bg-surface: #ffffff;
   --text: #0f172a;
@@ -23,7 +23,7 @@
   --sb-active: rgba(255,255,255,0.12);
 
   /* Boutons */
-  --primary: #0f172a;      /* bouton sombre comme sur la capture */
+  --primary: #0f172a;     
   --primary-hover: #111827;
   --light: #f3f4f6;
   --light-hover: #e5e7eb;
@@ -45,67 +45,77 @@
 /* ========== SIDEBAR ========== */
 .sidebar {
   width: 260px;
-  background: var(--sb-bg);
-  color: var(--sb-text);
-  padding: 20px 16px;
+  background-color: #f8f9fa;
+  color: black;
+  padding: 0;                /* IMPORTANT */
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  position: fixed;
+  
 }
 
 .brand {
-  font-size: 22px;
-  font-weight: 700;
+  height: 64px;              /* même hauteur que .header */
+  width: 100%;
+  background: #000;
   color: #fff;
-  background: transparent;
-  padding: 12px 10px 6px 10px;
-  margin: 0 4px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  padding-left: 69px;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;                 /* enlève l'espace par défaut du h2 */
 }
 
 /* SEARCH BOX dans la sidebar */
 .search-box {
   position: relative;
-  margin: 6px 4px 2px 4px;
+  margin: 14px 4px 2px 4px;
+  background-color: #b1aeaed4;
+  border-radius: 20px
 }
 .search-box input {
   width: 100%;
   height: 38px;
   padding: 8px 36px 8px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.08);
-  color: #fff;
+  border: 1px solid rgba(10, 9, 9, 0.742);
+  background: rgba(7, 6, 6, 0.731);
+  color: #060606;
   font-size: 14px;
   outline: none;
 }
-.search-box input::placeholder{ color: rgba(255,255,255,0.7); }
+.search-box input::placeholder{ color: rgba(0, 0, 0, 0.7); }
 .icon-search {
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 16px;
-  color: rgba(255,255,255,0.8);
+  color: rgba(8, 8, 8, 0.8);
 }
+  
 
 /* MENU */
 .menu {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-top: 8px;
+  margin-top: 40px;
+  color: #0f172a;
+  
+  
 }
 .menu a {
   padding: 10px 12px;
-  color: var(--sb-text);
+  color: black;
   text-decoration: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 15px;
   display: flex;
+  margin-left: 15px;
   align-items: center;
+  font-weight: 400;
   gap: 10px;
   transition: background .18s ease, color .18s ease;
 }
@@ -131,6 +141,7 @@
   padding: 0 20px;
   border-bottom: 1px solid var(--border);
   box-shadow: var(--shadow);
+  margin-left: 250px;
 }
 .header-left{
   display: flex;
@@ -141,6 +152,13 @@
   font-size: 18px;
   font-weight: 600;
   color: var(--text);
+
+}
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f172a;      /* bleu/noir moderne */
+  margin-bottom: 16px;
 }
 
 /* Header right */
@@ -354,6 +372,7 @@
   transition: background .18s ease, color .18s ease;
   line-height: 1;
   white-space: nowrap;
+  color: black;
 }
 
 .menu a .bx {
@@ -362,16 +381,17 @@
   min-width: 22px;
   text-align: center;
   opacity: .95;
-  color: #e5e7eb;
+  color: #000000;
 }
 
 .menu a:hover {
-  background: var(--sb-hover);
+  background: black;
   color: #fff;
 }
 
 .menu a:hover .bx {
   color: #fff;
+  background: #000000;
 }
 
 /* État actif de l’élément courant */
