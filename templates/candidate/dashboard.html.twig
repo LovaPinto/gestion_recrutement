@@ -1,0 +1,206 @@
+{% extends 'candidate/menu.html.twig' %}
+
+{% block title %}Dashboard - Candidat{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <!-- Card 1: Nombre de candidatures -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <h3 class="stat-title">Nombre de candidatures</h3>
+                <button class="stat-refresh">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">{{ totalCandidatures ?? 0 }}</div>
+                <div class="stat-label">Candidatures</div>
+            </div>
+            <div class="stat-footer">
+                <span class="stat-subtitle">Total des candidatures créées</span>
+                <span class="stat-trend positive">
+                    <i class="fas fa-arrow-up"></i> +36.5%
+                </span>
+            </div>
+        </div>
+
+        <!-- Card 2: Candidatures en attente -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <h3 class="stat-title">Candidatures en attente</h3>
+                <button class="stat-refresh">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">{{ enAttente ?? 0 }}</div>
+                <div class="stat-label">Candidatures</div>
+            </div>
+            <div class="stat-footer">
+                <span class="stat-subtitle">Total des candidatures en attente</span>
+                <span class="stat-trend negative">
+                    <i class="fas fa-arrow-down"></i> -3.5%
+                </span>
+            </div>
+        </div>
+
+        <!-- Card 3: Candidatures en validation -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <h3 class="stat-title">Candidatures en validation</h3>
+                <button class="stat-refresh">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">{{ enValidation ?? 0 }}</div>
+                <div class="stat-label">Candidatures</div>
+            </div>
+            <div class="stat-footer">
+                <span class="stat-subtitle">Total des candidatures en validation</span>
+                <span class="stat-trend positive">
+                    <i class="fas fa-arrow-up"></i> +36.5%
+                </span>
+            </div>
+        </div>
+
+        <!-- Card 4: Candidatures acceptées -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <h3 class="stat-title">Candidatures acceptées</h3>
+                <button class="stat-refresh">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">{{ acceptees ?? 0 }}</div>
+                <div class="stat-label">Candidatures</div>
+            </div>
+            <div class="stat-footer">
+                <span class="stat-subtitle">Total des candidatures acceptées</span>
+                <span class="stat-trend positive">
+                    <i class="fas fa-arrow-up"></i> +36.5%
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des candidatures -->
+    <div class="candidatures-section">
+        <h2 class="section-title">Liste de mes candidatures</h2>
+
+        <!-- Search and Filters -->
+        <div class="search-filter-bar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search Jobs and keywords" class="search-input">
+                <button class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Statut</label>
+                    <select class="filter-select">
+                        <option>Sélectionner</option>
+                        <option>En attente</option>
+                        <option>En validation</option>
+                        <option>Acceptée</option>
+                        <option>Refusée</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Département</label>
+                    <select class="filter-select">
+                        <option>Sélectionner</option>
+                        <option>Informatique</option>
+                        <option>RH</option>
+                        <option>Marketing</option>
+                        <option>Finance</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Contact type</label>
+                    <select class="filter-select">
+                        <option>Sélectionner</option>
+                        <option>Email</option>
+                        <option>Téléphone</option>
+                        <option>LinkedIn</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table or Empty State -->
+        <div class="candidatures-content">
+            {% if candidatures is defined and candidatures|length > 0 %}
+                <table class="candidatures-table">
+                    <thead>
+                        <tr>
+                            <th>Entreprise</th>
+                            <th>Poste</th>
+                            <th>Département</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for candidature in candidatures %}
+                            <tr>
+                                <td>{{ candidature.jobOffer.company.name ?? 'N/A' }}</td>
+                                <td>{{ candidature.jobOffer.title ?? 'N/A' }}</td>
+                                <td>{{ candidature.jobOffer.department.name ?? 'N/A' }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ candidature.status|lower|replace({' ': '-', '_': '-'}) }}">
+                                        {{ candidature.status }}
+                                    </span>
+                                </td>
+                                <td>{{ candidature.dateCandidacy|date('d/m/Y') }}</td>
+                                <td>
+                                    <a href="#" class="action-btn">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="#" class="action-btn">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    <div class="loading-spinner"></div>
+                    <p class="empty-message">Chargement de vos candidatures...</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh stats (optional)
+    document.querySelectorAll('.stat-refresh').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.classList.add('rotating');
+            setTimeout(() => {
+                this.classList.remove('rotating');
+            }, 1000);
+        });
+    });
+</script>
+{% endblock %}
