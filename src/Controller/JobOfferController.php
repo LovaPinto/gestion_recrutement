@@ -67,7 +67,6 @@ final class JobOfferController extends AbstractController
     }
 
     /* ===================== PORTAIL ===================== */
-
     #[Route('/portail', name: 'app_job_portail_default')]
     public function portail(Request $request): Response
     {
@@ -92,7 +91,6 @@ final class JobOfferController extends AbstractController
     }
 
     /* ===================== LISTE OFFRES ===================== */
-
     #[Route('/job/offers', name: 'app_job_offer')]
     public function showAllOffers(
         Request $request,
@@ -115,7 +113,6 @@ final class JobOfferController extends AbstractController
     }
 
     /* ===================== DÉTAIL OFFRE ===================== */
-
     #[Route('/job/offer/{id}', name: 'job_offer_show')]
     public function showJobOfferDetails(JobOffer $jobOffer): Response
     {
@@ -124,14 +121,8 @@ final class JobOfferController extends AbstractController
         ]);
     }
 
-    /* ===================== CRÉATION OFFRE (WIZARD) ===================== */
-
-    #[Route(
-        '/create_job/{step}',
-        name: 'job_offer_create',
-        defaults: ['step' => 1],
-        requirements: ['step' => '\d+']
-    )]
+    /* ===================== CRÉATION OFFRE (WIZARD 5 STEPS) ===================== */
+    #[Route('/create_job/{step}', name: 'job_offer_create', defaults: ['step' => 1], requirements: ['step' => '\d+'])]
     public function create(Request $request, int $step): Response
     {
         $session  = $request->getSession();
@@ -142,13 +133,15 @@ final class JobOfferController extends AbstractController
                 case 1:
                     $jobOffer->setTitle($request->request->get('title'));
 
-                    $company = $this->entityManager
-                        ->getRepository(Company::class)
+                    // Récupérer les entités existantes
+                    $company = $this->entityManager->getRepository(Company::class)
                         ->find((int) $request->request->get('company'));
-
-                    $department = $this->entityManager
-                        ->getRepository(Department::class)
+                    $department = $this->entityManager->getRepository(Department::class)
                         ->find((int) $request->request->get('department'));
+
+                    if (!$company || !$department) {
+                        throw new \Exception('Entreprise ou département introuvable.');
+                    }
 
                     $jobOffer->setCompany($company);
                     $jobOffer->setDepartment($department);
@@ -174,21 +167,27 @@ final class JobOfferController extends AbstractController
 
                 case 5:
                     $jobOffer->setDateCreation(new \DateTime());
+                case 5:
+                    $jobOffer->setDateCreation(new \DateTime());
 
-                    $user = $this->entityManager
-                        ->getRepository(Users::class)
-                        ->find(1);
-
+                    // Utilisateur créateur (id = 1 pour exemple)
+                    $user = $this->entityManager->getRepository(Users::class)->find(1);
                     $jobOffer->setUser($user);
 
+                    $this->entityManager->persist($jobOffer);
+                    $this->entityManager->flush();
                     $this->entityManager->persist($jobOffer);
                     $this->entityManager->flush();
 
                     $session->remove('job_offer');
                     return $this->redirectToRoute('app_job_portail_default');
+                    $session->remove('job_offer');
+                    return $this->redirectToRoute('app_job_portail_default');
             }
 
+            // Sauvegarder dans la session pour le wizard
             $session->set('job_offer', $jobOffer);
+
             return $this->redirectToRoute('job_offer_create', ['step' => $step + 1]);
         }
 
