@@ -200,4 +200,14 @@ final class JobOfferController extends AbstractController
             'offerTypes'  => $this->jobOfferRepository->findAllOfferTypes(),
         ]);
     }
+
+     #[Route('/job-offers1', name: 'job_offer_list_RH')]
+    public function index(JobOfferRepository $jobOfferRepository): Response
+    {
+        $jobOffers = $jobOfferRepository->findAllOrdered();
+
+        return $this->render('job_offer/ajoutOffre.html.twig', [
+            'jobOffers' => $jobOffers
+        ]);
+    }
 }

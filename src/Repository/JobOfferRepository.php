@@ -97,4 +97,13 @@ class JobOfferRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+
+     public function findAllOrdered(): array
+    {
+        return $this->createQueryBuilder('j')
+            ->orderBy('j.dateCreation', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

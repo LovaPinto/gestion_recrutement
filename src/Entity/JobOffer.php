@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Entity;
 
 use App\Repository\JobOfferRepository;
@@ -27,20 +26,19 @@ class JobOffer
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $dateCreation = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type : Types::DATE_MUTABLE)]
     private ?\DateTime $deadline = null;
 
     // 👤 Créateur de l'offre
-    #[ORM\ManyToOne(targetEntity: Users::class)]
+    #[ORM\ManyToOne(targetEntity : Users::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?Users $user = null;
 
     // 🏢 Company
 
-#[ORM\ManyToOne(targetEntity: Company::class)]
-#[ORM\JoinColumn(nullable: false)]
-private ?Company $company = null;
-
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
 
     // 🏬 Department
     #[ORM\ManyToOne(targetEntity: Department::class)]
@@ -57,10 +55,6 @@ private ?Company $company = null;
     private ?string $experience_level = null;
 
     /* ================= GETTERS & SETTERS ================= */
-
-
-    
-
 
     /////
 
