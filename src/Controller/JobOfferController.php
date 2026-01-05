@@ -14,11 +14,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use app\Repository\CompanyRepository;
+use app\Repository\DepartmentRepository;
 
 final class JobOfferController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
     private JobOfferRepository $jobOfferRepository;
+    private CompanyRepository $companyRepository;
+    private DepartmentRepository $departmentRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -26,6 +30,8 @@ final class JobOfferController extends AbstractController
     ) {
         $this->entityManager = $entityManager;
         $this->jobOfferRepository = $jobOfferRepository;
+        $this->companyRepository = $entityManager->getRepository(Company::class);
+        $this->departmentRepository = $entityManager->getRepository(Department::class);
     }
 
     /* ===================== FORMULAIRE OFFRE ===================== */
@@ -67,7 +73,6 @@ final class JobOfferController extends AbstractController
     }
 
     /* ===================== PORTAIL ===================== */
-
     #[Route('/portail', name: 'app_job_portail_default')]
     public function portail(Request $request): Response
     {
@@ -91,8 +96,7 @@ final class JobOfferController extends AbstractController
         ]);
     }
 
-    /* ===================== LISTE OFFRES ===================== */
-
+    /* ===================== LISTE DES OFFRES (ADMIN) ===================== */
     #[Route('/job/offers', name: 'app_job_offer')]
     public function showAllOffers(
         Request $request,
@@ -108,14 +112,18 @@ final class JobOfferController extends AbstractController
             $request->query->getInt('page', 1),
             20
         );
+        $jobOffers = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            20
+        );
 
         return $this->render('job_offer/ShowAlljob.html.twig', [
             'jobOffers' => $jobOffers,
         ]);
     }
 
-    /* ===================== DÉTAIL OFFRE ===================== */
-
+    /* ===================== DÉTAIL D’UNE OFFRE ===================== */
     #[Route('/job/offer/{id}', name: 'job_offer_show')]
     public function showJobOfferDetails(JobOffer $jobOffer): Response
     {
@@ -124,8 +132,7 @@ final class JobOfferController extends AbstractController
         ]);
     }
 
-    /* ===================== CRÉATION OFFRE (WIZARD) ===================== */
-
+    /* ===================== CRÉATION OFFRE (WIZARD 5 ÉTAPES) ===================== */
     #[Route(
         '/create_job/{step}',
         name: 'job_offer_create',
@@ -138,24 +145,31 @@ final class JobOfferController extends AbstractController
         $jobOffer = $session->get('job_offer', new JobOffer());
 
         if ($request->isMethod('POST')) {
+
             switch ($step) {
+
                 case 1:
                     $jobOffer->setTitle($request->request->get('title'));
 
-                    $company = $this->entityManager
-                        ->getRepository(Company::class)
-                        ->find((int) $request->request->get('company'));
+                    $company = $this->companyRepository->find(
+                        (int) $request->request->get('company')
+                    );
+                    $department = $this->departmentRepository->find(
+                        (int) $request->request->get('department')
+                    );
 
-                    $department = $this->entityManager
-                        ->getRepository(Department::class)
-                        ->find((int) $request->request->get('department'));
+                    if (!$company || !$department) {
+                        throw new \Exception('Entreprise ou département introuvable.');
+                    }
 
                     $jobOffer->setCompany($company);
                     $jobOffer->setDepartment($department);
                     break;
 
                 case 2:
-                    $jobOffer->setDescription($request->request->get('description'));
+                    $jobOffer->setDescription(
+                        $request->request->get('description')
+                    );
                     break;
 
                 case 3:
@@ -174,7 +188,12 @@ final class JobOfferController extends AbstractController
 
                 case 5:
                     $jobOffer->setDateCreation(new \DateTime());
+                case 5:
+                    $jobOffer->setDateCreation(new \DateTime());
+                case 5:
+                    $jobOffer->setDateCreation(new \DateTime());
 
+                    // Exemple : utilisateur connecté
                     $user = $this->entityManager
                         ->getRepository(Users::class)
                         ->find(1);
@@ -183,13 +202,20 @@ final class JobOfferController extends AbstractController
 
                     $this->entityManager->persist($jobOffer);
                     $this->entityManager->flush();
+                    $this->entityManager->persist($jobOffer);
+                    $this->entityManager->flush();
 
+                    $session->remove('job_offer');
+                    return $this->redirectToRoute('app_job_portail_default');
                     $session->remove('job_offer');
                     return $this->redirectToRoute('app_job_portail_default');
             }
 
             $session->set('job_offer', $jobOffer);
-            return $this->redirectToRoute('job_offer_create', ['step' => $step + 1]);
+
+            return $this->redirectToRoute('job_offer_create', [
+                'step' => $step + 1
+            ]);
         }
 
         return $this->render('job_offer/insert_job.html.twig', [

@@ -2,6 +2,8 @@
 namespace App\Entity;
 
 use App\Repository\JobOfferRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -13,7 +15,6 @@ class JobOffer
     #[ORM\Column]
     private ?int $id = null;
 
-    // 🆕 Titre du job
     #[ORM\Column(length: 100)]
     private ?string $title = null;
 
@@ -26,26 +27,63 @@ class JobOffer
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $dateCreation = null;
 
+<<<<<<< HEAD
     #[ORM\Column(type : Types::DATE_MUTABLE)]
     private ?\DateTime $deadline = null;
 
     // 👤 Créateur de l'offre
     #[ORM\ManyToOne(targetEntity : Users::class)]
+=======
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTime $deadline = null;
+
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: 'jobOffers')]
+    private ?Users $user = null;
+
+    #[ORM\OneToMany(mappedBy: 'jobOffer', targetEntity: Candidacy::class, orphanRemoval: true)]
+    private Collection $candidacies;
+
+    #[ORM\ManyToMany(targetEntity: Candidate::class, inversedBy: 'jobOffers')]
+    #[ORM\JoinTable(name: 'job_offer_candidate')]
+    private Collection $candidates;
+
+    // =====================
+    // Constructor
+    // =====================
+    public function __construct()
+    {
+        $this->candidacies = new ArrayCollection();
+        $this->candidates = new ArrayCollection();
+    }
+
+    // =====================
+    // Getters & Setters
+    // =====================
+
+    #[ORM\ManyToOne(targetEntity: Users::class)]
+>>>>>>> baa261bfa40a5ca69694b02c9ad5e063b3f8e245
     #[ORM\JoinColumn(nullable: false)]
     private ?Users $user = null;
 
-    // 🏢 Company
+    // ✅ Correction : cascade persist pour éviter l'erreur Doctrine
+    #[ORM\ManyToOne(targetEntity: Company::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
 
+<<<<<<< HEAD
     #[ORM\ManyToOne(targetEntity: Company::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
 
     // 🏬 Department
     #[ORM\ManyToOne(targetEntity: Department::class)]
+=======
+    #[ORM\ManyToOne(targetEntity: Department::class, cascade: ['persist'])]
+>>>>>>> baa261bfa40a5ca69694b02c9ad5e063b3f8e245
     #[ORM\JoinColumn(nullable: false)]
     private ?Department $department = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private array $job_skills = [];
 
     #[ORM\Column(length: 255)]
@@ -54,24 +92,28 @@ class JobOffer
     #[ORM\Column(length: 255)]
     private ?string $experience_level = null;
 
+    /**
+     * @var Collection<int, Candidacy>
+     */
+    #[ORM\OneToMany(targetEntity: Candidacy::class, mappedBy: 'jobOffer')]
+    private Collection $candidacies;
+
+    public function __construct()
+    {
+        $this->candidacies = new ArrayCollection();
+        $this->job_skills = []; // initialisation sécurisée
+    }
+
     /* ================= GETTERS & SETTERS ================= */
 
+<<<<<<< HEAD
     /////
 
+=======
+>>>>>>> baa261bfa40a5ca69694b02c9ad5e063b3f8e245
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): static
-    {
-        $this->title = $title;
-        return $this;
     }
 
     public function getOfferType(): ?string
@@ -112,7 +154,7 @@ class JobOffer
         return $this->deadline;
     }
 
-    public function setDeadline(\DateTime $deadline): static
+    public function setDeadline(?\DateTime $deadline): static
     {
         $this->deadline = $deadline;
         return $this;
@@ -123,48 +165,80 @@ class JobOffer
         return $this->user;
     }
 
-    public function setUser(Users $user): static
+    public function setUser(?Users $user): static
     {
         $this->user = $user;
         return $this;
     }
 
-    public function getCompany(): ?Company
+    // =====================
+    // Candidacies Relation
+    // =====================
+    /**
+     * @return Collection|Candidacy[]
+     */
+    public function getCandidacies(): Collection
     {
-        return $this->company;
+        return $this->candidacies;
     }
 
-    public function setCompany(Company $company): static
+    public function addCandidacy(Candidacy $candidacy): static
     {
-        $this->company = $company;
+        if (!$this->candidacies->contains($candidacy)) {
+            $this->candidacies->add($candidacy);
+            $candidacy->setJobOffer($this);
+        }
         return $this;
     }
 
-    public function getDepartment(): ?Department
+    public function removeCandidacy(Candidacy $candidacy): static
     {
-        return $this->department;
-    }
-
-    public function setDepartment(Department $department): static
-    {
-        $this->department = $department;
+        if ($this->candidacies->removeElement($candidacy)) {
+            if ($candidacy->getJobOffer() === $this) {
+                $candidacy->setJobOffer(null);
+            }
+        }
         return $this;
     }
 
+
+    // =====================
+    // Candidates Relation
+    // =====================
+    /**
+     * @return Collection|Candidate[]
+     */
+    public function getCandidates(): Collection
+    {
+        return $this->candidates;
+    }
+
+    public function addCandidate(Candidate $candidate): static
+    {
+        if (!$this->candidates->contains($candidate)) {
+            $this->candidates->add($candidate);
+            $candidate->addJobOffer($this);
+        }
+
+    // 🔹 JOB SKILLS : getter sécurisé
     public function getJobSkills(): array
     {
-        return $this->job_skills;
+        return $this->job_skills ?? [];
     }
 
-    public function setJobSkills(array $job_skills): static
+    // 🔹 JOB SKILLS : setter sécurisé
+    public function setJobSkills(?array $job_skills): static
     {
-        $this->job_skills = $job_skills;
-
+        $this->job_skills = $job_skills ?? [];
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function removeCandidate(Candidate $candidate): static
     {
+
+        if ($this->candidates->removeElement($candidate)) {
+            $candidate->removeJobOffer($this);
+
         return $this->status;
     }
 
@@ -183,7 +257,60 @@ class JobOffer
     public function setExperienceLevel(string $experience_level): static
     {
         $this->experience_level = $experience_level;
+        return $this;
+    }
 
+    /**
+     * @return Collection<int, Candidacy>
+     */
+    public function getCandidacies(): Collection
+    {
+        return $this->candidacies;
+    }
+
+    public function addCandidacy(Candidacy $candidacy): static
+    {
+        if (!$this->candidacies->contains($candidacy)) {
+            $this->candidacies->add($candidacy);
+            $candidacy->setJobOffer($this);
+        }
+        return $this;
+    }
+
+    public function removeCandidacy(Candidacy $candidacy): static
+    {
+        if ($this->candidacies->removeElement($candidacy)) {
+            if ($candidacy->getJobOffer() === $this) {
+                $candidacy->setJobOffer(null);
+            }
+        }
+        return $this;
+    }
+
+    /* ================= CANDIDATES RELATION ================= */
+
+    /**
+     * @return Collection|Candidate[]
+     */
+    public function getCandidates(): Collection
+    {
+        return $this->candidates;
+    }
+
+    public function addCandidate(Candidate $candidate): static
+    {
+        if (!$this->candidates->contains($candidate)) {
+            $this->candidates->add($candidate);
+            $candidate->addJobOffer($this);
+        }
+        return $this;
+    }
+
+    public function removeCandidate(Candidate $candidate): static
+    {
+        if ($this->candidates->removeElement($candidate)) {
+            $candidate->removeJobOffer($this);
+        }
         return $this;
     }
 }
