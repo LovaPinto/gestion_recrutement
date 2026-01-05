@@ -43,9 +43,7 @@ final class JobOfferController extends AbstractController
     }
 
     #[Route('/job/offer/insert', name: 'app_job_offer_insert', methods: ['POST'])]
-    public function insertJob(
-        Request $request,
-        UsersRepository $usersRepository
+    public function insertJob( Request $request,UsersRepository $usersRepository
     ): Response {
         $offerType    = $request->request->get('offerType');
         $description  = $request->request->get('description');
@@ -85,8 +83,8 @@ final class JobOfferController extends AbstractController
             ->findAllByFilter($keyword, $companyId, $departmentId, $offerType);
 
         return $this->render('candidate/Portail_candidate.html.twig', [
-            'companyNames'      => $this->jobOfferRepository->findAllCompanyName(),
-            'departmentNames'   => $this->jobOfferRepository->findAllDepartmentName(),
+            'companyNames'      => $this->companyRepository->findAllCompanyName(),
+            'departmentNames'   => $this->departmentRepository->findAllDepartmentName(),
             'offerTypes'        => $this->jobOfferRepository->findAllOfferTypes(),
             'jobOffers'         => $jobOffers,
             'keyword'           => $keyword,
@@ -134,10 +132,7 @@ final class JobOfferController extends AbstractController
 
     /* ===================== CRÉATION OFFRE (WIZARD 5 ÉTAPES) ===================== */
     #[Route(
-        '/create_job/{step}',
-        name: 'job_offer_create',
-        defaults: ['step' => 1],
-        requirements: ['step' => '\d+']
+        '/create_job/{step}', name: 'job_offer_create',defaults: ['step' => 1],requirements: ['step' => '\d+']
     )]
     public function create(Request $request, int $step): Response
     {
