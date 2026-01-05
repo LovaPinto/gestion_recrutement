@@ -1,77 +1,33 @@
 {% extends 'admin/headerLayout.html.twig' %}
-
 {% block body %}
+{% include 'admin/headertilte.html.twig' %}
 
-  <div class="topbar d-flex justify-content-between align-items-center border-bottom bg-white px-3 py-2">
-    <!-- Gauche -->
-    <h2 class="m-0" id="text-entete">Tableau De Bord</h2>
-
-    <!-- Droite -->
-    <div class="d-flex align-items-center">
-        <span class="me-3">admin</span>
-        <i class="bi bi-bell me-3"></i>
-        <i class="bi bi-gear"></i>
-    </div>
-</div>
 
     <!-- Metrics -->
-<div class="mt-3 d-flex justify-content-center">
-  <div class="row w-100 justify-content-center">
-    <div class="col-md-3">
-      <div class="card card-metric text-center">
-        <div class="card-body">
-          <h5 class="card-title">Nombre d'offres</h5>
-          <p class="card-text">0 Offres</p>
-          <p class="text-Total">Total des offres crées</p>
-
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card card-metric text-center">
-        <div class="card-body">
-          <h5 class="card-title">Utilisateurs actifs</h5>
-          <p class="card-text">0 Utilisateurs</p>
-          <p class="text-Total">Total des utilisateurs actifs</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card card-metric text-center">
-        <div class="card-body">
-          <h5 class="card-title">Candidats</h5>
-          <p class="card-text">0 Candidats</p>
-          <p class="text-Total">Total des candidats postulés</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card card-metric text-center">
-        <div class="card-body">
-          <h5 class="card-title">Entreprises</h5>
-          <p class="card-text">0 Entreprises</p>
-          <p class="text-Total">Total des entreprises</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+{% include 'admin/sectionDashboaard.html.twig' %}
 
 
     <!-- Graph section -->
     <div class="mt-5">
-      <h5>Activité par type d'opération</h5>
-      <div class="graph-legend mt-2">
-        <span><i style="background-color: blue;"></i> Postulations</span>
-        <span><i style="background-color: green;"></i> Créations d'offres</span>
-        <span><i style="background-color: yellow;"></i> Validations</span>
-      </div>
-      <div class="btn-group mt-3" role="group">
-        <button type="button" class="btn btn-outline-primary active">Par semaine</button>
-        <button type="button" class="btn btn-outline-primary">Par mois</button>
+      <div class="conteActivite">
+        <h5 style="margin-left:3vh;">Activité par type d'opération</h5>
+    <div class="btn-group mt-3" role="group">
+        <button type="button" id="parSemaine" class="toggle-btn active">Par semaine</button>
+        <button type="button" id="parMois" class="toggle-btn">Par mois</button>
+        <form class="parMois" id="formparMois">
+            <select class="form-select" id="mois" name="mois">
+                <option value="1">Decembre</option>
+            </select>
+            <select class="form-select" id="annee" name="annee">
+                <option value="1">2025</option>
+            </select>
+        </form>
+    </div>
+
       </div>
       <div class="mt-4 border rounded p-5 text-center text-muted">
-        Graphique ici
+        <!-- Metrics -->
+        {% include 'admin/grapheBaton.html.twig' %}
       </div>
     </div>
   </div>

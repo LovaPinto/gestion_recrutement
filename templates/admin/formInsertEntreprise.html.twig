@@ -1,40 +1,41 @@
 {% extends 'admin/headerLayout.html.twig' %}
 
 {% block body %}
-<div>  <a href="#" class="text-decoration-none mb-3 d-block text-muted">Retour</a>
+<div><a href="#" class="text-decoration-none mb-3 d-block text-muted">Retour</a>
 
  <div class="form-section" style="">
       <h3>Créer une entreprise</h3>
       <p>Remplissez les informations pour créer un nouvel utilisateur</p>
-      <form action="" id="form-section">
+      <form action="/admin/form/manager/traitment" id="form-section" method="post">
         <div class="containerDiv">
-            <div class="mb-3">
+            <div class="mb-3" id="nomInput">
                 <label for="nom" class="form-label">Nom de l'entreprise *</label>
-                <input type="text" style="width: 100%;" class="form-control" id="nom" placeholder="Nom de l'entreprise">
+                <input type="text" style="width: 100%;" class="form-control" id="nom" name="companyName" placeholder="Nom de l'entreprise">
             </div>
-            <div class="mb-3">
+            <div class="mb-3" id="nomInput" >
                 <label for="email" class="form-label">Email *</label>
-                <input type="email" style="width: 100%;" class="form-control" id="email" placeholder="exemple@exemple.exemple">
+                <input type="email" style="width: 100%;" class="form-control" id="email" name="email" placeholder="exemple@exemple.exemple">
             </div>
         </div>
 
         <div class="mb-3">
           <label for="mdp" class="form-label">Mot de passe *</label>
-          <input type="password" class="form-control" id="mdp" placeholder="••••••••">
+          <input type="password" class="form-control" id="mdp" name="password" placeholder="••••••••">
         </div>
         <div class="mb-3">
           <label for="role" class="form-label">Rôle *</label>
-          <select class="form-select" id="role">
-            <option selected>Company</option>
-          </select>
+        <select class="form-select" id="role" name="role_id">
+            <option value="1">Company</option>
+        </select>
+
         </div>
         <div class="mb-3">
           <label for="description" class="form-label">Description de l'entreprise</label>
-          <textarea class="form-control" id="description" rows="4" placeholder="Décrivez votre entreprise..."></textarea>
+          <textarea class="form-control" id="description" name="description" rows="4" placeholder="Décrivez votre entreprise..."></textarea>
         </div>
-        <div>
-            <button type="submit" class="">Annuler</button>
-            <button type="submit" class="btn btn-primary">Créer l'entreprise</button>
+        <div class="form-foot">
+            <button type="submit" class="Annuler" >Annuler</button>
+            <button type="submit" class="creer">Créer l'entreprise</button>
         </div>
       </form>
     </div>

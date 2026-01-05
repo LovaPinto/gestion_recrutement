@@ -1,0 +1,36 @@
+ <div class="container mt-5">
+        <h1>Créer un nouveau produit</h1>
+        {{ form_start(form, {'attr': {'id': 'form-section'}}) }}
+    <div class="containerDiv">
+        <div class="mb-3" id="nomInput">
+            {{ form_label(form.nomComplet, "Nom de l'entreprise *", {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.nomComplet, {'attr': {'class': 'form-control', 'style': 'width:100%;'}}) }}
+        </div>
+        <div class="mb-3" id="emailInput">
+            {{ form_label(form.email, "Email *", {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.email, {'attr': {'class': 'form-control', 'style': 'width:100%;'}}) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.mdp, "Mot de passe *", {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.mdp, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.company, "Entreprise *", {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.company, {'attr': {'class': 'form-select'}}) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.role, "Rôle *", {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.role, {'attr': {'class': 'form-select'}}) }}
+    </div>
+
+    <div class="form-foot">
+        <button type="reset" class="Annuler">Annuler</button>
+        <button type="submit" class="creer">Créer l'entreprise</button>
+    </div>
+{{ form_end(form) }}
+
+    </div>

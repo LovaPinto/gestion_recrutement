@@ -3,8 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CompanyRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
@@ -18,19 +17,25 @@ class Company
     #[ORM\Column(length: 50)]
     private ?string $companyName = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $localisation = null;
+    #[ORM\Column(length: 200)]
+    private ?string $email = null;
 
-    /**
-     * @var Collection<int, Department>
-     */
-    #[ORM\OneToMany(targetEntity: Department::class, mappedBy: 'Company')]
-    private Collection $departments;
+    #[ORM\Column(length: 50)]
+    private ?string $password = null;
 
-    public function __construct()
-    {
-        $this->departments = new ArrayCollection();
-    }
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $description = null;
+
+    #[ORM\ManyToOne(cascade: ['persist'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Role $role = null;
+
+    #[ORM\Column]
+    private ?\DateTime $dateCreation = null;
+
+    #[ORM\Column]
+    private ?bool $status = null;
+
 
     public function getId(): ?int
     {
@@ -56,44 +61,74 @@ class Company
         return $this;
     }
 
-    public function getLocalisation(): ?string
+    public function getEmail(): ?string
     {
-        return $this->localisation;
+        return $this->email;
     }
 
-    public function setLocalisation(string $localisation): static
+    public function setEmail(string $email): static
     {
-        $this->localisation = $localisation;
+        $this->email = $email;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Department>
-     */
-    public function getDepartments(): Collection
+    public function getPassword(): ?string
     {
-        return $this->departments;
+        return $this->password;
     }
 
-    public function addDepartment(Department $department): static
+    public function setPassword(string $password): static
     {
-        if (!$this->departments->contains($department)) {
-            $this->departments->add($department);
-            $department->setCompany($this);
-        }
+        $this->password = $password;
 
         return $this;
     }
 
-    public function removeDepartment(Department $department): static
+    public function getDescription(): ?string
     {
-        if ($this->departments->removeElement($department)) {
-            // set the owning side to null (unless already changed)
-            if ($department->getCompany() === $this) {
-                $department->setCompany(null);
-            }
-        }
+        return $this->description;
+    }
+
+    public function setDescription(string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getRole(): ?role
+    {
+        return $this->role;
+    }
+
+    public function setRole(role $role): static
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    public function getDateCreation(): ?\DateTime
+    {
+        return $this->dateCreation;
+    }
+
+    public function setDateCreation(\DateTime $dateCreation): static
+    {
+        $this->dateCreation = $dateCreation;
+
+        return $this;
+    }
+
+    public function isStatus(): ?bool
+    {
+        return $this->status;
+    }
+
+    public function setStatus(bool $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }
