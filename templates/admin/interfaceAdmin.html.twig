@@ -1,0 +1,34 @@
+{% extends 'admin/headerLayout.html.twig' %}
+{% block body %}
+{% include 'admin/headertilte.html.twig' %}
+
+
+    <!-- Metrics -->
+{% include 'admin/sectionDashboaard.html.twig' %}
+
+
+    <!-- Graph section -->
+    <div class="mt-5">
+      <div class="conteActivite">
+        <h5 style="margin-left:3vh;">Activité par type d'opération</h5>
+    <div class="btn-group mt-3" role="group">
+        <button type="button" id="parSemaine" class="toggle-btn active">Par semaine</button>
+        <button type="button" id="parMois" class="toggle-btn">Par mois</button>
+        <form class="parMois" id="formparMois">
+            <select class="form-select" id="mois" name="mois">
+                <option value="1">Decembre</option>
+            </select>
+            <select class="form-select" id="annee" name="annee">
+                <option value="1">2025</option>
+            </select>
+        </form>
+    </div>
+
+      </div>
+      <div class="mt-4 border rounded p-5 text-center text-muted">
+        <!-- Metrics -->
+        {% include 'admin/grapheBaton.html.twig' %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
