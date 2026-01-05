@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Postuler | {{ jobOffer.title }}{% endblock %}
+
+{% block body %}
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+    background: #0d0d0d;
+    color: #f5f5f5;
+}
+.apply-box {
+    max-width: 700px;
+    margin: 60px auto;
+    background: #1a1a1a;
+    padding: 35px;
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.8);
+}
+.apply-box h2 {
+    margin-bottom: 5px;
+    font-size: 26px;
+    color: #2563eb;
+    text-align: center;
+}
+.apply-box p {
+    color: #ccc;
+    margin-bottom: 30px;
+    text-align: center;
+}
+.form-group {
+    margin-bottom: 22px;
+}
+
+/* LABELS */
+label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* INPUTS */
+input[type="url"], input[type="date"] {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    background: #0d0d0d;
+    color: #fff;
+}
+
+/* FICHIERS STABLES */
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.file-input-wrapper input[type="file"] {
+    display: none;
+}
+.file-btn {
+    padding: 12px 20px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+.file-btn:hover {
+    background: #1d4ed8;
+    transform: scale(1.05);
+}
+.file-name {
+    flex-grow: 1;
+    padding: 12px;
+    border-radius: 10px;
+    background: #0d0d0d;
+    border: 1px solid #333;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* BOUTON ENVOI */
+.btn-apply {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    background: #2563eb;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: .3s;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-top: 10px;
+}
+.btn-apply:hover {
+    background: #1d4ed8;
+    transform: scale(1.05);
+}
+</style>
+
+<div class="apply-box">
+    <h2>Postuler à : {{ jobOffer.title }}</h2>
+    <p>{{ jobOffer.company ? jobOffer.company.companyName : 'Entreprise' }} • {{ jobOffer.department ? jobOffer.department.departmentName : 'Département' }}</p>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Date de candidature</label>
+            <input type="date" name="date_candidacy" value="{{ "now"|date('Y-m-d') }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>CV (PDF)</label>
+            <div class="file-input-wrapper">
+                <button type="button" class="file-btn" onclick="document.getElementById('cv_input').click()">Choisir un fichier</button>
+                <span class="file-name" id="cv_filename">Aucun fichier choisi</span>
+                <input type="file" name="cv_path" id="cv_input" required onchange="document.getElementById('cv_filename').textContent = this.files[0]?.name || 'Aucun fichier choisi'">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Portfolio (lien)</label>
+            <input type="url" name="portfolio_link" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+            <label>Pièce jointe (optionnel)</label>
+            <div class="file-input-wrapper">
+                <button type="button" class="file-btn" onclick="document.getElementById('att_input').click()">Choisir un fichier</button>
+                <span class="file-name" id="att_filename">Aucun fichier choisi</span>
+                <input type="file" name="attachement" id="att_input" onchange="document.getElementById('att_filename').textContent = this.files[0]?.name || 'Aucun fichier choisi'">
+            </div>
+        </div>
+
+        <button class="btn-apply">Envoyer ma candidature</button>
+    </form>
+</div>
+{% endblock %}

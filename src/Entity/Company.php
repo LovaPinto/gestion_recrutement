@@ -14,8 +14,8 @@ class Company
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $companyName = null;
+  #[ORM\Column(length: 50, nullable: true)]
+private ?string $companyName = null;
 
     #[ORM\Column(length: 200)]
     private ?string $email = null;
@@ -45,7 +45,6 @@ class Company
     public function setId(?int $id): static
     {
         $this->id = $id;
-
         return $this;
     }
 
@@ -57,7 +56,6 @@ class Company
     public function setCompanyName(string $companyName): static
     {
         $this->companyName = $companyName;
-
         return $this;
     }
 

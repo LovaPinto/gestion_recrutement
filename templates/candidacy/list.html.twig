@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Candidatures | {{ jobOffer.title }}{% endblock %}
+
+{% block body %}
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+    background: #0d0d0d;
+    color: #f5f5f5;
+}
+.container {
+    max-width: 900px;
+    margin: 60px auto;
+}
+h2 {
+    color: #2563eb;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.candidacy-card {
+    background: #1a1a1a;
+    padding: 20px 25px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.candidacy-card h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+}
+.candidacy-card p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #ccc;
+}
+.status {
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #fff;
+}
+.status.pending { background: #f59e0b; }
+.status.accepted { background: #16a34a; }
+.status.rejected { background: #dc2626; }
+</style>
+
+<div class="container">
+    <h2>Candidatures pour : {{ jobOffer.title }}</h2>
+
+    {% if candidacies|length > 0 %}
+        {% for c in candidacies %}
+            <div class="candidacy-card">
+                <h3>Candidat #{{ c.id }}</h3>
+                <p>Date de candidature : {{ c.dateCandidacy ? c.dateCandidacy|date('d/m/Y') : 'N/A' }}</p>
+                <p>Portfolio : {{ c.portfolioLink ?: 'Non renseigné' }}</p>
+                <p>Note recruteur : {{ c.recruiterNote ?: 'Aucune' }}</p>
+                <p>Entretien : {{ c.interviewDate ? c.interviewDate|date('d/m/Y') : 'Non programmé' }}</p>
+                <span class="status {{ c.status|lower }}">{{ c.status|capitalize }}</span>
+            </div>
+        {% endfor %}
+
+        {# Pagination #}
+        <div style="text-align:center; margin-top:20px;">
+            {{ knp_pagination_render(candidacies) }}
+        </div>
+    {% else %}
+        <p style="text-align:center; color:#999;">Aucune candidature pour cette offre.</p>
+    {% endif %}
+</div>
+{% endblock %}

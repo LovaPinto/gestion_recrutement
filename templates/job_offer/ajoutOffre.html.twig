@@ -1,0 +1,76 @@
+{% extends 'layout/layout_frontend/sidebar.html.twig' %}
+{% set menus = ['dashboard','recrutement', 'offre','candidat'] %}
+{% block body %}
+	<!DOCTYPE html>
+	<html lang="fr">
+		<head>
+			<meta charset="UTF-8">
+			<title>Demandes de recrutement</title>
+			<link rel="stylesheet" href="{{ asset('styles/demande.css') }}">
+		</head>
+		<body>
+
+			<div
+				class="container">
+
+				<!-- Titre -->
+				<div class="page-header">
+					<div>
+						<h1>Demandes de recrutement</h1>
+						<p>Gérez vos demandes de recrutement</p>
+					</div>
+
+					<a href="{{ path ('job_offer_create')}}" class="btn-primary">
+						+ Nouvelle demande
+					</a>
+				</div>
+
+				<!-- Recherche + filtre (UI seulement pour l’instant) -->
+				<div class="filters">
+					<input type="text" placeholder="Rechercher une demande...">
+					<select>
+						<option>Tous les statuts</option>
+						<option>draft</option>
+						<option>published</option>
+						<option>closed</option>
+					</select>
+				</div>
+
+				<!-- Tableau -->
+				<table>
+					<thead>
+						<tr>
+							<th>POSTE</th>
+							<th>TYPE</th>
+							<th>DÉPARTEMENT</th>
+							<th>SOCIÉTÉ</th>
+							<th>CRÉATEUR</th>
+							<th>DATE DE CRÉATION</th>
+						</tr>
+					</thead>
+					<tbody>
+
+						{% for offer in jobOffers %}
+							<tr>
+								<td>
+									<strong>{{ offer.title }}</strong><br>
+									<span class="location">
+										{{ offer.experienceLevel }}
+									</span>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="6" style="text-align:center;">
+									Aucune offre trouvée
+								</td>
+							</tr>
+						{% endfor %}
+
+					</tbody>
+				</table>
+
+			</div>
+
+		</body>
+	</html>
+{% endblock %}

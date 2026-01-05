@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Nextwork{% endblock %}</title>
+
+    <script src="{{ asset('js/department.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('styles/sidebar.css') }}">
+    {#<link rel="stylesheet" href="{{ asset('styles/formulaireAjoutDepart.css') }}">#}
+    <link rel="stylesheet" href="{{ asset('styles/ajoutDepart.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/listageDepart.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/formulaireAjoutUsers.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/ajoutOffre.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/suivieCandidature.css') }}">
+
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+   {% include "department/menu.html.twig" with { menus: menus|default([]) } %}
+    
+    <div class="main">
+       {% include "department/header.html.twig" %}
+
+        <div class="content">
+            {% block body %}{% endblock %}
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.js"></script>
+</body>
+</html>
