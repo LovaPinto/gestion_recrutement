@@ -23,4 +23,13 @@ class CompanyRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findAllCompanyName(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->select('DISTINCT c.companyName AS companyName')
+            ->orderBy('c.companyName', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

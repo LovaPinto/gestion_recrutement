@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Candidate;
 use App\Repository\UsersRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -25,113 +24,29 @@ class Users
     #[ORM\Column(length: 50)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 50)]
     private ?string $password = null;
 
     #[ORM\ManyToOne(targetEntity: Role::class)]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Role $role = null;
+
 
     #[ORM\ManyToOne(targetEntity: Department::class)]
     private ?Department $department = null;
-    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Candidate::class, cascade: ['persist', 'remove'])]
-    private ?Candidate $candidate = null;
-
-
-    // =====================
-    // Relations
-    // =====================
-
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: JobOffer::class, orphanRemoval: true)]
-    private Collection $jobOffers;
-
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Candidacy::class)]
-    private Collection $candidacies;
-
-    // =====================
-    // Constructor
-    // =====================
-    public function __construct()
-    {
-        $this->jobOffers = new ArrayCollection();
-        $this->candidacies = new ArrayCollection();
-    }
-
-    // =====================
-    // Getters & Setters
-    // =====================
-
-    public function getCandidate(): ?Candidate
-    {
-        return $this->candidate;
-    }
-
-    public function setCandidate(?Candidate $candidate): self
-    {
-        $this->candidate = $candidate;
-        return $this;
-    }
-
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getFirstName(): ?string
-    {
-        return $this->firstName;
-    }
-
-    public function setFirstName(string $firstName): static
-    {
-        $this->firstName = $firstName;
-        return $this;
-    }
-
-    public function getLastName(): ?string
-    {
-        return $this->lastName;
-    }
-
-    public function setLastName(string $lastName): static
-    {
-        $this->lastName = $lastName;
-        return $this;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): static
-    {
-        $this->email = $email;
-        return $this;
-    }
-
-    public function getPassword(): ?string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): static
-    {
-        $this->password = $password;
-        return $this;
-    }
 
     public function getRole(): ?Role
     {
         return $this->role;
     }
 
-    public function setRole(?Role $role): static
+    public function setRole(?Role $role): self
     {
         $this->role = $role;
         return $this;
     }
 
+    // --- getters/setters ---
     public function getDepartment(): ?Department
     {
         return $this->department;
@@ -143,63 +58,65 @@ class Users
         return $this;
     }
 
-    // =====================
-    // JobOffers Relation
-    // =====================
-    /**
-     * @return Collection|JobOffer[]
-     */
-    public function getJobOffers(): Collection
+    public function getId(): ?int
     {
-        return $this->jobOffers;
+        return $this->id;
     }
 
-    public function addJobOffer(JobOffer $jobOffer): static
+    public function setId(int $id): static
     {
-        if (!$this->jobOffers->contains($jobOffer)) {
-            $this->jobOffers->add($jobOffer);
-            $jobOffer->setUser($this);
-        }
+        $this->id = $id;
+
         return $this;
     }
 
-    public function removeJobOffer(JobOffer $jobOffer): static
+    public function getFirstName(): ?string
     {
-        if ($this->jobOffers->removeElement($jobOffer)) {
-            if ($jobOffer->getUser() === $this) {
-                $jobOffer->setUser(null);
-            }
-        }
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): static
+    {
+        $this->firstName = $firstName;
+
         return $this;
     }
 
-    // =====================
-    // Candidacies Relation
-    // =====================
-    /**
-     * @return Collection|Candidacy[]
-     */
-    public function getCandidacies(): Collection
+    public function getLastName(): ?string
     {
-        return $this->candidacies;
+        return $this->lastName;
     }
 
-    public function addCandidacy(Candidacy $candidacy): static
+    public function setLastName(string $lastName): static
     {
-        if (!$this->candidacies->contains($candidacy)) {
-            $this->candidacies->add($candidacy);
-            $candidacy->setUser($this);
-        }
+        $this->lastName = $lastName;
+
         return $this;
     }
 
-    public function removeCandidacy(Candidacy $candidacy): static
+    public function getEmail(): ?string
     {
-        if ($this->candidacies->removeElement($candidacy)) {
-            if ($candidacy->getUser() === $this) {
-                $candidacy->setUser(null);
-            }
-        }
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
+
         return $this;
     }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    
 }

@@ -31,29 +31,6 @@ class JobOffer
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $deadline = null;
 
-    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: 'jobOffers')]
-    private ?Users $user = null;
-
-    #[ORM\OneToMany(mappedBy: 'jobOffer', targetEntity: Candidacy::class, orphanRemoval: true)]
-    private Collection $candidacies;
-
-    #[ORM\ManyToMany(targetEntity: Candidate::class, inversedBy: 'jobOffers')]
-    #[ORM\JoinTable(name: 'job_offer_candidate')]
-    private Collection $candidates;
-
-    // =====================
-    // Constructor
-    // =====================
-    public function __construct()
-    {
-        $this->candidacies = new ArrayCollection();
-        $this->candidates = new ArrayCollection();
-    }
-
-    // =====================
-    // Getters & Setters
-    // =====================
-
     #[ORM\ManyToOne(targetEntity: Users::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?Users $user = null;
@@ -93,6 +70,17 @@ class JobOffer
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
+        return $this;
     }
 
     public function getOfferType(): ?string
@@ -144,60 +132,33 @@ class JobOffer
         return $this->user;
     }
 
-    public function setUser(?Users $user): static
+    public function setUser(Users $user): static
     {
         $this->user = $user;
         return $this;
     }
 
-    // =====================
-    // Candidacies Relation
-    // =====================
-    /**
-     * @return Collection|Candidacy[]
-     */
-    public function getCandidacies(): Collection
+    public function getCompany(): ?Company
     {
-        return $this->candidacies;
+        return $this->company;
     }
 
-    public function addCandidacy(Candidacy $candidacy): static
+    public function setCompany(Company $company): static
     {
-        if (!$this->candidacies->contains($candidacy)) {
-            $this->candidacies->add($candidacy);
-            $candidacy->setJobOffer($this);
-        }
+        $this->company = $company;
         return $this;
     }
 
-    public function removeCandidacy(Candidacy $candidacy): static
+    public function getDepartment(): ?Department
     {
-        if ($this->candidacies->removeElement($candidacy)) {
-            if ($candidacy->getJobOffer() === $this) {
-                $candidacy->setJobOffer(null);
-            }
-        }
+        return $this->department;
+    }
+
+    public function setDepartment(Department $department): static
+    {
+        $this->department = $department;
         return $this;
     }
-
-
-    // =====================
-    // Candidates Relation
-    // =====================
-    /**
-     * @return Collection|Candidate[]
-     */
-    public function getCandidates(): Collection
-    {
-        return $this->candidates;
-    }
-
-    public function addCandidate(Candidate $candidate): static
-    {
-        if (!$this->candidates->contains($candidate)) {
-            $this->candidates->add($candidate);
-            $candidate->addJobOffer($this);
-        }
 
     // 🔹 JOB SKILLS : getter sécurisé
     public function getJobSkills(): array
@@ -212,19 +173,14 @@ class JobOffer
         return $this;
     }
 
-    public function removeCandidate(Candidate $candidate): static
+    public function getStatus(): ?string
     {
-
-        if ($this->candidates->removeElement($candidate)) {
-            $candidate->removeJobOffer($this);
-
         return $this->status;
     }
 
     public function setStatus(string $status): static
     {
         $this->status = $status;
-
         return $this;
     }
 
@@ -262,33 +218,6 @@ class JobOffer
             if ($candidacy->getJobOffer() === $this) {
                 $candidacy->setJobOffer(null);
             }
-        }
-        return $this;
-    }
-
-    /* ================= CANDIDATES RELATION ================= */
-
-    /**
-     * @return Collection|Candidate[]
-     */
-    public function getCandidates(): Collection
-    {
-        return $this->candidates;
-    }
-
-    public function addCandidate(Candidate $candidate): static
-    {
-        if (!$this->candidates->contains($candidate)) {
-            $this->candidates->add($candidate);
-            $candidate->addJobOffer($this);
-        }
-        return $this;
-    }
-
-    public function removeCandidate(Candidate $candidate): static
-    {
-        if ($this->candidates->removeElement($candidate)) {
-            $candidate->removeJobOffer($this);
         }
         return $this;
     }

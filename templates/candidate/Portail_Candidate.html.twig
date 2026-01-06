@@ -48,9 +48,12 @@
 							<select name="company" id="company" onchange="this.form.submit()">
 								<option value="">Sélectionner</option>
 								{% for company in companyNames %}
-									<option value="{{ company.id }}" {% if company.id == selectedCompany %} selected {% endif %}>{{ company.companyName }}</option>
+									<option value="{{ company.companyName }}" {% if company.companyName == selectedCompany %} selected {% endif %}>
+										{{ company.companyName }}
+									</option>
 								{% endfor %}
 							</select>
+
 						</div>
 
 						<div class="filter-box">
@@ -58,10 +61,13 @@
 							<select name="department" id="filter-department" onchange="this.form.submit()">
 								<option value="">Sélectionner</option>
 								{% for department in departmentNames %}
-									<option value="{{ department.id }}" {% if department.id == selectedDepartment %} selected {% endif %}>{{ department.departmentName }}</option>
+									<option value="{{ department.departmentName }}" {% if department.departmentName == selectedDepartment %} selected {% endif %}>
+										{{ department.departmentName }}
+									</option>
 								{% endfor %}
 							</select>
 						</div>
+
 
 						<div class="filter-box">
 							<label for="filter-position">Contrat :</label>
@@ -108,24 +114,24 @@
 			</div>
 		</section>
 
-<section>
+		<section>
 
 
-    <!-- Nouvelle section: Pourquoi postuler sur NextWork -->
-    <div class="reason-box full-width">
-        <div class="reason-icon">
-            <span class="icon">🌟</span>
-        </div>
-        <h3>Pourquoi postuler sur NextWork ?</h3>
-        <ul>
-            <li>+10 ans d'expérience en développement logiciel (backend, frontend ou fullstack).</li>
-            <li>Solide maîtrise d'un ou plusieurs langages : Java, Python, Go, Typescript/React.</li>
-            <li>Expérience avec les architectures cloud (AWS, GCP, Azure) et les microservices.</li>
-            <li>Bonnes connaissances en bases de données SQL et NoSQL.</li>
-        </ul>
-        <a href="/apply" class="btn-apply">Clique ici pour postuler</a>
-    </div>
-</section>
+			<!-- Nouvelle section: Pourquoi postuler sur NextWork -->
+			<div class="reason-box full-width">
+				<div class="reason-icon">
+					<span class="icon">🌟</span>
+				</div>
+				<h3>Pourquoi postuler sur NextWork ?</h3>
+				<ul>
+					<li>+10 ans d'expérience en développement logiciel (backend, frontend ou fullstack).</li>
+					<li>Solide maîtrise d'un ou plusieurs langages : Java, Python, Go, Typescript/React.</li>
+					<li>Expérience avec les architectures cloud (AWS, GCP, Azure) et les microservices.</li>
+					<li>Bonnes connaissances en bases de données SQL et NoSQL.</li>
+				</ul>
+				<a href="/apply" class="btn-apply">Clique ici pour postuler</a>
+			</div>
+		</section>
 
 
 		<!-- Footer -->
