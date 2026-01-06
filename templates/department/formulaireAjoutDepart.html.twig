@@ -1,50 +1,54 @@
 {# templates/departement/new.html.twig #}
 {% extends 'layout/layout_frontend/sidebar.html.twig' %}
 {% set menus = ['dashboard', 'offre','utilisateur','departement','candidat'] %}
-{% block title %}Créer un département{% endblock %}
+{% block title %}Créer un département
+{% endblock %}
 
 {% block body %}
-<div class="page-wrap">
-    <div class="page-header">
-        <div class="header-left">
-            <span class="pretitle">CRÉATION</span>
-            <h1 class="page-title">Ajouter un département</h1>
-            <p class="page-subtitle">Remplissez les informations pour créer un nouveau département.</p>
-        </div>
-        <div class="header-right">
-            <a class="btn btn-secondary btn-back" href="{{ path('app_department_ajout') }}">
-                <span class="icon">&larr;</span> Retour à la liste
-            </a>
-        </div>
-    </div>
+	<div class="page-wrap">
+		<div class="page-header">
+			<div class="header-left">
+				<span class="pretitle">CRÉATION</span>
+				<h1 class="page-title">Ajouter un département</h1>
+				<p class="page-subtitle">Remplissez les informations pour créer un nouveau département.</p>
+			</div>
+			<div class="header-right">
+				<a class="btn btn-secondary btn-back" href="{{ path('app_department_ajout') }}">
+					<span class="icon">&larr;</span>
+					Retour à la liste
+				</a>
+			</div>
+		</div>
 
-    {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ label }}">{{ message }}</div>
-        {% endfor %}
-    {% endfor %}
+		{% for label, messages in app.flashes %}
+			{% for message in messages %}
+				<div class="alert alert-{{ label }}">{{ message }}</div>
+			{% endfor %}
+		{% endfor %}
 
-    <div class="card form-card">
-        {{ form_start(form, { attr: { class: 'dept-form' } }) }}
-            <div class="form-row">
-                <label for="{{ form.departmentName.vars.id }}">
-                    Nom du département <span class="required">*</span>
-                </label>
-                {{ form_widget(form.departmentName, { attr: { class: 'input-text' } }) }}
-                <div class="form-help">{{ form_help(form.departmentName) }}</div>
-                {% if form_errors(form.departmentName) %}
-                    <div class="form-error">{{ form_errors(form.departmentName) }}</div>
-                {% endif %}
-            </div>
+		<div class="card form-card">
+			{{ form_start(form, { attr: { class: 'dept-form' } }) }}
+			<div class="form-row">
+				<label for="{{ form.departmentName.vars.id }}">
+					Nom du département
+					<span class="required">*</span>
+				</label>
+				{{ form_widget(form.departmentName, { attr: { class: 'input-text' } }) }}
+				<div class="form-help">{{ form_help(form.departmentName) }}</div>
+				{% if form_errors(form.departmentName) %}
+					<div class="form-error">{{ form_errors(form.departmentName) }}</div>
+				{% endif %}
+			</div>
 
-       
-            <div class="form-actions-depart">
-                <a href="{{ path('app_department_ajout') }}" class="btn btn-ghost">Annuler</a>
-                <button type="submit" class="btn btn-primary">
-                    <span class="check">✔</span> Créer le département
-                </button>
-            </div>
-        {{ form_end(form) }}
-    </div>
-</div>
+
+			<div class="form-actions-depart">
+				<a href="{{ path('app_department_ajout') }}" class="btn btn-ghost">Annuler</a>
+				<button type="submit" class="btn btn-primary">
+					<span class="check">✔</span>
+					Créer le département
+				</button>
+			</div>
+			{{ form_end(form) }}
+		</div>
+	</div>
 {% endblock %}
