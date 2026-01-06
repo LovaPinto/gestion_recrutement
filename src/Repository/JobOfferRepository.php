@@ -73,4 +73,58 @@ public function findAllByFilter(
             ->getQuery()
             ->getResult();
     }
+
+
+     public function findAllOrdered(): array
+    {
+        return $this->createQueryBuilder('j')
+            ->orderBy('j.dateCreation', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+public function findAllJobByFilter(
+    ?string $keyword,
+    ?string $companyName,
+    ?string $departmentName,
+    ?string $offerType,
+    ?string $status
+): array {
+    $qb = $this->createQueryBuilder('j')
+        ->leftJoin('j.company', 'c')
+        ->addSelect('c')
+        ->leftJoin('j.department', 'd')
+        ->addSelect('d');
+
+    if (!empty($keyword)) {
+        $qb->andWhere('j.title LIKE :keyword')
+           ->setParameter('keyword', '%' . $keyword . '%');
+    }
+
+    if (!empty($companyName)) {
+        $qb->andWhere('c.companyName = :companyName')
+           ->setParameter('companyName', $companyName);
+    }
+
+    if (!empty($departmentName)) {
+        $qb->andWhere('d.departmentName = :departmentName')
+           ->setParameter('departmentName', $departmentName);
+    }
+
+    if (!empty($offerType)) {
+        $qb->andWhere('j.offerType = :offerType')
+           ->setParameter('offerType', $offerType);
+    }
+
+    if (!empty($status)) {
+        $qb->andWhere('j.status = :status')
+           ->setParameter('status', $status);
+    }
+
+    return $qb
+        ->orderBy('j.dateCreation', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
+
+
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Entity;
 
 use App\Repository\JobOfferRepository;
@@ -11,6 +10,12 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: JobOfferRepository::class)]
 class JobOffer
 {
+    /* ================= STATUTS ================= */
+    public const STATUS_PUBLIEE   = 'publiee';
+    public const STATUS_EN_ATTENTE = 'en_attente';
+    public const STATUS_PRISE     = 'prise';
+    public const STATUS_SUPPRIMEE = 'supprimee';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -31,11 +36,10 @@ class JobOffer
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $deadline = null;
 
-    #[ORM\ManyToOne(targetEntity: Users::class)]
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: 'jobOffers')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Users $user = null;
 
-    // ✅ Correction : cascade persist pour éviter l'erreur Doctrine
     #[ORM\ManyToOne(targetEntity: Company::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
@@ -56,13 +60,19 @@ class JobOffer
     /**
      * @var Collection<int, Candidacy>
      */
-    #[ORM\OneToMany(targetEntity: Candidacy::class, mappedBy: 'jobOffer')]
+    #[ORM\OneToMany(mappedBy: 'jobOffer', targetEntity: Candidacy::class, orphanRemoval: true)]
     private Collection $candidacies;
+
+    #[ORM\ManyToMany(targetEntity: Candidate::class, inversedBy: 'jobOffers')]
+    #[ORM\JoinTable(name: 'job_offer_candidate')]
+    private Collection $candidates;
 
     public function __construct()
     {
         $this->candidacies = new ArrayCollection();
-        $this->job_skills = []; // initialisation sécurisée
+        $this->candidates = new ArrayCollection();
+        $this->job_skills = [];
+        $this->status = self::STATUS_EN_ATTENTE; // initialisation par défaut
     }
 
     /* ================= GETTERS & SETTERS ================= */
@@ -143,7 +153,7 @@ class JobOffer
         return $this->company;
     }
 
-    public function setCompany(Company $company): static
+    public function setCompany(?Company $company): static
     {
         $this->company = $company;
         return $this;
@@ -154,19 +164,17 @@ class JobOffer
         return $this->department;
     }
 
-    public function setDepartment(Department $department): static
+    public function setDepartment(?Department $department): static
     {
         $this->department = $department;
         return $this;
     }
 
-    // 🔹 JOB SKILLS : getter sécurisé
     public function getJobSkills(): array
     {
         return $this->job_skills ?? [];
     }
 
-    // 🔹 JOB SKILLS : setter sécurisé
     public function setJobSkills(?array $job_skills): static
     {
         $this->job_skills = $job_skills ?? [];
@@ -180,6 +188,17 @@ class JobOffer
 
     public function setStatus(string $status): static
     {
+        $allowedStatuses = [
+            self::STATUS_PUBLIEE,
+            self::STATUS_EN_ATTENTE,
+            self::STATUS_PRISE,
+            self::STATUS_SUPPRIMEE,
+        ];
+
+        if (!in_array($status, $allowedStatuses, true)) {
+            throw new \InvalidArgumentException('Statut invalide pour une offre d\'emploi');
+        }
+
         $this->status = $status;
         return $this;
     }
@@ -195,9 +214,7 @@ class JobOffer
         return $this;
     }
 
-    /**
-     * @return Collection<int, Candidacy>
-     */
+    // ===================== Candidacies Relation =====================
     public function getCandidacies(): Collection
     {
         return $this->candidacies;
@@ -221,4 +238,14 @@ class JobOffer
         }
         return $this;
     }
+
+    // ===================== Candidates Relation =====================
+    /**
+     * @return Collection|Candidate[]
+     */
+    public function getCandidates(): Collection
+    {
+        return $this->candidates;
+    }
+
 }

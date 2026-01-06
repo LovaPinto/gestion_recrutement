@@ -28,14 +28,14 @@ final class CandidateController extends AbstractController
     }
 
     // Dashboard candidat
-    #[Route('/dashboard', name: 'candidate_dashboard')]
+    #[Route('/dashboard', name: 'app_candidate_dashboard')]
     // #[IsGranted('ROLE_CANDIDATE')]
     public function dashboard(CandidateRepository $candidateRepository): Response
     {
-        $user = $this->getUser();
+        $candidate = $candidateRepository->findOneBy(['user' => $this->getUser()]);
 
-        return $this->render('candidate/dashboard_candidate.html.twig', [
-            'candidateStats' => $candidateRepository->findStats($user),
+        return $this->render('candidate/dashboard.html.twig', [
+            'candidate' => $candidate,
         ]);
     }
 

@@ -1,26 +1,103 @@
 {% extends 'layout/layout_frontend/sidebar.html.twig' %}
-{% set menus = ['dashboard', 'offre','candidat'] %}
-{% block title %}Demandes de recrutement{% endblock %}
-
+{% set menus = ['dashboard','recrutement', 'offre','candidat'] %}
 {% block body %}
-<div class="page-containerOffre">
+	<!DOCTYPE html>
+	<html lang="fr">
+		<head>
+			<meta charset="UTF-8">
+			<title>Demandes de recrutement</title>
+			<link rel="stylesheet" href="{{ asset('styles/demande.css') }}">
+		</head>
+		<body>
 
-    <!-- Header -->
-    <div class="page-headerOffre">
-        <div>
-            <h1>Demandes de recrutement</h1>
-            <p>Gérez vos demandes de recrutement</p>
-        </div>
+			<div
+				class="container">
 
-        <a href="#" class="nouvelleDemande">
-            <span>+</span> Nouvelle demande
-        </a>
-    </div>
+				<!-- Titre -->
+				<div class="page-header">
+					<div>
+						<h1>Demandes de recrutement</h1>
+						<p>Gérez vos demandes de recrutement</p>
+					</div>
 
-    <!-- Empty content -->
-    <div class="empty-cardi">
-        <p>Aucune demande de recrutement pour le moment.</p>
-    </div>
+					<a href="{{ path ('job_offer_create')}}" class="btn-primary">
+						+ Nouvelle demande
+					</a>
+				</div>
 
+				<!-- Recherche + filtre (UI seulement pour l’instant) -->
+			<div class="filters">
+    <form id="filterForm" method="get" action="{{ path('job_offer_list_RH') }}">
+        <!-- Recherche texte -->
+        <input type="text" name="keyword" placeholder="Rechercher une demande..." 
+               value="{{ keyword|default('') }}"
+               onkeyup="document.getElementById('filterForm').submit()">
+
+        <!-- Filtre statut -->
+        <select name="status" onchange="document.getElementById('filterForm').submit()">
+            <option value="">Tous les statuts</option>
+            <option value="Publiée" {{ selectedStatus == 'Publiée' ? 'selected' : '' }}>Publiée</option>
+            <option value="En attente" {{ selectedStatus == 'En attente' ? 'selected' : '' }}>En attente</option>
+            <option value="Déjà prise" {{ selectedStatus == 'Déjà prise' ? 'selected' : '' }}>Déjà prise</option>
+            <option value="Supprimée" {{ selectedStatus == 'Supprimée' ? 'selected' : '' }}>Supprimée</option>
+        </select>
+    </form>
 </div>
+
+
+
+				<!-- Tableau -->
+				<table class="job-table">
+    <thead>
+        <tr>
+            <th>POSTE</th>
+            <th>TYPE</th>
+            <th>DÉPARTEMENT</th>
+            <th>SOCIÉTÉ</th>
+            <th>DATE DE CRÉATION</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% if jobOffers is not empty %}
+            {% for offer in jobOffers %}
+                <tr>
+                    <!-- POSTE -->
+                    <td>
+                        <strong>{{ offer.title }}</strong><br>
+                        <span class="location">
+                            {{ offer.experienceLevel ?? '-' }}
+                        </span>
+                    </td>
+
+                    <!-- TYPE -->
+                    <td>
+                        {{ offer.offerType ?? '-' }}
+                    </td>
+
+                    <!-- DÉPARTEMENT -->
+                               <td>{{ offer.department.departmentName ?? '-' }}</td>
+			<td>{{ offer.company.companyName ?? '-' }}</td>
+
+                    <!-- DATE -->
+                    <td>
+                        {{ offer.dateCreation ? offer.dateCreation|date('d/m/Y') : '-' }}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="5" style="text-align:center; padding: 16px;">
+                    Aucune offre trouvée
+                </td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+
+			</div>
+
+		</body>
+	</html>
 {% endblock %}

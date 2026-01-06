@@ -150,8 +150,14 @@ MySQL">{{ jobOffer.jobSkills is defined ? jobOffer.jobSkills|join("\n") : '' }}<
             <div class="form-group">
                 <label>Statut</label>
                 <select name="status">
-                    <option value="active" {% if jobOffer.status == 'active' %}selected{% endif %}>Active</option>
-                    <option value="inactive" {% if jobOffer.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                 <select name="status" onchange="document.getElementById('filterForm').submit()">
+    <option value="">Tous les statuts</option>
+    <option value="Publiée" {{ selectedStatus == 'Publiée' ? 'selected' : '' }}>Publiée</option>
+    <option value="En attente" {{ selectedStatus == 'En attente' ? 'selected' : '' }}>En attente</option>
+    <option value="Déjà prise" {{ selectedStatus == 'Déjà prise' ? 'selected' : '' }}>Déjà prise</option>
+    <option value="Supprimée" {{ selectedStatus == 'Supprimée' ? 'selected' : '' }}>Supprimée</option>
+</select>
+
                 </select>
             </div>
 

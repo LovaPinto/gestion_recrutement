@@ -221,4 +221,34 @@ final class JobOfferController extends AbstractController
             'offerTypes'  => $this->jobOfferRepository->findAllOfferTypes(),
         ]);
     }
+
+   #[Route('/job-offers1', name: 'job_offer_list_RH')]
+public function index(Request $request): Response
+{
+    $keyword        = $request->query->get('keyword', null);
+    $companyName    = $request->query->get('company', null);
+    $departmentName = $request->query->get('department', null);
+    $offerType      = $request->query->get('offerType', null);
+    $status         = $request->query->get('status', null);
+
+    $jobOffers = $this->jobOfferRepository->findAllJobByFilter(
+        $keyword,
+        $companyName,
+        $departmentName,
+        $offerType,
+        $status
+    );
+
+    return $this->render('job_offer/ajoutOffre.html.twig', [
+        'jobOffers'         => $jobOffers,
+        'keyword'           => $keyword,
+        'selectedCompany'   => $companyName,
+        'selectedDepartment'=> $departmentName,
+        'selectedOfferType' => $offerType,
+        'selectedStatus'    => $status,
+    ]);
+}
+
+
+
 }
