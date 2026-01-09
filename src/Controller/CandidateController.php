@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use  App\Repository\CandidacyRepository;
 
 #[Route('/candidate')]
 final class CandidateController extends AbstractController
@@ -27,17 +28,117 @@ final class CandidateController extends AbstractController
         return $this->render('candidate/login_candidate.html.twig');
     }
 
-    // Dashboard candidat
-    #[Route('/dashboard', name: 'app_candidate_dashboard')]
-    // #[IsGranted('ROLE_CANDIDATE')]
-    public function dashboard(CandidateRepository $candidateRepository): Response
-    {
-        $candidate = $candidateRepository->findOneBy(['user' => $this->getUser()]);
+#[Route('/profil', name: 'app_candidate_profil', methods: ['GET', 'POST'])]
+public function profil(Request $request, EntityManagerInterface $em): Response
+{
+    $session = $request->getSession();
+    $userId = $session->get('user_id');
 
-        return $this->render('candidate/dashboard.html.twig', [
-            'candidate' => $candidate,
-        ]);
+    if (!$userId) {
+        $this->addFlash('error', 'Utilisateur non connecté.');
+        return $this->redirectToRoute('app_candidate_login');
+    } else {
+        $this->addFlash('info', 'Utilisateur connecté, ID=' . $userId);
     }
+
+    // Récupération du user depuis la session
+    $user = $em->getRepository(\App\Entity\Users::class)->find($userId);
+    if (!$user) {
+        $this->addFlash('error', 'Utilisateur introuvable en base.');
+        return $this->redirectToRoute('app_candidate_login');
+    } else {
+        $this->addFlash('info', 'Utilisateur trouvé : ' . $user->getFirstName());
+    }
+
+    // Récupération du candidat lié à l'utilisateur
+    $candidate = $em->getRepository(Candidate::class)->findOneBy(['user' => $user]);
+    if (!$candidate) {
+        $this->addFlash('error', 'Candidat introuvable pour cet utilisateur.');
+        return $this->redirectToRoute('app_candidate_login');
+    } else {
+        $this->addFlash('info', 'Candidat trouvé : ' . $candidate->getNom());
+    }
+
+    // Création du formulaire
+    $form = $this->createForm(CandidateType::class, $candidate);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted()) {
+        $this->addFlash('info', 'Formulaire soumis.');
+
+        if ($form->isValid()) {
+            $this->addFlash('success', 'Formulaire valide.');
+
+            // Protection de l’email (clé unique)
+            $candidate->setEmail($user->getEmail());
+
+            try {
+                $em->flush();
+                $this->addFlash('success', 'Profil mis à jour avec succès !');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
+            }
+
+            return $this->redirectToRoute('app_candidate_profil');
+        } else {
+            $this->addFlash('error', 'Formulaire invalide, vérifier les champs.');
+        }
+    } else {
+        $this->addFlash('info', 'Formulaire non soumis.');
+    }
+
+    return $this->render('candidate/profil.html.twig', [
+        'form' => $form->createView(),
+        'candidate' => $candidate,
+    ]);
+}
+
+
+
+
+    // Dashboard candidat
+#[Route('/dashboard', name: 'app_candidate_dashboard')]
+public function dashboard(
+    Request $request, 
+    EntityManagerInterface $em, 
+    CandidacyRepository $candidacyRepository
+): Response
+{
+    $userId = $request->getSession()->get('user_id');
+
+    if (!$userId) {
+        $this->addFlash('error', 'Vous devez être connecté.');
+        return $this->redirectToRoute('candidat_login');
+    }
+
+    $user = $em->getRepository(\App\Entity\Users::class)->find($userId);
+    if (!$user) {
+        $this->addFlash('error', 'Utilisateur introuvable.');
+        return $this->redirectToRoute('candidat_login');
+    }
+
+    // Counts des candidatures par statut pour l'utilisateur connecté
+    $totalCandidatures = $candidacyRepository->countByUser($user);
+    $enAttente = $candidacyRepository->countPending($user);
+    $acceptees = $candidacyRepository->countAccepted($user);
+    $refusees = $candidacyRepository->countRefused($user);
+    $invited = $candidacyRepository->countInterviewInvited($user);
+
+    // Liste de toutes les candidatures de l'utilisateur connecté
+    $candidatures = $candidacyRepository->findBy(['user' => $user]);
+
+    return $this->render('candidate/dashboard.html.twig', [
+        'totalCandidatures' => $totalCandidatures,
+        'enAttente' => $enAttente,
+        'acceptees' => $acceptees,
+        'refusees' => $refusees,
+        'invited' => $invited,
+        'candidatures' => $candidatures,
+        'user' => $user,
+    ]);
+}
+
+
 
     // Liste des candidats
     #[Route('/', name: 'app_candidate_index', methods: ['GET'])]

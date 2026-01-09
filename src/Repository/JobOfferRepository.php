@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\JobOffer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Company;
 
 class JobOfferRepository extends ServiceEntityRepository
 {
@@ -124,6 +125,29 @@ public function findAllJobByFilter(
         ->orderBy('j.dateCreation', 'DESC')
         ->getQuery()
         ->getResult();
+}
+
+public function findByCompany(Company $company): array
+    {
+        return $this->createQueryBuilder('j')
+            ->andWhere('j.company = :company')
+            ->setParameter('company', $company)
+            ->orderBy('j.dateCreation', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+    public function countByStatus(array $criteria): int
+{
+    $qb = $this->createQueryBuilder('o')
+        ->select('COUNT(o.id)')
+        ->where('o.company = :company')
+        ->andWhere('o.roleId = :roleId')
+        ->andWhere('o.status IN (:statuses)')
+        ->setParameter('company', $criteria['company'])
+        ->setParameter('roleId', $criteria['roleId'])
+        ->setParameter('statuses', $criteria['statuses']);
+
+    return (int) $qb->getQuery()->getSingleScalarResult();
 }
 
 

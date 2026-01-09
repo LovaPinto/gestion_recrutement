@@ -67,6 +67,10 @@ class JobOffer
     #[ORM\JoinTable(name: 'job_offer_candidate')]
     private Collection $candidates;
 
+    // ================= NOUVEAU =================
+    #[ORM\Column(type: 'integer')]
+    private ?int $roleId = null; // 1 = RH, 2 = Manager
+
     public function __construct()
     {
         $this->candidacies = new ArrayCollection();
@@ -248,4 +252,15 @@ class JobOffer
         return $this->candidates;
     }
 
+    // ===================== RoleId Getter/Setter =====================
+    public function getRoleId(): ?int
+    {
+        return $this->roleId;
+    }
+
+    public function setRoleId(int $roleId): static
+    {
+        $this->roleId = $roleId;
+        return $this;
+    }
 }

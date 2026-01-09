@@ -46,14 +46,11 @@ public function findStats($user): array
   
         $qb = $this->createQueryBuilder('c')
             ->select('c.id, c.firstName, c.lastName, c.email, u.id AS userId, u.email AS userEmail')
-            ->innerJoin('c.user', 'u') // Assure-toi que Candidate a un champ "user" ManyToOne vers Users
+            ->innerJoin('c.user', 'u') 
             ->where('u.email = :email')
             ->setParameter('email', $user->getEmail());
 
         $result = $qb->getQuery()->getArrayResult();
-
-        // Si tu veux juste un candidat, retourne le premier élément ou null
         return $result[0] ?? null;
 }
-
 }

@@ -19,7 +19,7 @@
 		{% endif %}
 
 		{% if 'recrutement' in menus %}
-			<a href="{{ path ('job_offer_list_RH')}}">
+			<a href="{{ path ('company_job_offers')}}">
 				<i class="bi bi-person-fill"></i>
 				<span>Demande de recrutement</span>
 			</a>
@@ -45,6 +45,12 @@
 				<span>Gestion des candidats</span>
 			</a>
 		{% endif %}
+		{% if app.session.get('company') %}
+            <a href="{{ path('logoutCompany') }}">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Logout</span>
+            </a>
+        {% endif %}
 
 	</nav>
 </aside>

@@ -9,26 +9,21 @@
 
 {% block content %}
 <div class="dashboard-container">
-    
+
     <!-- Stats Cards -->
     <div class="stats-grid">
         <!-- Card 1: Nombre de candidatures -->
         <div class="stat-card">
             <div class="stat-header">
                 <h3 class="stat-title">Nombre de candidatures</h3>
-                <button class="stat-refresh">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
+                <button class="stat-refresh"><i class="fas fa-sync-alt"></i></button>
             </div>
             <div class="stat-content">
                 <div class="stat-number">{{ totalCandidatures ?? 0 }}</div>
                 <div class="stat-label">Candidatures</div>
             </div>
             <div class="stat-footer">
-                <span class="stat-subtitle">Total des candidatures créées</span>
-                <span class="stat-trend positive">
-                    <i class="fas fa-arrow-up"></i> +36.5%
-                </span>
+                <span class="stat-subtitle">Total des candidatures effectuées</span>
             </div>
         </div>
 
@@ -36,39 +31,29 @@
         <div class="stat-card">
             <div class="stat-header">
                 <h3 class="stat-title">Candidatures en attente</h3>
-                <button class="stat-refresh">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
+                <button class="stat-refresh"><i class="fas fa-sync-alt"></i></button>
             </div>
             <div class="stat-content">
                 <div class="stat-number">{{ enAttente ?? 0 }}</div>
                 <div class="stat-label">Candidatures</div>
             </div>
             <div class="stat-footer">
-                <span class="stat-subtitle">Total des candidatures en attente</span>
-                <span class="stat-trend negative">
-                    <i class="fas fa-arrow-down"></i> -3.5%
-                </span>
+                <span class="stat-subtitle">Candidatures en attente</span>
             </div>
         </div>
 
-        <!-- Card 3: Candidatures en validation -->
+        <!-- Card 3: Candidatures refusées -->
         <div class="stat-card">
             <div class="stat-header">
-                <h3 class="stat-title">Candidatures en validation</h3>
-                <button class="stat-refresh">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
+                <h3 class="stat-title">Candidatures refusées</h3>
+                <button class="stat-refresh"><i class="fas fa-sync-alt"></i></button>
             </div>
             <div class="stat-content">
-                <div class="stat-number">{{ enValidation ?? 0 }}</div>
+                <div class="stat-number">{{ refusees ?? 0 }}</div>
                 <div class="stat-label">Candidatures</div>
             </div>
             <div class="stat-footer">
-                <span class="stat-subtitle">Total des candidatures en validation</span>
-                <span class="stat-trend positive">
-                    <i class="fas fa-arrow-up"></i> +36.5%
-                </span>
+                <span class="stat-subtitle">Total des candidatures refusées</span>
             </div>
         </div>
 
@@ -76,9 +61,7 @@
         <div class="stat-card">
             <div class="stat-header">
                 <h3 class="stat-title">Candidatures acceptées</h3>
-                <button class="stat-refresh">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
+                <button class="stat-refresh"><i class="fas fa-sync-alt"></i></button>
             </div>
             <div class="stat-content">
                 <div class="stat-number">{{ acceptees ?? 0 }}</div>
@@ -86,9 +69,6 @@
             </div>
             <div class="stat-footer">
                 <span class="stat-subtitle">Total des candidatures acceptées</span>
-                <span class="stat-trend positive">
-                    <i class="fas fa-arrow-up"></i> +36.5%
-                </span>
             </div>
         </div>
     </div>
@@ -97,47 +77,22 @@
     <div class="candidatures-section">
         <h2 class="section-title">Liste de mes candidatures</h2>
 
-        <!-- Search and Filters -->
+        <!-- Search and Date Filter -->
         <div class="search-filter-bar">
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" placeholder="Search Jobs and keywords" class="search-input">
-                <button class="search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
+                <input type="text" id="searchInput" placeholder="            Rechercher par titre ou entreprise" class="search-input" onkeyup="filterTable()">
             </div>
 
             <div class="filters">
                 <div class="filter-group">
-                    <label>Statut</label>
-                    <select class="filter-select">
-                        <option>Sélectionner</option>
-                        <option>En attente</option>
-                        <option>En validation</option>
-                        <option>Acceptée</option>
-                        <option>Refusée</option>
-                    </select>
+                    <label>Date de candidature (Début)</label>
+                    <input type="date" id="dateStart" onchange="filterTable()">
                 </div>
 
                 <div class="filter-group">
-                    <label>Département</label>
-                    <select class="filter-select">
-                        <option>Sélectionner</option>
-                        <option>Informatique</option>
-                        <option>RH</option>
-                        <option>Marketing</option>
-                        <option>Finance</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label>Contact type</label>
-                    <select class="filter-select">
-                        <option>Sélectionner</option>
-                        <option>Email</option>
-                        <option>Téléphone</option>
-                        <option>LinkedIn</option>
-                    </select>
+                    <label>Date de candidature (Fin)</label>
+                    <input type="date" id="dateEnd" onchange="filterTable()">
                 </div>
             </div>
         </div>
@@ -145,7 +100,7 @@
         <!-- Table or Empty State -->
         <div class="candidatures-content">
             {% if candidatures is defined and candidatures|length > 0 %}
-                <table class="candidatures-table">
+                <table id="candidaturesTable" class="candidatures-table">
                     <thead>
                         <tr>
                             <th>Entreprise</th>
@@ -159,22 +114,18 @@
                     <tbody>
                         {% for candidature in candidatures %}
                             <tr>
-                                <td>{{ candidature.jobOffer.company.name ?? 'N/A' }}</td>
+                                <td>{{ candidature.jobOffer.company.companyName ?? 'N/A' }}</td>
                                 <td>{{ candidature.jobOffer.title ?? 'N/A' }}</td>
-                                <td>{{ candidature.jobOffer.department.name ?? 'N/A' }}</td>
+                                <td>{{ candidature.jobOffer.department.departmentName ?? 'N/A' }}</td>
                                 <td>
                                     <span class="status-badge status-{{ candidature.status|lower|replace({' ': '-', '_': '-'}) }}">
                                         {{ candidature.status }}
                                     </span>
                                 </td>
-                                <td>{{ candidature.dateCandidacy|date('d/m/Y') }}</td>
+                                <td>{{ candidature.dateCandidacy|date('Y-m-d') }}</td>
                                 <td>
-                                    <a href="#" class="action-btn">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="#" class="action-btn">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
+                                    <a href="#" class="action-btn"><i class="fas fa-eye"></i></a>
+                                    <a href="#" class="action-btn"><i class="fas fa-edit"></i></a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -182,8 +133,7 @@
                 </table>
             {% else %}
                 <div class="empty-state">
-                    <div class="loading-spinner"></div>
-                    <p class="empty-message">Chargement de vos candidatures...</p>
+                    <p class="empty-message">Aucune candidature disponible.</p>
                 </div>
             {% endif %}
         </div>
@@ -193,14 +143,44 @@
 
 {% block extra_js %}
 <script>
-    // Auto-refresh stats (optional)
+    // Auto-refresh stats
     document.querySelectorAll('.stat-refresh').forEach(btn => {
         btn.addEventListener('click', function() {
             this.classList.add('rotating');
-            setTimeout(() => {
-                this.classList.remove('rotating');
-            }, 1000);
+            setTimeout(() => this.classList.remove('rotating'), 1000);
         });
     });
+
+    // Filter function by search and dates
+    function filterTable() {
+        let input = document.getElementById('searchInput').value.toLowerCase();
+        let startDate = document.getElementById('dateStart').value;
+        let endDate = document.getElementById('dateEnd').value;
+        let table = document.getElementById('candidaturesTable');
+        let tr = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < tr.length; i++) {
+            let tdCompany = tr[i].getElementsByTagName('td')[0];
+            let tdTitle = tr[i].getElementsByTagName('td')[1];
+            let tdDate = tr[i].getElementsByTagName('td')[4];
+            if (!tdCompany || !tdTitle || !tdDate) continue;
+
+            let companyText = tdCompany.textContent.toLowerCase();
+            let titleText = tdTitle.textContent.toLowerCase();
+            let rowDate = tdDate.textContent;
+
+            let matchesSearch = companyText.includes(input) || titleText.includes(input);
+
+            let matchesDate = true;
+            if (startDate && rowDate < startDate) matchesDate = false;
+            if (endDate && rowDate > endDate) matchesDate = false;
+
+            if (matchesSearch && matchesDate) {
+                tr[i].style.display = '';
+            } else {
+                tr[i].style.display = 'none';
+            }
+        }
+    }
 </script>
 {% endblock %}

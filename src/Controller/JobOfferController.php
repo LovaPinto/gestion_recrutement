@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use app\Repository\CompanyRepository;
 use app\Repository\DepartmentRepository;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 final class JobOfferController extends AbstractController
 {
@@ -248,7 +249,74 @@ public function index(Request $request): Response
         'selectedStatus'    => $status,
     ]);
 }
+//offre par company 
+  #[Route('/company/job-offers', name: 'company_job_offers')]
+    public function list(
+        Request $request,
+        EntityManagerInterface $em,
+        JobOfferRepository $jobOfferRepository
+    ): Response {
 
+        /* ===============================
+           1. Vérifier session company
+        =============================== */
+        $companySession = $request->getSession()->get('company');
 
+        if (!$companySession) {
+            $this->addFlash('error', 'Veuillez vous connecter.');
+            return $this->redirectToRoute('loginCompany');
+        }
 
+        /* ===============================
+           2. Charger Company
+        =============================== */
+        $company = $em->getRepository(Company::class)
+                      ->find($companySession['id']);
+
+        if (!$company) {
+            throw $this->createNotFoundException('Entreprise introuvable');
+        }
+
+        /* ===============================
+           3. Récupérer les offres
+        =============================== */
+        $status = $request->query->get('status');
+
+        if ($status) {
+            $jobOffers = $jobOfferRepository
+                ->findByCompanyAndStatus($company, $status);
+        } else {
+            $jobOffers = $jobOfferRepository
+                ->findByCompany($company);
+        }
+
+        /* ===============================
+           4. Render
+        =============================== */
+        return $this->render('job_offer/ajoutOffre.html.twig', [
+            'jobOffers' => $jobOffers,
+            'company'   => $company,
+            'status'    => $status,
+        ]);
+    }
+  #[Route('/job_offer/hide/{id}', name: 'job_offer_hide', methods: ['POST'])]
+    public function hide(JobOffer $jobOffer, Request $request, EntityManagerInterface $em): RedirectResponse
+    {
+        // Vérification du token CSRF
+        $token = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('hide' . $jobOffer->getId(), $token)) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+            return $this->redirectToRoute('company_job_offers');
+        }
+
+        // Changer le statut pour "supprimee"
+        $jobOffer->setStatus(JobOffer::STATUS_SUPPRIMEE);
+        $em->flush();
+
+        $this->addFlash('success', 'Offre masquée avec succès.');
+        return $this->redirectToRoute('company_job_offers');
+    }
 }
+
+
+

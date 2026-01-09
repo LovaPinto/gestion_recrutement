@@ -1,103 +1,216 @@
 {% extends 'layout/layout_frontend/sidebar.html.twig' %}
-{% set menus = ['dashboard','recrutement', 'offre','candidat'] %}
+{% set menus = ['dashboard','recrutement','offre','utilisateur','departement','candidat'] %}
+
+{% block title %}Offres de {{ company.companyName }}{% endblock %}
+
 {% block body %}
-	<!DOCTYPE html>
-	<html lang="fr">
-		<head>
-			<meta charset="UTF-8">
-			<title>Demandes de recrutement</title>
-			<link rel="stylesheet" href="{{ asset('styles/demande.css') }}">
-		</head>
-		<body>
 
-			<div
-				class="container">
-
-				<!-- Titre -->
-				<div class="page-header">
-					<div>
-						<h1>Demandes de recrutement</h1>
-						<p>Gérez vos demandes de recrutement</p>
-					</div>
-
-					<a href="{{ path ('job_offer_create')}}" class="btn-primary">
-						+ Nouvelle demande
-					</a>
-				</div>
-
-				<!-- Recherche + filtre (UI seulement pour l’instant) -->
-			<div class="filters">
-    <form id="filterForm" method="get" action="{{ path('job_offer_list_RH') }}">
-        <!-- Recherche texte -->
-        <input type="text" name="keyword" placeholder="Rechercher une demande..." 
-               value="{{ keyword|default('') }}"
-               onkeyup="document.getElementById('filterForm').submit()">
-
-        <!-- Filtre statut -->
-        <select name="status" onchange="document.getElementById('filterForm').submit()">
-            <option value="">Tous les statuts</option>
-            <option value="Publiée" {{ selectedStatus == 'Publiée' ? 'selected' : '' }}>Publiée</option>
-            <option value="En attente" {{ selectedStatus == 'En attente' ? 'selected' : '' }}>En attente</option>
-            <option value="Déjà prise" {{ selectedStatus == 'Déjà prise' ? 'selected' : '' }}>Déjà prise</option>
-            <option value="Supprimée" {{ selectedStatus == 'Supprimée' ? 'selected' : '' }}>Supprimée</option>
-        </select>
-    </form>
+<div class="page-header-fixed">
+    <h2 class="page-title">Offres d'emploi – {{ company.companyName }}</h2>
 </div>
 
+{% if jobOffers is not empty %}
+    <div class="job-offer-list">
 
+        {% for offer in jobOffers %}
+            {% if offer.status != 'hidden' %}
 
-				<!-- Tableau -->
-				<table class="job-table">
-    <thead>
-        <tr>
-            <th>POSTE</th>
-            <th>TYPE</th>
-            <th>DÉPARTEMENT</th>
-            <th>SOCIÉTÉ</th>
-            <th>DATE DE CRÉATION</th>
-        </tr>
-    </thead>
+            <div class="job-offer-card">
 
-    <tbody>
-        {% if jobOffers is not empty %}
-            {% for offer in jobOffers %}
-                <tr>
-                    <!-- POSTE -->
-                    <td>
-                        <strong>{{ offer.title }}</strong><br>
-                        <span class="location">
-                            {{ offer.experienceLevel ?? '-' }}
+                <!-- HEADER -->
+                <div class="job-offer-header">
+
+                    <div class="job-offer-title">
+                        <h3>{{ offer.title }}</h3>
+                        <span class="status status-{{ offer.status }}">
+                            {{ offer.status|upper }}
                         </span>
-                    </td>
+                    </div>
 
-                    <!-- TYPE -->
-                    <td>
-                        {{ offer.offerType ?? '-' }}
-                    </td>
+                    <!-- ACTIONS HEADER (ALIGNÉES) -->
+                    <div class="job-offer-actions-header">
 
-                    <!-- DÉPARTEMENT -->
-                               <td>{{ offer.department.departmentName ?? '-' }}</td>
-			<td>{{ offer.company.companyName ?? '-' }}</td>
+                        <!-- BADGE CANDIDATURE -->
+                        <span class="badge-candidature">
+                            <i class="bi bi-people-fill"></i>
+                            {{ offer.candidacies|length }}
+                        </span>
 
-                    <!-- DATE -->
-                    <td>
-                        {{ offer.dateCreation ? offer.dateCreation|date('d/m/Y') : '-' }}
-                    </td>
-                </tr>
-            {% endfor %}
-        {% else %}
-            <tr>
-                <td colspan="5" style="text-align:center; padding: 16px;">
-                    Aucune offre trouvée
-                </td>
-            </tr>
-        {% endif %}
-    </tbody>
-</table>
+                        <!-- SUPPRIMER -->
+                        <form method="post"
+                              action="{{ path('job_offer_hide', {id: offer.id}) }}"
+                              onsubmit="return confirm('Voulez-vous vraiment masquer cette offre ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('hide' ~ offer.id) }}">
+                            <button class="btn-delete" title="Supprimer">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
 
+                    </div>
+                </div>
 
-			</div>
+                <!-- META -->
+                <div class="job-offer-meta">
+                    <span><strong>Type :</strong> {{ offer.offerType }}</span>
+                    <span><strong>Département :</strong> {{ offer.department.departmentName }}</span>
+                    <span><strong>Publié le :</strong> {{ offer.dateCreation|date('d/m/Y') }}</span>
+                    <span><strong>Deadline :</strong> {{ offer.deadline ? offer.deadline|date('d/m/Y') : 'Non définie' }}</span>
+                </div>
 
-		</body>
-	</html>
+                <!-- DESCRIPTION -->
+                <p class="job-offer-desc">
+                    {{ offer.description|slice(0, 180) }}{% if offer.description|length > 180 %}...{% endif %}
+                </p>
+
+                <!-- FOOTER -->
+                <div class="job-offer-footer">
+                    <a href="{{ path('job_offer_show', {id: offer.id}) }}"
+                       class="bton bton-secondary bton-sm">
+                        Voir l’offre
+                    </a>
+                </div>
+
+            </div>
+
+            {% endif %}
+        {% endfor %}
+
+    </div>
+{% else %}
+    <div class="alert alert-info text-center mt-4">
+        <i class="bi bi-info-circle"></i>
+        Aucune offre trouvée
+    </div>
+{% endif %}
+
+<style>
+/* ===================== */
+/* MAIN DESCEND PLUS BAS */
+/* ===================== */
+.main-content {
+    margin-left: 240px;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-top: 150px; /* ⬅️ PLUS BAS QUE LE HEADER */
+    background: #f8fafc;
+    min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 70px;
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-top: 150px;
+    }
+}
+
+/* ===================== */
+/* LISTE */
+/* ===================== */
+.job-offer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* CARD */
+.job-offer-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+}
+
+.job-offer-card:hover {
+    transform: translateY(-3px);
+}
+
+/* HEADER */
+.job-offer-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* TITRE */
+.job-offer-title h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* STATUS */
+.status {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: #111827;
+    color: #ffffff;
+}
+
+/* ACTIONS HEADER ALIGNÉES */
+.job-offer-actions-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* BADGE CANDIDATURE */
+.badge-candidature {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #eef2ff;
+    color: #4338ca;
+    border-radius: 999px;
+}
+
+/* META */
+.job-offer-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 13px;
+    color: #4b5563;
+}
+
+/* DESCRIPTION */
+.job-offer-desc {
+    font-size: 14px;
+    color: #374151;
+}
+
+/* FOOTER */
+.job-offer-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* SUPPRIMER */
+.btn-delete {
+    width: 36px;
+    height: 36px;
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-delete:hover {
+    background: #fecaca;
+    color: #b91c1c;
+}
+</style>
+
 {% endblock %}

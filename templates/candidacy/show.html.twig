@@ -242,9 +242,10 @@ h2 {
             <div>
                 <label>Statut du candidature</label>
                 <select name="status">
-                    <option value="vue" {{ candidacy.status == 'vue' ? 'selected' : '' }}>vue</option>
-                    <option value="invité à une entretien" {{ candidacy.status == 'invité à une entretien' ? 'selected' : '' }}>Invité à une entretien</option>
-                    <option value="rejetée" {{ candidacy.status == 'rejetée' ? 'selected' : '' }}>Rejetée</option>
+                    <option value="en attente" {{ candidacy.status == 'en attente' ? 'selected' : '' }}>En attente</option>
+                    <option value="invité à un entretien" {{ candidacy.status == 'invité à un entretien' ? 'selected' : '' }}>Invité à un entretien</option>
+                    <option value="acceptée" {{ candidacy.status == 'acceptée' ? 'selected' : '' }}>Acceptée</option>
+                    <option value="refusée" {{ candidacy.status == 'refusée' ? 'selected' : '' }}>Refusée</option>
                 </select>
             </div>
 

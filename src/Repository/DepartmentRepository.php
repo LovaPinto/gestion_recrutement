@@ -32,4 +32,19 @@ class DepartmentRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    
+      public function findOffersByCompanyWithCandidacyCount(int $companyId, int $managerRoleId): array
+    {
+        $qb = $this->createQueryBuilder('o')
+    ->select('o', 'COUNT(c.id) AS candidacyCount')
+    ->leftJoin('o.candidacies', 'c')
+    ->where('o.company = :companyId')
+    ->andWhere('o.roleId = :roleId')
+    ->setParameter('companyId', $companyId)
+    ->setParameter('roleId', $managerRoleId)
+    ->groupBy('o.id')
+    ->orderBy('o.datePublication', 'DESC');
+
+        return $qb->getQuery()->getResult();
+    }
 }

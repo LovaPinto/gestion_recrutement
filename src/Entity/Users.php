@@ -34,6 +34,23 @@ class Users
 
     #[ORM\ManyToOne(targetEntity: Department::class)]
     private ?Department $department = null;
+#[ORM\OneToOne(mappedBy: 'user', targetEntity: Candidate::class, cascade: ['persist', 'remove'])]
+private ?Candidate $candidate = null;
+
+public function getCandidate(): ?Candidate
+{
+    return $this->candidate;
+}
+
+public function setCandidate(Candidate $candidate): static
+{
+    $this->candidate = $candidate;
+    // On s’assure que le candidate pointe vers ce user
+    if ($candidate->getUser() !== $this) {
+        $candidate->setUser($this);
+    }
+    return $this;
+}
 
     public function getRole(): ?Role
     {

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Dashboard Manager{% endblock %}</title>
+
+    {% block stylesheets %}
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+        <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+        <style>
+            body {
+                margin: 0;
+                font-family: Arial, sans-serif;
+                background: #f8fafc;
+            }
+
+            /* ===================== STRUCTURE ===================== */
+            .dashboard-wrapper {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            /* ===================== SIDEBAR ===================== */
+            .sidebar {
+                width: 240px;
+                background: #111;
+                color: #fff;
+                display: flex;
+                flex-direction: column;
+                padding-top: 20px;
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                z-index: 1001;
+            }
+
+            .brand {
+                font-size: 22px;
+                text-align: center;
+                font-weight: bold;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #333;
+            }
+
+            .menu {
+                display: flex;
+                flex-direction: column;
+                margin-top: 10px;
+            }
+
+            .menu a {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 20px;
+                color: #fff;
+                text-decoration: none;
+                transition: background 0.2s;
+            }
+
+            .menu a:hover {
+                background: #1f2937;
+            }
+
+            /* ===================== HEADER ===================== */
+            .header {
+                position: fixed;
+                top: 0;
+                left: 240px;
+                right: 0;
+                height: 72px;
+                background: #ffffff;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 24px;
+                border-bottom: 1px solid #e5e7eb;
+                z-index: 1000;
+            }
+
+            .brand-line {
+                font-size: 22px;
+                font-weight: 700;
+                color: #111827;
+                position: relative;
+            }
+
+            .brand-line::after {
+                content: '';
+                width: 32px;
+                height: 3px;
+                background: #111827;
+                position: absolute;
+                bottom: -6px;
+                left: 0;
+                border-radius: 2px;
+            }
+
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+            }
+
+            .icon-btn {
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                background: #f3f4f6;
+                border: none;
+                cursor: pointer;
+                color: #111827;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .user-profile {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                background: #111827;
+                color: #ffffff;
+                border-radius: 50%;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .logout {
+                font-size: 14px;
+                color: #111827;
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+            /* ===================== MAIN CONTENT ===================== */
+            .main-content {
+                margin-left: 240px;
+                padding: 110px 30px 30px; /* espace header */
+                flex: 1;
+            }
+
+            /* ===================== RESPONSIVE ===================== */
+            @media (max-width: 768px) {
+                .sidebar {
+                    width: 70px;
+                }
+
+                .header {
+                    left: 70px;
+                }
+
+                .main-content {
+                    margin-left: 70px;
+                    padding-top: 100px;
+                }
+
+                .brand-line {
+                    font-size: 18px;
+                }
+
+                .logout {
+                    display: none;
+                }
+            }
+        </style>
+    {% endblock %}
+</head>
+
+<body>
+
+<div class="dashboard-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <h2 class="brand">Nextwork</h2>
+        <nav class="menu">
+            {% block sidebar %}
+                <a href="{{ path('dashboard_manager') }}">
+                    <i class="bx bxs-dashboard"></i> Tableau de bord
+                </a>
+                <a href="{{ path('dashboard_manager') }}">
+                    <i class="bx bxs-briefcase"></i> Offres
+                </a>
+                <a href="{{ path('suivieCandidate') }}">
+                    <i class="bi bi-people-fill"></i> Candidatures
+                </a>
+                <a href="{{ path('app_department_ajout') }}">
+                    <i class="bi bi-buildings-fill"></i> Départements
+                </a>
+                <a href="{{ path('logoutCompany') }}">
+                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                </a>
+            {% endblock %}
+        </nav>
+    </aside>
+
+    <!-- HEADER -->
+    <header class="header">
+        <h1 class="brand-line">
+            {{ app.session.get('company') ? app.session.get('company').name : 'Entreprise' }}
+        </h1>
+
+        <div class="header-right">
+
+            <button class="icon-btn">
+                <i class="bi bi-bell"></i>
+            </button>
+
+            <div class="user-profile">
+                <div class="user-avatar">
+                    {{
+                        app.session.get('company') and app.session.get('company').name
+                        ? app.session.get('company').name|first|upper
+                        : 'C'
+                    }}
+                </div>
+                <i class="bi bi-gear settings-icon"></i>
+            </div>
+
+            <a href="{{ path('logoutCompany') }}" class="logout">
+                Déconnexion
+            </a>
+        </div>
+    </header>
+
+    <!-- CONTENU -->
+    <main class="main-content">
+        {% block body %}{% endblock %}
+    </main>
+
+</div>
+
+{% block javascripts %}{% endblock %}
+</body>
+</html>
