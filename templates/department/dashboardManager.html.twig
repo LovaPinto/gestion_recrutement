@@ -1,0 +1,166 @@
+{% extends 'layout/layout_frontend/layoutDepart.html.twig' %}
+
+{% block title %}
+Dashboard {{ roleId == 1 ? 'RH' : 'Manager' }} - {{ company.companyName }}
+{% endblock %}
+
+{% block body %}
+<h2>Dashboard {{ roleId == 1 ? 'RH' : 'Manager' }} – {{ company.companyName }}</h2>
+
+<div class="offers-count" style="display:flex; gap:30px; margin-bottom:30px; flex-wrap:wrap;">
+
+    <div class="count-box">
+        <h3 class="section-title">En attente</h3>
+        <div class="count-number">
+            {{ offersByStatus['en attente']|default(0) }}
+        </div>
+    </div>
+
+    <div class="count-box">
+        <h3 class="section-title">Publiée</h3>
+        <div class="count-number">
+            {{ offersByStatus['publiee']|default(0) }}
+        </div>
+    </div>
+
+    <div class="count-box">
+        <h3 class="section-title">Déjà prise</h3>
+        <div class="count-number">
+            {{ offersByStatus['prise']|default(0) }}
+        </div>
+    </div>
+
+    <div class="count-box">
+        <h3 class="section-title">Total créées</h3>
+        <div class="count-number">
+            {{ jobOffers|length }}
+        </div>
+    </div>
+
+</div>
+
+<div class="actions" style="margin-bottom:20px;">
+    <a href="{{ path('job_offer_create') }}" class="btn-create">Ajouter une offre</a>
+</div>
+
+{% if jobOffers is empty %}
+    <p>Aucune offre pour le moment.</p>
+{% else %}
+    <div class="job-offer-list">
+        {% for offer in jobOffers %}
+            {% if offer.status != 'hidden' %}
+            <div class="job-offer-card">
+
+                <div class="job-offer-header">
+                    <div class="job-offer-title">
+                        <h3>{{ offer.title }}</h3>
+                    </div>
+
+                    <div class="job-offer-actions-header">
+                        <span class="badge-candidature">
+                            <i class="bi bi-people-fill"></i>
+                            {{ offer.candidacies|length }}
+                        </span>
+
+                        <a href="#" class="btn-edit" title="Modifier">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+
+                        <form method="post"
+                              action="{{ path('job_offer_hide', {id: offer.id}) }}"
+                              onsubmit="return confirm('Voulez-vous vraiment masquer cette offre ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('hide' ~ offer.id) }}">
+                            <button class="btn-delete" title="Supprimer">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="job-offer-meta">
+                    <span><strong>Type :</strong> {{ offer.offerType }}</span>
+                    <span><strong>Département :</strong> {{ offer.department ? offer.department.departmentName : 'Non défini' }}</span>
+                    <span><strong>Publié le :</strong> {{ offer.dateCreation ? offer.dateCreation|date('d/m/Y') : '-' }}</span>
+                    <span><strong>Deadline :</strong> {{ offer.deadline ? offer.deadline|date('d/m/Y') : 'Non définie' }}</span>
+                </div>
+
+                <p class="job-offer-desc">
+                    {{ offer.description|slice(0, 180) }}{% if offer.description|length > 180 %}...{% endif %}
+                </p>
+
+                <div class="job-offer-footer">
+                    <a href="{{ path('job_offer_show', {id: offer.id}) }}" class="btn-view">
+                        Voir l’offre
+                    </a>
+                </div>
+
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }} {# Conserve le CSS du layout #}
+    <style>
+    .offers-count {
+        display:flex; 
+        gap:30px; 
+        margin-bottom:30px; 
+        flex-wrap:wrap;
+    }
+    .count-box {
+        width:140px;
+        height:140px;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
+        background:#f9fafb;
+        border-radius:12px;
+        box-shadow:0 4px 10px rgba(0,0,0,0.05);
+        padding:16px;
+        transition:all 0.3s;
+    }
+    .count-box:hover {
+        box-shadow:0 6px 14px rgba(0,0,0,0.1);
+    }
+    .count-box .section-title {
+        font-size:16px;
+        font-weight:600;
+        color:#4b5563;
+        text-align:center;
+        margin-bottom:12px;
+    }
+    .count-box .count-number {
+        font-size:36px;
+        font-weight:700;
+        color:#111827;
+        text-align:center;
+        line-height:1;
+    }
+
+    .job-offer-list { display:flex; flex-direction:column; gap:20px; }
+    .job-offer-card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 4px 12px rgba(0,0,0,0.05); transition:transform 0.2s; }
+    .job-offer-card:hover { transform:translateY(-3px); }
+    .job-offer-header { display:flex; justify-content:space-between; align-items:center; }
+    .job-offer-title h3 { margin:0; font-size:18px; font-weight:600; }
+    .job-offer-actions-header { display:flex; align-items:center; gap:8px; }
+    .badge-candidature { display:flex; align-items:center; gap:4px; padding:4px 8px; font-size:12px; font-weight:600; background:#eef2ff; color:#4338ca; border-radius:999px; }
+    .btn-edit, .btn-delete, .btn-view { display:flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:6px; font-size:14px; cursor:pointer; transition:all 0.2s; text-decoration:none; }
+    .btn-edit { background:#f3f4f6; color:#111; } 
+    .btn-edit:hover { background:#d1d5db; }
+    .btn-delete { background:#fee2e2; color:#dc2626; border:none; } 
+    .btn-delete:hover { background:#fecaca; }
+    .btn-view { background:#f3f4f6; color:#111; padding:6px 12px; border-radius:6px; text-decoration:none; } 
+    .btn-view:hover { background:#d1d5db; }
+    .job-offer-meta { display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:13px; color:#4b5563; }
+    .job-offer-desc { margin-top:10px; font-size:14px; color:#374151; }
+    .job-offer-footer { display:flex; justify-content:flex-end; margin-top:12px; }
+    .actions { margin-bottom:20px; }
+    .btn-create { padding:10px 20px; background-color:#007bff; color:#fff; border-radius:6px; text-decoration:none; } 
+    .btn-create:hover { background-color:#0056b3; }
+    @media(max-width:768px){ .job-offer-card{padding:15px;} .job-offer-meta{font-size:12px;} .job-offer-desc{font-size:13px;} .btn-create{padding:8px 16px; font-size:13px;} }
+    </style>
+{% endblock %}

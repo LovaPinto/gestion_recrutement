@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\CandidacyRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Users;
 
 #[ORM\Entity(repositoryClass: CandidacyRepository::class)]
 class Candidacy
@@ -38,6 +39,11 @@ class Candidacy
     #[ORM\ManyToOne(inversedBy: 'candidacies')]
     #[ORM\JoinColumn(nullable: false)]
     private ?JobOffer $jobOffer = null;
+
+    // ================= NOUVELLE RELATION AVEC USERS =================
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: 'candidacies')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Users $user = null;
 
     // ================= GETTERS & SETTERS =================
 
@@ -137,6 +143,18 @@ class Candidacy
     public function setJobOffer(?JobOffer $jobOffer): static
     {
         $this->jobOffer = $jobOffer;
+        return $this;
+    }
+
+    // ================= GETTER & SETTER POUR USER =================
+    public function getUser(): ?Users
+    {
+        return $this->user;
+    }
+
+    public function setUser(?Users $user): static
+    {
+        $this->user = $user;
         return $this;
     }
 }

@@ -1,28 +1,60 @@
 {% extends 'layout/layout_frontend/connexionDepart.html.twig' %}
 
-{% block title %}Connexion société
-{% endblock %}
+{% block title %}Connexion société{% endblock %}
 
 {% block auth_content %}
-	<h2>Ravie de te revoir !</h2>
 
-	<form method="post" action="{{ path('loginSociety') }}">
+    <h2>Ravi de vous revoir 👋</h2>
+    <p class="subtitle">Connectez-vous pour gérer vos offres et candidatures</p>
 
-		<input type="text" name="company_name" placeholder="Nom du société" required>
+    {# Messages flash #}
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ type }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
 
-		<div class="password-field">
-			<input type="password" name="password" placeholder="Password" required>
-			<span class="eye">👁</span>
-		</div>
+    <form method="post" action="{{ path('loginSociety') }}" class="auth-form">
 
-		<button class="btn-primary">Se connecter</button>
+        <input
+            type="text"
+            name="company_name"
+            placeholder="Nom de la société"
+            required
+        >
 
-	</form>
+        <div class="password-field">
+            <input
+                type="password"
+                name="password"
+                placeholder="Mot de passe"
+                required
+            >
+            <span class="eye" onclick="togglePassword(this)">👁</span>
+        </div>
 
-	<p class="register">
-		Don’t have an account ?
-		<a href="{{ path('creer_Compte_Department') }}">Sign in</a>
-	</p>
+        <button type="submit" class="btn-primary">
+            Se connecter
+        </button>
 
-	<a class="forgot" href="#">Mot de passe oublié ?</a>
+    </form>
+
+    <p class="register">
+        Vous n’avez pas encore de compte ?
+        <a href="{{ path('creer_Compte_Department') }}">Créer un compte</a>
+    </p>
+
+    <a class="forgot" href="#">
+        Mot de passe oublié ?
+    </a>
+
+    <script>
+        function togglePassword(el) {
+            const input = el.previousElementSibling;
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+
 {% endblock %}

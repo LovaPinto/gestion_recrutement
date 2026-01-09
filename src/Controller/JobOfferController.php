@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use app\Repository\CompanyRepository;
 use app\Repository\DepartmentRepository;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 final class JobOfferController extends AbstractController
 {
@@ -43,9 +44,7 @@ final class JobOfferController extends AbstractController
     }
 
     #[Route('/job/offer/insert', name: 'app_job_offer_insert', methods: ['POST'])]
-    public function insertJob(
-        Request $request,
-        UsersRepository $usersRepository
+    public function insertJob( Request $request,UsersRepository $usersRepository
     ): Response {
         $offerType    = $request->request->get('offerType');
         $description  = $request->request->get('description');
@@ -85,8 +84,8 @@ final class JobOfferController extends AbstractController
             ->findAllByFilter($keyword, $companyId, $departmentId, $offerType);
 
         return $this->render('candidate/Portail_candidate.html.twig', [
-            'companyNames'      => $this->jobOfferRepository->findAllCompanyName(),
-            'departmentNames'   => $this->jobOfferRepository->findAllDepartmentName(),
+            'companyNames'      => $this->companyRepository->findAllCompanyName(),
+            'departmentNames'   => $this->departmentRepository->findAllDepartmentName(),
             'offerTypes'        => $this->jobOfferRepository->findAllOfferTypes(),
             'jobOffers'         => $jobOffers,
             'keyword'           => $keyword,
@@ -134,10 +133,7 @@ final class JobOfferController extends AbstractController
 
     /* ===================== CRÉATION OFFRE (WIZARD 5 ÉTAPES) ===================== */
     #[Route(
-        '/create_job/{step}',
-        name: 'job_offer_create',
-        defaults: ['step' => 1],
-        requirements: ['step' => '\d+']
+        '/create_job/{step}', name: 'job_offer_create',defaults: ['step' => 1],requirements: ['step' => '\d+']
     )]
     public function create(Request $request, int $step): Response
     {
@@ -227,13 +223,100 @@ final class JobOfferController extends AbstractController
         ]);
     }
 
-     #[Route('/job-offers1', name: 'job_offer_list_RH')]
-    public function index(JobOfferRepository $jobOfferRepository): Response
-    {
-        $jobOffers = $jobOfferRepository->findAllOrdered();
+   #[Route('/job-offers1', name: 'job_offer_list_RH')]
+public function index(Request $request): Response
+{
+    $keyword        = $request->query->get('keyword', null);
+    $companyName    = $request->query->get('company', null);
+    $departmentName = $request->query->get('department', null);
+    $offerType      = $request->query->get('offerType', null);
+    $status         = $request->query->get('status', null);
 
+    $jobOffers = $this->jobOfferRepository->findAllJobByFilter(
+        $keyword,
+        $companyName,
+        $departmentName,
+        $offerType,
+        $status
+    );
+
+    return $this->render('job_offer/ajoutOffre.html.twig', [
+        'jobOffers'         => $jobOffers,
+        'keyword'           => $keyword,
+        'selectedCompany'   => $companyName,
+        'selectedDepartment'=> $departmentName,
+        'selectedOfferType' => $offerType,
+        'selectedStatus'    => $status,
+    ]);
+}
+//offre par company 
+  #[Route('/company/job-offers', name: 'company_job_offers')]
+    public function list(
+        Request $request,
+        EntityManagerInterface $em,
+        JobOfferRepository $jobOfferRepository
+    ): Response {
+
+        /* ===============================
+           1. Vérifier session company
+        =============================== */
+        $companySession = $request->getSession()->get('company');
+
+        if (!$companySession) {
+            $this->addFlash('error', 'Veuillez vous connecter.');
+            return $this->redirectToRoute('loginCompany');
+        }
+
+        /* ===============================
+           2. Charger Company
+        =============================== */
+        $company = $em->getRepository(Company::class)
+                      ->find($companySession['id']);
+
+        if (!$company) {
+            throw $this->createNotFoundException('Entreprise introuvable');
+        }
+
+        /* ===============================
+           3. Récupérer les offres
+        =============================== */
+        $status = $request->query->get('status');
+
+        if ($status) {
+            $jobOffers = $jobOfferRepository
+                ->findByCompanyAndStatus($company, $status);
+        } else {
+            $jobOffers = $jobOfferRepository
+                ->findByCompany($company);
+        }
+
+        /* ===============================
+           4. Render
+        =============================== */
         return $this->render('job_offer/ajoutOffre.html.twig', [
-            'jobOffers' => $jobOffers
+            'jobOffers' => $jobOffers,
+            'company'   => $company,
+            'status'    => $status,
         ]);
     }
+  #[Route('/job_offer/hide/{id}', name: 'job_offer_hide', methods: ['POST'])]
+    public function hide(JobOffer $jobOffer, Request $request, EntityManagerInterface $em): RedirectResponse
+    {
+        // Vérification du token CSRF
+        $token = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('hide' . $jobOffer->getId(), $token)) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+            return $this->redirectToRoute('company_job_offers');
+        }
+
+        // Changer le statut pour "supprimee"
+        $jobOffer->setStatus(JobOffer::STATUS_SUPPRIMEE);
+        $em->flush();
+
+        $this->addFlash('success', 'Offre masquée avec succès.');
+        return $this->redirectToRoute('company_job_offers');
+    }
 }
+
+
+

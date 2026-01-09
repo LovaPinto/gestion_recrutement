@@ -29,10 +29,12 @@ class Candidate
     #[Assert\Email]
     private ?string $email = null;
 
-    #[ORM\OneToOne(inversedBy: 'candidate')]
-    #[ORM\JoinColumn(nullable: false)]
+    // =========================
+    // Relation OneToOne avec Users
+    // =========================
+    #[ORM\OneToOne(inversedBy: 'candidate', targetEntity: Users::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
     private ?Users $user = null;
-
 
     #[ORM\Column(type: Types::STRING, length: 20, nullable: true)]
     private ?string $telephone = null;
@@ -76,7 +78,6 @@ class Candidate
     // =====================
     // Relations
     // =====================
-
     #[ORM\OneToMany(mappedBy: 'candidate', targetEntity: Candidacy::class, orphanRemoval: true)]
     private Collection $candidacies;
 
@@ -111,18 +112,6 @@ class Candidate
         return $this;
     }
 
-    public function getUser(): ?Users
-    {
-    return $this->user;
-}
-
-public function setUser(Users $user): self
-{
-    $this->user = $user;
-    return $this;
-}
-
-
     public function getPrenom(): ?string
     {
         return $this->prenom;
@@ -140,6 +129,16 @@ public function setUser(Users $user): self
     public function setEmail(?string $email): static
     {
         $this->email = $email;
+        return $this;
+    }
+
+    public function getUser(): ?Users
+    {
+        return $this->user;
+    }
+    public function setUser(Users $user): static
+    {
+        $this->user = $user;
         return $this;
     }
 
@@ -273,9 +272,6 @@ public function setUser(Users $user): self
         return $this;
     }
 
-    // =====================
-    // Candidacies Relation
-    // =====================
     /**
      * @return Collection|Candidacy[]
      */
@@ -284,50 +280,8 @@ public function setUser(Users $user): self
         return $this->candidacies;
     }
 
-    public function addCandidacy(Candidacy $candidacy): static
-    {
-        if (!$this->candidacies->contains($candidacy)) {
-            $this->candidacies->add($candidacy);
-            $candidacy->setCandidate($this);
-        }
-        return $this;
-    }
-
-    public function removeCandidacy(Candidacy $candidacy): static
-    {
-        if ($this->candidacies->removeElement($candidacy)) {
-            if ($candidacy->getCandidate() === $this) {
-                $candidacy->setCandidate(null);
-            }
-        }
-        return $this;
-    }
-
-    // =====================
-    // JobOffers Relation
-    // =====================
-    /**
-     * @return Collection|JobOffer[]
-     */
     public function getJobOffers(): Collection
     {
         return $this->jobOffers;
-    }
-
-    public function addJobOffer(JobOffer $jobOffer): static
-    {
-        if (!$this->jobOffers->contains($jobOffer)) {
-            $this->jobOffers->add($jobOffer);
-            $jobOffer->addCandidate($this);
-        }
-        return $this;
-    }
-
-    public function removeJobOffer(JobOffer $jobOffer): static
-    {
-        if ($this->jobOffers->removeElement($jobOffer)) {
-            $jobOffer->removeCandidate($this);
-        }
-        return $this;
     }
 }

@@ -1,0 +1,33 @@
+{% extends 'layout/layout_frontend/connexionDepart.html.twig' %}
+
+{% block title %}Inscription Candidat{% endblock %}
+
+{% block auth_content %}
+
+<h2>Bienvenue !</h2>
+
+{# Affiche les messages flash #}
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }}">{{ message }}</div>
+    {% endfor %}
+{% endfor %}
+
+<form method="post" action="{{ path('candidat_signup') }}">
+    <input type="text" name="first_name" placeholder="Prénom" required>
+    <input type="text" name="last_name" placeholder="Nom" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <div class="password-field">
+        <input type="password" name="password" placeholder="Mot de passe" required>
+        <span class="eye">👁</span>
+    </div>
+    <input type="hidden" name="_csrf_token" value="">
+
+    <button class="btn-primary">S'inscrire</button>
+</form>
+
+<p class="register">Vous avez déjà un compte ? 
+    <a href="{{ path('candidat_login') }}">Se connecter</a>
+</p>
+
+{% endblock %}

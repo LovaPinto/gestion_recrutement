@@ -4,47 +4,59 @@ namespace App\Controller;
 
 use App\Entity\Candidacy;
 use App\Entity\JobOffer;
+use App\Entity\Users;
+use App\Event\CandidacyStatusChangedEvent;
 use App\Repository\CandidacyRepository;
+use App\Service\CandidacyMailer;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 
 final class CandidacyController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-    private CandidacyRepository $candidacyRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, CandidacyRepository $candidacyRepository)
-    {
-        $this->entityManager = $entityManager;
-        $this->candidacyRepository = $candidacyRepository;
-    }
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private CandidacyRepository $candidacyRepository,
+        private CandidacyMailer $mailer
+    ) {}
 
     /* ===================== POSTULER À UNE OFFRE ===================== */
     #[Route('/job/{id}/apply', name: 'job_apply')]
     public function apply(JobOffer $jobOffer, Request $request): Response
     {
+        $userId = $request->getSession()->get('user_id');
+
+        if (!$userId) {
+            $this->addFlash('error', 'Vous devez être connecté pour postuler.');
+            return $this->redirectToRoute('candidat_login');
+        }
+
+        $user = $this->entityManager->getRepository(Users::class)->find($userId);
+        if (!$user) {
+            $this->addFlash('error', 'Utilisateur introuvable.');
+            return $this->redirectToRoute('candidat_login');
+        }
+
         if ($request->isMethod('POST')) {
             $candidacy = new Candidacy();
             $candidacy->setJobOffer($jobOffer);
+            $candidacy->setUser($user);
             $candidacy->setDateCandidacy(new \DateTime());
             $candidacy->setStatus('en attente');
 
-            // CV en BLOB
-            $cv = $request->files->get('cv_path');
-            if ($cv) {
-                $content = file_get_contents($cv->getPathname());
-                $candidacy->setCvPath($content);
+            // CV
+            if ($cv = $request->files->get('cv_path')) {
+                $candidacy->setCvPath(file_get_contents($cv->getPathname()));
             }
 
-            // Pièce jointe en BLOB
-            $att = $request->files->get('attachement');
-            if ($att) {
-                $content = file_get_contents($att->getPathname());
-                $candidacy->setAttachement($content);
+            // Pièce jointe
+            if ($att = $request->files->get('attachement')) {
+                $candidacy->setAttachement(file_get_contents($att->getPathname()));
             }
 
             // Portfolio
@@ -54,7 +66,7 @@ final class CandidacyController extends AbstractController
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Votre candidature a été envoyée avec succès.');
-            return $this->redirectToRoute('app_job_portail_default');
+            return $this->redirectToRoute('app_candidate_dashboard');
         }
 
         return $this->render('candidacy/apply.html.twig', [
@@ -64,8 +76,11 @@ final class CandidacyController extends AbstractController
 
     /* ===================== LISTE DES CANDIDATURES ===================== */
     #[Route('/job/offer/{id}/candidacies', name: 'job_offer_candidacies')]
-    public function showCandidacies(JobOffer $jobOffer, Request $request, PaginatorInterface $paginator): Response
-    {
+    public function showCandidacies(
+        JobOffer $jobOffer,
+        Request $request,
+        PaginatorInterface $paginator
+    ): Response {
         $query = $this->candidacyRepository->createQueryBuilder('c')
             ->where('c.jobOffer = :jobOffer')
             ->setParameter('jobOffer', $jobOffer)
@@ -84,7 +99,7 @@ final class CandidacyController extends AbstractController
         ]);
     }
 
-    /* ===================== DÉTAIL D’UNE CANDIDATURE ===================== */
+    /* ===================== DÉTAIL ===================== */
     #[Route('/candidacy/{id}', name: 'candidacy_show')]
     public function show(Candidacy $candidacy): Response
     {
@@ -93,91 +108,91 @@ final class CandidacyController extends AbstractController
         ]);
     }
 
-    /* ===================== AFFICHER / TÉLÉCHARGER FICHIER ===================== */
-#[Route('/candidacy/{id}/file/{type}', name: 'candidacy_file')]
-public function downloadCandidacyFile(Candidacy $candidacy, string $type): Response
-{
-    if (!in_array($type, ['cv', 'attachement'])) {
-        throw $this->createNotFoundException('Type de fichier inconnu.');
-    }
-
-    $data = ($type === 'cv') ? $candidacy->getCvPath() : $candidacy->getAttachement();
-    if (!$data) {
-        throw $this->createNotFoundException('Fichier non trouvé.');
-    }
-
-    // Lire le BLOB si c'est un resource
-    if (is_resource($data)) {
-        rewind($data);
-        $data = stream_get_contents($data);
-    }
-
-    // Détecter le type mime pour PDF, image, Word
-    $finfo = new \finfo(FILEINFO_MIME_TYPE);
-    $mime = $finfo->buffer($data) ?: 'application/octet-stream';
-
-    // Nom du fichier avec extension possible
-    $filename = ($type === 'cv') ? 'CV_'.$candidacy->getId() : 'Attachement_'.$candidacy->getId();
-
-    // Ajouter l'extension si c'est un PDF
-    if ($mime === 'application/pdf') {
-        $filename .= '.pdf';
-    } elseif ($mime === 'image/jpeg') {
-        $filename .= '.jpg';
-    } elseif ($mime === 'image/png') {
-        $filename .= '.png';
-    } elseif ($mime === 'application/msword') {
-        $filename .= '.doc';
-    } elseif ($mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-        $filename .= '.docx';
-    }
-
-    return new Response($data, 200, [
-        'Content-Type' => $mime,
-        'Content-Disposition' => 'inline; filename="'.$filename.'"',
-        'Content-Length' => strlen($data)
-    ]);
-}
-//update candidature par le RH 
-// ===================== MISE À JOUR D’UNE CANDIDATURE =====================
-#[Route('/candidacy/{id}/update', name: 'candidacy_update', methods: ['POST'])]
-public function updateCandidacy(Candidacy $candidacy, Request $request): Response
-{
-    // Récupérer les données du formulaire
-    $status = $request->request->get('status');
-    $recruiterNote = $request->request->get('recruiter_note');
-    $interviewDateStr = $request->request->get('interview_date');
-
-    // Mettre à jour le statut
-    if ($status) {
-        $candidacy->setStatus($status);
-    }
-
-    // Mettre à jour la note RH
-    $candidacy->setRecruiterNote($recruiterNote ?: null);
-
-    // Mettre à jour la date d'entretien
-    if ($interviewDateStr) {
-        try {
-            $interviewDate = new \DateTime($interviewDateStr);
-            $candidacy->setInterviewDate($interviewDate);
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Date d’entretien invalide.');
-            return $this->redirectToRoute('candidacy_show', ['id' => $candidacy->getId()]);
+    /* ===================== TÉLÉCHARGEMENT FICHIERS ===================== */
+    #[Route('/candidacy/{id}/file/{type}', name: 'candidacy_file')]
+    public function downloadFile(Candidacy $candidacy, string $type): Response
+    {
+        if (!in_array($type, ['cv', 'attachement'])) {
+            throw $this->createNotFoundException();
         }
-    } else {
-        $candidacy->setInterviewDate(null);
+
+        $data = $type === 'cv' ? $candidacy->getCvPath() : $candidacy->getAttachement();
+        if (!$data) {
+            throw $this->createNotFoundException();
+        }
+
+        if (is_resource($data)) {
+            rewind($data);
+            $data = stream_get_contents($data);
+        }
+
+        $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($data) ?: 'application/octet-stream';
+        $filename = strtoupper($type).'_'.$candidacy->getId();
+
+        return new Response($data, 200, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'inline; filename="'.$filename.'"'
+        ]);
     }
 
-    // Enregistrer dans la base
-    $this->entityManager->persist($candidacy);
-    $this->entityManager->flush();
+    /* ===================== UPDATE RH + OBSERVER ===================== */
+  #[Route('/candidacy/{id}/update', name: 'candidacy_update', methods: ['POST'])]
+    public function updateCandidacy(
+        Candidacy $candidacy,
+        Request $request,
+        EventDispatcherInterface $dispatcher
+    ): Response {
+        $oldStatus = $candidacy->getStatus();
 
-    $this->addFlash('success', 'Candidature mise à jour avec succès.');
+        $status = $request->request->get('status');
+        $note = $request->request->get('recruiter_note');
+        $dateStr = $request->request->get('interview_date');
 
-    return $this->redirectToRoute('candidacy_show', ['id' => $candidacy->getId()]);
-}
+        if ($status) {
+            $candidacy->setStatus($status);
+        }
+
+        $candidacy->setRecruiterNote($note ?: null);
+
+        if ($dateStr) {
+            try {
+                $candidacy->setInterviewDate(new \DateTime($dateStr));
+            } catch (\Exception) {
+                $this->addFlash('error', 'Date d’entretien invalide.');
+                return $this->redirectToRoute('candidacy_show', ['id' => $candidacy->getId()]);
+            }
+        } else {
+            $candidacy->setInterviewDate(null);
+        }
+
+        $this->entityManager->flush();
+
+        // 🔔 Envoi mail si le statut change
+        if ($oldStatus !== $candidacy->getStatus()) {
+            $sent = false;
+
+            switch ($candidacy->getStatus()) {
+                case 'invité à un entretien':
+                    $sent = $this->mailer->sendInterviewEmail($candidacy);
+                    break;
+
+                case 'acceptée':
+                    $sent = $this->mailer->sendAcceptedEmail($candidacy);
+                    break;
+            }
+
+            if ($sent) {
+                $this->addFlash('success', 'Candidature mise à jour. Email envoyé.');
+            } else {
+                $this->addFlash('warning', 'Candidature mise à jour. Échec de l’envoi de l’email.');
+            }
+        } else {
+            $this->addFlash('success', 'Candidature mise à jour. Aucun changement de statut.');
+        }
+
+        return $this->redirectToRoute('candidacy_show', ['id' => $candidacy->getId()]);
+    }
 
 
-
+    
 }

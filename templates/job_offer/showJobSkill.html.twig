@@ -186,26 +186,16 @@
 
 {% block body %}
 <div class="offer-container">
-
-    <!-- TITRE -->
     <div class="offer-title">{{ jobOffer.title }}</div>
-
-    <!-- STATUS -->
     <div class="offer-status {{ jobOffer.status == 'active' ? 'active' : 'inactive' }}">
         {{ jobOffer.status|capitalize }}
     </div>
-
-    <!-- ENTREPRISE & DEPARTEMENT -->
     <div class="offer-company">{{ jobOffer.company ? jobOffer.company.companyName : 'N/A' }}</div>
     <div class="offer-department">{{ jobOffer.department ? jobOffer.department.departmentName : 'N/A' }}</div>
-
-    <!-- DESCRIPTION -->
     <div class="offer-section">
         <h3>Description</h3>
         <p>{{ jobOffer.description }}</p>
     </div>
-
-    <!-- META (CONTRAT + EXPERIENCE) -->
     <div class="offer-meta">
         <div class="meta-box">
             Type de contrat
@@ -216,8 +206,6 @@
             <span>{{ jobOffer.experienceLevel }}</span>
         </div>
     </div>
-
-    <!-- JOB SKILLS -->
     {% if jobOffer.jobSkills is defined and jobOffer.jobSkills|length > 0 %}
     <div class="offer-section">
         <h3>Compétences requises</h3>
@@ -228,14 +216,10 @@
         </ul>
     </div>
     {% endif %}
-
-    <!-- DATES -->
     <div class="offer-dates">
         <span>Date de publication: {{ jobOffer.dateCreation ? jobOffer.dateCreation|date('d/m/Y') : '' }}</span>
         <span>Deadline: {{ jobOffer.deadline ? jobOffer.deadline|date('d/m/Y') : '' }}</span>
     </div>
-
-    <!-- BOUTON POSTULER -->
 <a href="{{ path('job_apply', {id: jobOffer.id}) }}" class="apply-btn">Postuler</a>
 
 

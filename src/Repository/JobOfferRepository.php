@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\JobOffer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Company;
 
 class JobOfferRepository extends ServiceEntityRepository
 {
@@ -14,28 +15,7 @@ class JobOfferRepository extends ServiceEntityRepository
     }
 
     /* ===================== ENTREPRISES SANS DOUBLONS ===================== */
-    public function findAllCompanyName(): array
-    {
-        return $this->createQueryBuilder('j')
-            ->select('c.id, c.companyName')
-            ->join('j.company', 'c')
-            ->groupBy('c.id, c.companyName')
-            ->orderBy('c.companyName', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    /* ===================== DÉPARTEMENTS SANS DOUBLONS ===================== */
-    public function findAllDepartmentName(): array
-    {
-        return $this->createQueryBuilder('j')
-            ->select('d.id, d.departmentName')
-            ->join('j.department', 'd')
-            ->groupBy('d.id, d.departmentName')
-            ->orderBy('d.departmentName', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
+    
 
     /* ===================== TYPES D’OFFRES SANS DOUBLONS ===================== */
     public function findAllOfferTypes(): array
@@ -48,38 +28,43 @@ class JobOfferRepository extends ServiceEntityRepository
     }
 
     /* ===================== FILTRAGE DES OFFRES ===================== */
-    public function findAllByFilter($keyword, $companyId, $departmentId, $offerType)
-    {
-        $qb = $this->createQueryBuilder('j')
-            ->select('j.id, j.title, j.offerType, c.companyName, d.departmentName')
-            ->join('j.company', 'c')
-            ->join('j.department', 'd');
+   // src/Repository/JobOfferRepository.php
+public function findAllByFilter(
+    ?string $keyword,
+    ?string $companyName,
+    ?string $departmentName,
+    ?string $offerType
+): array {
+    $qb = $this->createQueryBuilder('j')
+        ->select('j.id, j.title, j.offerType, c.companyName, d.departmentName')
+        ->join('j.company', 'c')
+        ->join('j.department', 'd');
 
-        if (!empty($keyword)) {
-            $qb->andWhere('j.title LIKE :keyword')
-               ->setParameter('keyword', '%' . $keyword . '%');
-        }
-
-        if (!empty($companyId)) {
-            $qb->andWhere('c.id = :companyId')
-               ->setParameter('companyId', $companyId);
-        }
-
-        if (!empty($departmentId)) {
-            $qb->andWhere('d.id = :departmentId')
-               ->setParameter('departmentId', $departmentId);
-        }
-
-        if (!empty($offerType)) {
-            $qb->andWhere('j.offerType = :offerType')
-               ->setParameter('offerType', $offerType);
-        }
-
-        return $qb
-            ->orderBy('j.dateCreation', 'DESC')
-            ->getQuery()
-            ->getResult();
+    if (!empty($keyword)) {
+        $qb->andWhere('j.title LIKE :keyword')
+           ->setParameter('keyword', '%' . $keyword . '%');
     }
+
+    if (!empty($companyName)) {
+        $qb->andWhere('c.companyName = :companyName')
+           ->setParameter('companyName', $companyName);
+    }
+
+    if (!empty($departmentName)) {
+        $qb->andWhere('d.departmentName = :departmentName')
+           ->setParameter('departmentName', $departmentName);
+    }
+
+    if (!empty($offerType)) {
+        $qb->andWhere('j.offerType = :offerType')
+           ->setParameter('offerType', $offerType);
+    }
+
+    return $qb
+        ->orderBy('j.dateCreation', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
 
     /* ===================== TOUTES LES OFFRES ===================== */
     public function findAll(): array
@@ -98,4 +83,72 @@ class JobOfferRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+public function findAllJobByFilter(
+    ?string $keyword,
+    ?string $companyName,
+    ?string $departmentName,
+    ?string $offerType,
+    ?string $status
+): array {
+    $qb = $this->createQueryBuilder('j')
+        ->leftJoin('j.company', 'c')
+        ->addSelect('c')
+        ->leftJoin('j.department', 'd')
+        ->addSelect('d');
+
+    if (!empty($keyword)) {
+        $qb->andWhere('j.title LIKE :keyword')
+           ->setParameter('keyword', '%' . $keyword . '%');
+    }
+
+    if (!empty($companyName)) {
+        $qb->andWhere('c.companyName = :companyName')
+           ->setParameter('companyName', $companyName);
+    }
+
+    if (!empty($departmentName)) {
+        $qb->andWhere('d.departmentName = :departmentName')
+           ->setParameter('departmentName', $departmentName);
+    }
+
+    if (!empty($offerType)) {
+        $qb->andWhere('j.offerType = :offerType')
+           ->setParameter('offerType', $offerType);
+    }
+
+    if (!empty($status)) {
+        $qb->andWhere('j.status = :status')
+           ->setParameter('status', $status);
+    }
+
+    return $qb
+        ->orderBy('j.dateCreation', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
+
+public function findByCompany(Company $company): array
+    {
+        return $this->createQueryBuilder('j')
+            ->andWhere('j.company = :company')
+            ->setParameter('company', $company)
+            ->orderBy('j.dateCreation', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+    public function countByStatus(array $criteria): int
+{
+    $qb = $this->createQueryBuilder('o')
+        ->select('COUNT(o.id)')
+        ->where('o.company = :company')
+        ->andWhere('o.roleId = :roleId')
+        ->andWhere('o.status IN (:statuses)')
+        ->setParameter('company', $criteria['company'])
+        ->setParameter('roleId', $criteria['roleId'])
+        ->setParameter('statuses', $criteria['statuses']);
+
+    return (int) $qb->getQuery()->getSingleScalarResult();
+}
+
+
 }

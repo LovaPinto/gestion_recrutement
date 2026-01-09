@@ -10,6 +10,12 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: JobOfferRepository::class)]
 class JobOffer
 {
+    /* ================= STATUTS ================= */
+    public const STATUS_PUBLIEE   = 'publiee';
+    public const STATUS_EN_ATTENTE = 'en_attente';
+    public const STATUS_PRISE     = 'prise';
+    public const STATUS_SUPPRIMEE = 'supprimee';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -61,11 +67,16 @@ class JobOffer
     #[ORM\JoinTable(name: 'job_offer_candidate')]
     private Collection $candidates;
 
+    // ================= NOUVEAU =================
+    #[ORM\Column(type: 'integer')]
+    private ?int $roleId = null; // 1 = RH, 2 = Manager
+
     public function __construct()
     {
         $this->candidacies = new ArrayCollection();
         $this->candidates = new ArrayCollection();
         $this->job_skills = [];
+        $this->status = self::STATUS_EN_ATTENTE; // initialisation par défaut
     }
 
     /* ================= GETTERS & SETTERS ================= */
@@ -135,7 +146,7 @@ class JobOffer
         return $this->user;
     }
 
-    public function setUser(?Users $user): static
+    public function setUser(Users $user): static
     {
         $this->user = $user;
         return $this;
@@ -181,6 +192,17 @@ class JobOffer
 
     public function setStatus(string $status): static
     {
+        $allowedStatuses = [
+            self::STATUS_PUBLIEE,
+            self::STATUS_EN_ATTENTE,
+            self::STATUS_PRISE,
+            self::STATUS_SUPPRIMEE,
+        ];
+
+        if (!in_array($status, $allowedStatuses, true)) {
+            throw new \InvalidArgumentException('Statut invalide pour une offre d\'emploi');
+        }
+
         $this->status = $status;
         return $this;
     }
@@ -196,9 +218,7 @@ class JobOffer
         return $this;
     }
 
-    // =====================
-    // Candidacies Relation
-    // =====================
+    // ===================== Candidacies Relation =====================
     public function getCandidacies(): Collection
     {
         return $this->candidacies;
@@ -223,28 +243,24 @@ class JobOffer
         return $this;
     }
 
-    // =====================
-    // Candidates Relation
-    // =====================
+    // ===================== Candidates Relation =====================
+    /**
+     * @return Collection|Candidate[]
+     */
     public function getCandidates(): Collection
     {
         return $this->candidates;
     }
 
-    public function addCandidate(Candidate $candidate): static
+    // ===================== RoleId Getter/Setter =====================
+    public function getRoleId(): ?int
     {
-        if (!$this->candidates->contains($candidate)) {
-            $this->candidates->add($candidate);
-            $candidate->addJobOffer($this);
-        }
-        return $this;
+        return $this->roleId;
     }
 
-    public function removeCandidate(Candidate $candidate): static
+    public function setRoleId(int $roleId): static
     {
-        if ($this->candidates->removeElement($candidate)) {
-            $candidate->removeJobOffer($this);
-        }
+        $this->roleId = $roleId;
         return $this;
     }
 }

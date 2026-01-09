@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Nextwork - Candidat{% endblock %}</title>
+    <title>{% block title %}Nextwork - {{ app.session.get('last_name') ?: 'Candidat' }}{% endblock %}</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -25,21 +25,40 @@
         </div>
         <ul class="nav-menu">
             <li class="nav-item">
-                <a href="{{ path('app_candidate_dashboard') }}" class="nav-link {% if 'candidate_dashboard' in app.request.attributes.get('_route') %}active{% endif %}">
+                <a href="{{ path('app_candidate_dashboard') }}" class="nav-link {% if 'app_candidate_dashboard' in app.request.attributes.get('_route') %}active{% endif %}">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
+              <li class="nav-item">
+    <a href="{{ path('app_job_offer') }}" 
+       class="nav-link {% if 'app_job_offer' in app.request.attributes.get('_route') %}active{% endif %}">
+        <i class="fas fa-user"></i>
+        <span>Voir les offres</span>
+    </a>
+</li>
             <li class="nav-item">
-                <a href="{{ path('app_candidate_index') }}" class="nav-link">
+                <a href="{{ path('app_candidate_index') }}" class="nav-link {% if 'app_candidate_index' in app.request.attributes.get('_route') %}active{% endif %}">
                     <i class="fas fa-briefcase"></i>
                     <span>Mes candidatures</span>
                 </a>
             </li>
+   <li class="nav-item">
+    <a href="{{ path('app_candidate_profil') }}" 
+       class="nav-link {% if 'app_candidate_profil' in app.request.attributes.get('_route') %}active{% endif %}">
+        <i class="fas fa-user"></i>
+        <span>Mon profil</span>
+    </a>
+</li>
+
+
+
+
+
             <li class="nav-item">
-                <a href="{% if candidate %}{{ path('app_candidate_profil', {'id': candidate.id}) }}{% else %}#{% endif %}" class="nav-link">
-                    <i class="fas fa-user"></i>
-                    <span>Mon profil</span>
+                <a href="{{ path('app_logout') }}" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Déconnexion</span>
                 </a>
             </li>
         </ul>
@@ -60,10 +79,10 @@
                     </button>
                     <div class="user-profile">
                         <div class="user-avatar">
-                            {% if candidate %}{{ candidate.nom|first|upper }}{% else %}C{% endif %}
+                            {{ app.session.get('last_name') ? app.session.get('last_name')|first|upper : 'C' }}
                         </div>
                         <span class="user-name">
-                            {% if candidate %}{{ candidate.nom }} {{ candidate.prenom }}{% else %}Candidat{% endif %}
+                            {{ app.session.get('first_name') ?: '' }} {{ app.session.get('last_name') ?: 'Candidat' }}
                         </span>
                         <i class="fas fa-cog settings-icon"></i>
                     </div>

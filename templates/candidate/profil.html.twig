@@ -1,6 +1,6 @@
 {% extends 'candidate/menu.html.twig' %}
 
-{% block title %}Profil Candidat{% endblock %}
+{% block title %}Mon profil{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -8,89 +8,144 @@
 {% endblock %}
 
 {% block content %}
-<div class="container profile-container">
-    <h2 class="profile-title">Mon profil</h2>
+<div class="container profile-container mt-4">
+    <h2 class="profile-title mb-4">Mon profil</h2>
 
+    {# Messages flash #}
     {% for message in app.flashes('success') %}
         <div class="alert alert-success">{{ message }}</div>
     {% endfor %}
 
-    <div class="profile-card">
-        <h4 class="profile-subtitle">Mes informations</h4>
-        
-        {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+    <div class="profile-card card shadow-sm">
+        <div class="card-body">
 
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                {{ form_row(form.nom) }}
+            {{ form_start(form, {
+                action: path('app_candidate_profil'),
+                method: 'POST',
+                attr: {
+                    class: 'needs-validation'
+                },
+                enctype: 'multipart/form-data'
+            }) }}
+
+            {# ================== IDENTITÉ ================== #}
+            <h5 class="mb-3">Informations personnelles</h5>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    {{ form_label(form.nom) }}
+                    {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.nom) }}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_label(form.prenom) }}
+                    {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.prenom) }}
+                </div>
             </div>
-            <div class="col-md-6">
-                {{ form_row(form.prenom) }}
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    {{ form_label(form.email) }}
+                    {{ form_widget(form.email, {
+                        'attr': {
+                            'class': 'form-control',
+                            'readonly': true
+                        }
+                    }) }}
+                    {{ form_errors(form.email) }}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_label(form.telephone) }}
+                    {{ form_widget(form.telephone, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.telephone) }}
+                </div>
             </div>
+
+            <div class="mb-3">
+                {{ form_label(form.adresse) }}
+                {{ form_widget(form.adresse, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.adresse) }}
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    {{ form_label(form.nationalite) }}
+                    {{ form_widget(form.nationalite, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.nationalite) }}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_label(form.genre) }}
+                    {{ form_widget(form.genre, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.genre) }}
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    {{ form_label(form.dateNaissance) }}
+                    {{ form_widget(form.dateNaissance, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.dateNaissance) }}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_label(form.status) }}
+                    {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.status) }}
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    {{ form_label(form.linkedin) }}
+                    {{ form_widget(form.linkedin, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.linkedin) }}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_label(form.facebook) }}
+                    {{ form_widget(form.facebook, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.facebook) }}
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            {# ================== DOCUMENTS ================== #}
+            <h5 class="mb-3">Documents</h5>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    {{ form_label(form.cvFile) }}
+                    {{ form_widget(form.cvFile, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.cvFile) }}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_label(form.lmFile) }}
+                    {{ form_widget(form.lmFile, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.lmFile) }}
+                </div>
+            </div>
+
+            {# CSRF + champs cachés #}
+            {{ form_rest(form) }}
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a href="{{ path('app_candidate_dashboard') }}" class="btn btn-outline-secondary">
+                    Annuler
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    Enregistrer les modifications
+                </button>
+            </div>
+
+            {{ form_end(form) }}
+
         </div>
-
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                {{ form_row(form.email) }}
-            </div>
-            <div class="col-md-6">
-                {{ form_row(form.telephone) }}
-            </div>
-        </div>
-
-        <div class="row g-3 mb-3">
-            <div class="col-md-12">
-                {{ form_row(form.adresse) }}
-            </div>
-        </div>
-
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                {{ form_row(form.nationalite) }}
-            </div>
-            <div class="col-md-6">
-                {{ form_row(form.genre) }}
-            </div>
-        </div>
-
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                {{ form_row(form.dateNaissance) }}
-            </div>
-            <div class="col-md-6">
-                {{ form_row(form.status) }}
-            </div>
-        </div>
-
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                {{ form_row(form.linkedin) }}
-            </div>
-            <div class="col-md-6">
-                {{ form_row(form.facebook) }}
-            </div>
-        </div>
-
-        <hr class="form-separator">
-
-        <h5 class="form-section-title">Documents</h5>
-        <div class="row g-3 mb-4">
-            <div class="col-md-6">
-                {{ form_row(form.cvFile) }}
-            </div>
-            <div class="col-md-6">
-                {{ form_row(form.lmFile) }}
-            </div>
-        </div>
-
-        {{ form_rest(form) }}
-
-        <div class="form-actions">
-            <a href="{{ path('app_candidate_dashboard') }}" class="btn btn-cancel">Annuler</a>
-            <button type="submit" class="btn btn-save">Enregistrer les modifications</button>
-        </div>
-
-        {{ form_end(form) }}
     </div>
 </div>
 {% endblock %}

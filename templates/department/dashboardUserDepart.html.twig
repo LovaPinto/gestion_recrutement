@@ -1,0 +1,217 @@
+{% extends 'layout/layout_frontend/layoutDepart.html.twig' %}
+
+{% block title %}
+Dashboard {{ roleId == 1 ? 'RH' : 'Manager' }} - {{ companyName }}
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+
+    <h2 class="dashboard-title">Tableau de bord du {{ roleId == 1 ? 'RH' : 'Manager' }}</h2>
+
+    <!-- ================= NOMBRE OFFRES PAR STATUT ================= -->
+    <div class="offers-count">
+       <div class="count-box">
+    <h3 class="section-title">Offres en attente</h3>
+    <div class="count-number">
+        {{ offersByStatus['en attente']|default(0) }}
+    </div>
+</div>
+
+<div class="count-box">
+    <h3 class="section-title">Offres publiées</h3>
+    <div class="count-number">
+        {{ offersByStatus['publiée']|default(0) }}
+    </div>
+</div>
+
+<div class="count-box">
+    <h3 class="section-title">Offres déjà prises</h3>
+    <div class="count-number">
+        {{ offersByStatus['déjà prise']|default(0) }}
+    </div>
+</div>
+
+        <div class="count-box">
+            <h3 class="section-title">Total des offres</h3>
+            <div class="count-number">
+                {{ offersCount|default(0) }}
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= FORMULAIRE MOIS ================= -->
+    <form method="get" class="month-form">
+        <label for="month">Choisir le mois :</label>
+        <input type="month" id="month" name="month" value="{{ selectedMonth }}">
+        <button type="submit" class="btn-month">Afficher</button>
+    </form>
+
+    <!-- ================= DIAGRAMME BARRES ================= -->
+    <div class="chart-section">
+        <h3 class="section-title">Offres créées par jour et par rôle</h3>
+        <canvas id="offersChart" height="120"></canvas>
+    </div>
+
+</div>
+
+<!-- ================= SCRIPT CHART ================= -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('offersChart');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ chartLabels|json_encode|raw }},
+        datasets: [
+            {
+                label: 'RH',
+                data: {{ chartRH|json_encode|raw }},
+                backgroundColor: '#22c55e', // vert clair
+                borderRadius: 6
+            },
+            {
+                label: 'Manager',
+                data: {{ chartManager|json_encode|raw }},
+                backgroundColor: '#3b82f6', // bleu doux
+                borderRadius: 6
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom', labels: { font: { size: 12 } } },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.dataset.label + ': ' + context.parsed.y + ' offre(s)';
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                stacked: false,
+                title: { display: true, text: 'Jour du mois', color: '#6b7280', font: { size: 12 } },
+                grid: { display: false }
+            },
+            y: {
+                beginAtZero: true,
+                stepSize: 1,
+                title: { display: true, text: 'Nombre d’offres', color: '#6b7280', font: { size: 12 } },
+                ticks: { color: '#4b5563', font: { size: 12 } }
+            }
+        }
+    }
+});
+</script>
+
+<!-- ================= STYLES ================= -->
+<style>
+.dashboard-container{
+    max-width: 1200px;
+    padding: 24px;
+    font-family: 'Inter', sans-serif;
+    color: #374151;
+}
+.dashboard-title{
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #0c71ff;
+}
+/* ================= COUNT BOX ================= */
+.offers-count {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+.count-box {
+    width: 140px;
+    height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #f9fafb;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: all 0.3s;
+    padding: 16px;
+}
+.count-box:hover {
+    box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+}
+.count-box .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #4b5563;
+    text-align: center;
+    margin-bottom: 12px;
+}
+.count-box .count-number {
+    font-size: 36px;
+    font-weight: 700;
+    color: #111827;
+    text-align: center;
+    line-height: 1;
+}
+
+/* ================= FORMULAIRE MOIS ================= */
+.month-form{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+.month-form label{
+    font-size: 13px;
+    color: #6b7280;
+}
+.month-form input[type="month"]{
+    padding: 6px 10px;
+    font-size: 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #f3f4f6;
+}
+.month-form .btn-month{
+    padding: 6px 12px;
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+.month-form .btn-month:hover{
+    background: #2563eb;
+}
+
+/* ================= DIAGRAMME ================= */
+.chart-section{
+    margin-top: 20px;
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow:0 3px 6px rgba(0,0,0,0.05);
+}
+.chart-section .section-title{
+    font-size: 14px;
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 10px;
+}
+canvas{
+    background:#ffffff;
+    border-radius:12px;
+    box-shadow:0 3px 6px rgba(0,0,0,0.05);
+    padding:10px;
+}
+</style>
+{% endblock %}

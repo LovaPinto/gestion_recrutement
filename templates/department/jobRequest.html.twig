@@ -1,0 +1,61 @@
+{% extends 'layout/layout_frontend/sidebar.html.twig' %}
+{% set menus = ['dashboard','recrutement'] %}
+
+{% block title %}Demande de recrutement{% endblock %}
+
+{% block body %}
+
+<div class="page-wrap">
+    <div class="page-header">
+        <h1>Demande de recrutement</h1>
+        <p>Exprimez le besoin de votre département</p>
+    </div>
+
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ type }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card">
+        {{ form_start(form) }}
+
+        <div class="form-grid">
+            {{ form_row(form.poste) }}
+            {{ form_row(form.typeContrat) }}
+            {{ form_row(form.nombrePostes) }}
+            {{ form_row(form.experienceSouhaitee) }}
+        </div>
+
+        {{ form_row(form.justification) }}
+
+        <div class="form-actions">
+            <button class="bton bton-primary">
+                Envoyer la demande
+            </button>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+
+<style>
+.page-wrap { max-width: 900px; margin: auto; }
+.card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.05);
+}
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 20px;
+}
+.form-actions {
+    margin-top: 20px;
+    text-align: right;
+}
+</style>
+
+{% endblock %}
