@@ -11,7 +11,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-
+use App\Repository\JobOfferRepository;
+use App\Repository\CandidacyRepository;
+use App\Service\CvTextExtractor;
+use App\Service\AtsAiService;
+use App\Entity\Candidacy;
+use App\Entity\JobOffer;
+use App\Entity\Users;
+use App\Entity\Company;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use App\Entity\Role;
 final class DepartmentController extends AbstractController
 {
     #[Route('/department', name: 'app_department')]
@@ -52,41 +61,74 @@ final class DepartmentController extends AbstractController
         ]);
     }
 
-    #[Route('/formulaireAjoutDepart', name: 'formulaire_departement')]
-    public function formulaireAjoutDepart(
-        Request $request,
-        EntityManagerInterface $em
-    ): Response {
+#[Route('/formulaireAjoutDepart', name: 'formulaire_departement')]
+public function formulaireAjoutDepart(
+    Request $request,
+    EntityManagerInterface $em
+): Response {
 
-        $companySession = $request->getSession()->get('company');
-        if (!$companySession) {
-            $this->addFlash('error', 'Veuillez vous connecter.');
-            return $this->redirectToRoute('loginCompany');
-        }
-
-        $company = $em->getRepository(\App\Entity\Company::class)
-                      ->find($companySession['id']);
-
-        if (!$company) {
-            throw $this->createNotFoundException('Entreprise introuvable');
-        }
-
-        $departement = new Department();
-        $departement->setCompany($company);
-        $form = $this->createForm(DepartmentType::class, $departement);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($departement);
-            $em->flush();
-            $this->addFlash('success', 'Département créé avec succès !');
-            return $this->redirectToRoute('app_department_ajout');
-        }
-
-        return $this->render('department/formulaireAjoutDepart.html.twig', [
-            'form' => $form->createView(),
-        ]);
+    $companySession = $request->getSession()->get('company');
+    if (!$companySession) {
+        $this->addFlash('error', 'Veuillez vous connecter.');
+        return $this->redirectToRoute('loginCompany');
     }
+
+    $company = $em->getRepository(Company::class)
+        ->find($companySession['id']);
+
+    if (!$company) {
+        throw $this->createNotFoundException('Entreprise introuvable');
+    }
+
+    // 1️⃣ Département
+    $department = new Department();
+    $department->setCompany($company);
+
+    $form = $this->createForm(DepartmentType::class, $department);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+
+        // 2️⃣ Récupération rôle MANAGER (id = 1)
+        $managerRole = $em->getRepository(Role::class)->find(2);
+        if (!$managerRole) {
+            throw new \LogicException('Le rôle Manager  est introuvable.');
+        }
+
+        // 3️⃣ Création Manager
+        $password = strtolower($department->getDepartmentName()) . '@123';
+
+        $manager = new Users();
+        $manager->setFirstName($form->get('managerFirstName')->getData());
+        $manager->setLastName($form->get('managerLastName')->getData());
+        $manager->setEmail($form->get('managerEmail')->getData());
+        $manager->setPassword($password); // ❌ volontairement non hashé
+        $manager->setRole($managerRole);
+        $manager->setDepartment($department);
+
+        // 4️⃣ LIAISON BIDIRECTIONNELLE OBLIGATOIRE
+        $department->setManager($manager);
+
+        // 5️⃣ Persist
+        $em->persist($department);
+        $em->persist($manager);
+        $em->flush();
+
+        $this->addFlash(
+            'success',
+            "Département créé avec succès. 
+             Manager : {$manager->getFirstName()} {$manager->getLastName()} 
+             | Mot de passe : $password"
+        );
+
+        return $this->redirectToRoute('app_department_ajout');
+    }
+
+    return $this->render('department/formulaireAjoutDepart.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
+
 
     #[Route('/manager', name: 'managerDepartment')]
     public function managerAccueil(): Response
@@ -154,12 +196,13 @@ final class DepartmentController extends AbstractController
         ]);
     }
 
-    #[Route('/suivieCandidat', name: 'suivieCandidate')]
-    public function suivieCandidat(): Response
+ 
+  
+    // 🔒 Route de sécurité (évite le 404)
+    #[Route('/suivieCandidat', name: 'suivieCandidate_redirect')]
+    public function suivieCandidatRedirect(): Response
     {
-        return $this->render('department/suivieCandidature.html.twig', [
-            'controller_name' => 'DepartmentController',
-        ]);
+        return $this->redirectToRoute('dashboard_manager');
     }
 
     // ================= DASHBOARD RH (role_id = 1) =================
@@ -184,58 +227,79 @@ final class DepartmentController extends AbstractController
         ]);
     }
 
-    // ================= DASHBOARD MANAGER (role_id = 2) =================
-#[Route('/dashboard/manager', name: 'dashboard_manager')]
-public function dashboardManager(SessionInterface $session, EntityManagerInterface $em): Response
+    // ================= DASHBOARD MANAGER  =================
+#[Route('/dashboard/RH', name: 'dashboard_manager')]
+public function dashboardManager(
+    SessionInterface $session,
+    EntityManagerInterface $em
+): Response
 {
-    // Vérification de la session company
+    /* ================== ENTREPRISE EN SESSION ================== */
     $companySession = $session->get('company');
+
     if (!$companySession) {
         $this->addFlash('error', 'Veuillez vous connecter.');
         return $this->redirectToRoute('loginCompany');
     }
 
-    // Récupérer l'objet Company depuis l'ID de session
-    $company = $em->getRepository(\App\Entity\Company::class)
-                  ->find($companySession['id']);
+    $company = $em->getRepository(Company::class)
+        ->find($companySession['id']);
+
     if (!$company) {
         $this->addFlash('error', 'Entreprise introuvable.');
         return $this->redirectToRoute('loginCompany');
     }
 
-    // Récupérer le rôle connecté
-    $roleId = $session->get('role_id'); // 1 = RH | 2 = Manager
+    /* ================== STATUTS AUTORISÉS ================== */
+    $allowedStatuses = [
+        JobOffer::STATUS_EN_ATTENTE,
+        JobOffer::STATUS_PUBLIEE,
+        JobOffer::STATUS_PRISE,
+    ];
 
-    // Récupérer les offres selon le rôle connecté
-    $jobOffers = $em->getRepository(\App\Entity\JobOffer::class)
-        ->findBy([
-            'company' => $company,
-            'roleId'  => $roleId
-        ], ['dateCreation' => 'DESC']);
+    /* ================== OFFRES ================== */
+    $jobOffers = $em->getRepository(JobOffer::class)
+        ->createQueryBuilder('j')
+        ->andWhere('j.company = :company')
+        ->andWhere('j.status IN (:statuses)')
+        ->setParameter('company', $company)
+        ->setParameter('statuses', $allowedStatuses)
+        ->orderBy('j.dateCreation', 'DESC')
+        ->getQuery()
+        ->getResult();
 
-    // Compter les offres par statut
-    $statuses = ['en attente', 'publiee', 'prise'];
+    /* ================== COMPTEURS ================== */
     $offersByStatus = [];
 
-    foreach ($statuses as $status) {
-        $offersByStatus[$status] = $em->getRepository(\App\Entity\JobOffer::class)
-            ->count([
-                'company' => $company,
-                'roleId'  => $roleId,
-                'status'  => $status
-            ]);
+    foreach ($allowedStatuses as $status) {
+        $offersByStatus[$status] = (int) $em
+            ->getRepository(JobOffer::class)
+            ->createQueryBuilder('j')
+            ->select('COUNT(j.id)')
+            ->andWhere('j.company = :company')
+            ->andWhere('j.status = :status')
+            ->setParameter('company', $company)
+            ->setParameter('status', $status)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     return $this->render('department/dashboardManager.html.twig', [
-        'company'        => $company,
         'jobOffers'      => $jobOffers,
-        'roleId'         => $roleId,
-        'offersByStatus' => $offersByStatus
+        'offersByStatus' => $offersByStatus,
     ]);
 }
 
 
+
+#[Route('/logout/department', name: 'logout_department')]
+public function logoutDepartment(SessionInterface $session): RedirectResponse
+{
+    $session->remove('role_id');
+    $this->addFlash('success', 'Déconnexion du département réussie.');
+    return $this->redirectToRoute('login_department');
 }
 
 
+ }
 

@@ -11,7 +11,7 @@
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 30px;
-    color: #111;
+    color: #111111;
 }
 
 /* RECHERCHE */
@@ -55,83 +55,76 @@
 
 /* CARTE OFFRE */
 .job-card {
-    display: flex;
     background: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    transition: transform 0.25s, box-shadow 0.25s;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+    transition: all .2s ease;
 }
 
 .job-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+    border-color: #1148ff;
 }
 
-/* BARRE COULEUR GAUCHE */
-.job-color-bar {
-    width: 6px;
-    background: #041c50; /* accent bleu */
-}
-
-/* CONTENU DE LA CARTE */
-.job-content {
-    flex: 1;
-    padding: 20px 25px;
-    display: flex;
-    flex-direction: column;
-}
-
-/* HEADER TITRE + CONTRAT */
 .job-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
 }
 
 .job-title a {
-    font-size: 20px;
-    font-weight: 700;
-    color: #111;
+    font-size: 22px;
+    font-weight: 600;
+    color: #0830e2;
     text-decoration: none;
-    transition: color .3s;
 }
 
-.job-title a:hover {
-    color: #1e40af;
+.job-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .job-contract {
     font-size: 13px;
-    font-weight: 500;
-    color: #2563eb;
-    background: #e0e7ff;
-    padding: 4px 10px;
-    border-radius: 6px;
-}
-
-/* DESCRIPTION */
-.job-description {
-    font-size: 14px;
-    color: #444;
-    line-height: 1.5;
-    margin-bottom: 12px;
-}
-
-/* INFOS SUPPLÉMENTAIRES */
-.job-info {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    font-size: 13px;
     color: #555;
-    margin-bottom: 12px;
 }
 
-.job-info i {
-    color: #2563eb;
+.badge-urgent {
+    background: #000;
+    color: #fff;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
 }
+
+.job-info {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #666;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.btn-details {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid #000;
+    color: #000;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.btn-details:hover {
+    background: #000;
+    color: #fff;
+}
+
 
 /* BOUTON VOIR L’OFFRE PETIT ET GRIS */
 .btn-details.btn-small {
@@ -161,4 +154,10 @@
     text-align: center;
     color: #777;
     margin-top: 40px;
+}
+.badge-urgent{
+    
+    color: #ffffff;
+   background-color: red;
+   border: solid;
 }

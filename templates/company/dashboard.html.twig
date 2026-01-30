@@ -1,0 +1,133 @@
+{% extends 'layout/layout_frontend/sidebar.html.twig' %}
+{% block title %}Dashboard - {{ company.companyName }}{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('styles/companydashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+
+    <!-- =================== Stats Cards =================== -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <h3 class="stat-title">Nombre de candidatures</h3>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">{{ totalCandidatures ?? 0 }}</div>
+                <div class="stat-label">Candidatures</div>
+            </div>
+            <div class="stat-footer">
+                <span class="stat-subtitle">Total des candidatures effectuées</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <h3 class="stat-title">Candidatures en attente</h3>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">{{ enAttente ?? 0 }}</div>
+                <div class="stat-label">Candidatures</div>
+            </div>
+            <div class="stat-footer">
+                <span class="stat-subtitle">Candidatures en attente</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <h3 class="stat-title">Candidatures refusées</h3>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">{{ refusees ?? 0 }}</div>
+                <div class="stat-label">Candidatures</div>
+            </div>
+            <div class="stat-footer">
+                <span class="stat-subtitle">Total des candidatures refusées</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <h3 class="stat-title">Candidatures acceptées</h3>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">{{ acceptees ?? 0 }}</div>
+                <div class="stat-label">Candidatures</div>
+            </div>
+            <div class="stat-footer">
+                <span class="stat-subtitle">Total des candidatures acceptées</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================== Graphiques =================== -->
+    <h2>Graphiques</h2>
+    <div class="charts-wrapper">
+        <div class="chart-container">
+            <canvas id="statusChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="monthlyChart"></canvas>
+        </div>
+    </div>
+
+    <!-- =================== Offres par Département =================== -->
+    <h2>Offres par département</h2>
+    <ul class="offers-list">
+        {% for dept, count in offersByDept %}
+            <li><strong>{{ dept }}</strong> : {{ count }} offres</li>
+        {% endfor %}
+    </ul>
+
+    <!-- =================== Délai moyen par Département =================== -->
+    <h2>Délai moyen de recrutement par département</h2>
+    <ul class="delay-list">
+        {% for dept, days in avgDelayByDept %}
+            <li><strong>{{ dept }}</strong> : {{ days }} jours</li>
+        {% endfor %}
+    </ul>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Doughnut chart
+    const statusData = {
+        labels: {{ statusLabels|json_encode|raw }},
+        datasets: [{
+            label: 'Candidatures',
+            data: {{ statusValues|json_encode|raw }},
+            backgroundColor: ['#3498db','#2ecc71','#e74c3c','#f1c40f','#9b59b6','#1abc9c'],
+            borderWidth: 1
+        }]
+    };
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: statusData,
+        options: { responsive: false, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // Line chart
+    const monthlyData = {
+        labels: {{ monthlyLabels|json_encode|raw }},
+        datasets: [{
+            label: 'Nombre de candidatures',
+            data: {{ monthlyValues|json_encode|raw }},
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52, 152, 219, 0.2)',
+            fill: true,
+            tension: 0.3
+        }]
+    };
+    new Chart(document.getElementById('monthlyChart'), {
+        type: 'line',
+        data: monthlyData,
+        options: { responsive: false, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+    });
+</script>
+{% endblock %}

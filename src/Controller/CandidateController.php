@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use  App\Repository\CandidacyRepository;
+use  App\Entity\Users;
 
 #[Route('/candidate')]
 final class CandidateController extends AbstractController
@@ -28,72 +29,7 @@ final class CandidateController extends AbstractController
         return $this->render('candidate/login_candidate.html.twig');
     }
 
-#[Route('/profil', name: 'app_candidate_profil', methods: ['GET', 'POST'])]
-public function profil(Request $request, EntityManagerInterface $em): Response
-{
-    $session = $request->getSession();
-    $userId = $session->get('user_id');
-
-    if (!$userId) {
-        $this->addFlash('error', 'Utilisateur non connecté.');
-        return $this->redirectToRoute('app_candidate_login');
-    } else {
-        $this->addFlash('info', 'Utilisateur connecté, ID=' . $userId);
-    }
-
-    // Récupération du user depuis la session
-    $user = $em->getRepository(\App\Entity\Users::class)->find($userId);
-    if (!$user) {
-        $this->addFlash('error', 'Utilisateur introuvable en base.');
-        return $this->redirectToRoute('app_candidate_login');
-    } else {
-        $this->addFlash('info', 'Utilisateur trouvé : ' . $user->getFirstName());
-    }
-
-    // Récupération du candidat lié à l'utilisateur
-    $candidate = $em->getRepository(Candidate::class)->findOneBy(['user' => $user]);
-    if (!$candidate) {
-        $this->addFlash('error', 'Candidat introuvable pour cet utilisateur.');
-        return $this->redirectToRoute('app_candidate_login');
-    } else {
-        $this->addFlash('info', 'Candidat trouvé : ' . $candidate->getNom());
-    }
-
-    // Création du formulaire
-    $form = $this->createForm(CandidateType::class, $candidate);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted()) {
-        $this->addFlash('info', 'Formulaire soumis.');
-
-        if ($form->isValid()) {
-            $this->addFlash('success', 'Formulaire valide.');
-
-            // Protection de l’email (clé unique)
-            $candidate->setEmail($user->getEmail());
-
-            try {
-                $em->flush();
-                $this->addFlash('success', 'Profil mis à jour avec succès !');
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
-            }
-
-            return $this->redirectToRoute('app_candidate_profil');
-        } else {
-            $this->addFlash('error', 'Formulaire invalide, vérifier les champs.');
-        }
-    } else {
-        $this->addFlash('info', 'Formulaire non soumis.');
-    }
-
-    return $this->render('candidate/profil.html.twig', [
-        'form' => $form->createView(),
-        'candidate' => $candidate,
-    ]);
-}
-
-
+ 
 
 
     // Dashboard candidat

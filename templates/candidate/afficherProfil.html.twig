@@ -1,0 +1,148 @@
+{% extends 'candidate/menu.html.twig' %}
+
+{% block title %}Mon profil candidat{% endblock %}
+
+{% block content %}
+
+<div class="profile-wrapper">
+    <div class="card">
+        <h2 class="page-title">✏️ Modifier mon profil</h2>
+
+        {{ form_start(form, { attr: { id: 'candidate-form' } }) }}
+
+        <div class="form-grid">
+            {{ form_row(form.prenom) }}
+            {{ form_row(form.nom) }}
+            {{ form_row(form.telephone) }}
+            {{ form_row(form.adresse) }}
+            {{ form_row(form.ville) }}
+            {{ form_row(form.codePostal) }}
+            {{ form_row(form.linkedin) }}
+            {{ form_row(form.facebook) }}
+            {{ form_row(form.nationalite) }}
+            {{ form_row(form.status) }}
+            {{ form_row(form.genre) }}
+            {{ form_row(form.dateNaissance) }}
+        </div>
+
+        <div class="form-group full">
+            <label>Email</label>
+            <input type="email" value="{{ candidate.email }}" disabled>
+        </div>
+
+        <button class="btn-primary" type="submit">💾 Enregistrer</button>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+
+<!-- Loader + Alert Success/Error -->
+<div id="overlay" class="overlay">
+    <div class="loader"></div>
+    <div id="overlay-message" class="overlay-message">Mise à jour du profil...</div>
+</div>
+
+<div id="alert" class="alert"></div>
+
+<style>
+/* Layout général */
+.profile-wrapper { max-width: 1200px; margin: auto; padding: 40px; }
+.card { background: #fff; padding: 35px; border-radius: 18px; box-shadow: 0 12px 35px rgba(0,0,0,.08); }
+.page-title { margin-bottom: 30px; text-align: center; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-group.full { grid-column: span 2; margin-top: 20px; }
+input, select, textarea { padding: 12px; border-radius: 10px; border: 1px solid #ccc; font-size: 14px; width: 100%; }
+.btn-primary { width: 100%; background: #111; color: #fff; border: none; padding: 16px; border-radius: 12px; font-size: 16px; cursor: pointer; margin-top: 20px; }
+.btn-primary:hover { background: #000; }
+
+/* Overlay Loader */
+.overlay {
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    flex-direction: column;
+}
+.loader {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #111;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.overlay-message { color: #fff; font-size: 18px; text-align: center; }
+
+/* Alert final moderne */
+.alert {
+    position: fixed;
+    top: 20px;
+    right: -400px;
+    padding: 18px 30px;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,.25);
+    z-index: 10000;
+    transition: right 0.5s ease, opacity 0.5s ease;
+    opacity: 0;
+}
+.alert.show { right: 20px; opacity: 1; }
+.alert.success { background: linear-gradient(135deg, #00c851, #007e33); }
+.alert.error { background: linear-gradient(135deg, #ff4444, #cc0000); }
+.alert i {
+    margin-right: 10px;
+    font-size: 18px;
+}
+</style>
+
+<script>
+// Affiche le loader
+function showLoader() {
+    const overlay = document.getElementById('overlay');
+    overlay.style.display = 'flex';
+}
+
+// Cache le loader
+function hideLoader() {
+    const overlay = document.getElementById('overlay');
+    overlay.style.display = 'none';
+}
+
+// Affiche l'alerte success ou erreur moderne
+function showAlert(message, type='success', duration=2000) {
+    const alertDiv = document.getElementById('alert');
+    alertDiv.innerHTML = (type === 'success' ? '✅ ' : '❌ ') + message;
+    alertDiv.className = 'alert ' + type + ' show';
+    setTimeout(() => { alertDiv.className = 'alert ' + type; }, duration);
+}
+
+// ================= SUBMIT FORM =================
+document.getElementById('candidate-form').addEventListener('submit', function(e){
+    showLoader();
+});
+
+// ================= FLASH MESSAGES =================
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        setTimeout(() => {
+            hideLoader();
+            {% if label == 'success' %}
+                showAlert("{{ message|e('js') }}", 'success', 2000);
+            {% else %}
+                showAlert("{{ message|e('js') }}", 'error', 2000);
+            {% endif %}
+        }, 2000);
+    {% endfor %}
+{% endfor %}
+</script>
+
+{% endblock %}

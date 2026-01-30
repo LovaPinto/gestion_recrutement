@@ -1,0 +1,83 @@
+/* ================= GLOBAL ================= */
+body, html {
+    margin-left: 10%;
+    margin-top: 2%;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    box-sizing: border-box;
+}
+
+/* ================= SIDEBAR FIXE ================= */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100vh;
+    background: #000000;
+    padding: 24px 16px;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+.sidebar .brand,
+.sidebar .menu a {
+    font-family: inherit; /* ne force pas la police du dashboard */
+}
+
+.sidebar .menu a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar .menu a:hover {
+    background: #feffff;
+    color: #000;
+}
+
+.sidebar .menu i {
+    font-size: 18px;
+}
+
+@media (max-width: 768px) {
+    .sidebar { width: 70px; padding: 20px 10px; }
+    .sidebar .brand, .sidebar .menu span { display: none; }
+}
+
+/* ================= MAIN / DASHBOARD ================= */
+.main { margin-left: 280px; padding: 20px; }
+.dashboard-container { width: calc(100% - 280px); max-width: none; margin: 0 auto; }
+
+/* ================= STATS CARDS ================= */
+.stats-grid { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 40px; }
+.stat-card { background: #fff; flex: 1 1 220px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.05); padding: 20px; transition: all 0.3s ease; }
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+.stat-number { font-size: 2rem; font-weight: bold; color: #3498db; }
+.stat-label { font-size: 1rem; color: #666; }
+.stat-subtitle { font-size: 0.85rem; color: #999; }
+
+/* ================= CHARTS ================= */
+.charts-wrapper { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 40px; justify-content: flex-start; }
+.chart-container:nth-child(1) { width: 10cm; height: 10cm; }
+.chart-container:nth-child(2) { width: 15cm; height: 10cm; }
+.chart-container canvas { width: 100% !important; height: 100% !important; display: block; }
+
+/* ================= LISTES ================= */
+.offers-list, .delay-list { list-style: none; display: flex; flex-wrap: wrap; gap: 20px; padding: 0; margin-bottom: 40px; }
+.offers-list li, .delay-list li { background: #fff; padding: 15px 20px; flex: 1 1 220px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .charts-wrapper, .stats-grid, .offers-list, .delay-list { flex-direction: column; align-items: center; }
+    .chart-container:nth-child(1), .chart-container:nth-child(2), .stat-card, .offers-list li, .delay-list li { max-width: 100%; flex: 1 1 100%; }
+}

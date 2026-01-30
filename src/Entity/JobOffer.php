@@ -11,10 +11,11 @@ use Doctrine\ORM\Mapping as ORM;
 class JobOffer
 {
     /* ================= STATUTS ================= */
-    public const STATUS_PUBLIEE   = 'publiee';
-    public const STATUS_EN_ATTENTE = 'en_attente';
+    public const STATUS_PUBLIEE   = 'publiée';
+    public const STATUS_EN_ATTENTE = 'en attente';
     public const STATUS_PRISE     = 'prise';
-    public const STATUS_SUPPRIMEE = 'supprimee';
+    public const STATUS_REFUSEE = 'refusée';
+    public const STATUS_SUPPRIMEE = 'supprimée';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -37,7 +38,7 @@ class JobOffer
     private ?\DateTime $deadline = null;
 
     #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: 'jobOffers')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Users $user = null;
 
     #[ORM\ManyToOne(targetEntity: Company::class, cascade: ['persist'])]
@@ -56,6 +57,12 @@ class JobOffer
 
     #[ORM\Column(length: 255)]
     private ?string $experience_level = null;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+private ?string $responsability = null;
+
+
+#[ORM\Column(type: 'boolean')]
+private bool $isVisible = true;
 
     /**
      * @var Collection<int, Candidacy>
@@ -68,7 +75,7 @@ class JobOffer
     private Collection $candidates;
 
     // ================= NOUVEAU =================
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $roleId = null; // 1 = RH, 2 = Manager
 
     public function __construct()
@@ -196,6 +203,7 @@ class JobOffer
             self::STATUS_PUBLIEE,
             self::STATUS_EN_ATTENTE,
             self::STATUS_PRISE,
+            self::STATUS_REFUSEE,
             self::STATUS_SUPPRIMEE,
         ];
 
@@ -263,4 +271,29 @@ class JobOffer
         $this->roleId = $roleId;
         return $this;
     }
+
+    public function getResponsability(): ?string
+{
+    return $this->responsability;
+}
+
+public function setResponsability(?string $responsability): static
+{
+    $this->responsability = $responsability;
+    return $this;
+}
+
+
+public function isVisible(): bool
+{
+    return $this->isVisible;
+}
+
+public function setIsVisible(bool $isVisible): static
+{
+    $this->isVisible = $isVisible;
+    return $this;
+}
+
+    
 }

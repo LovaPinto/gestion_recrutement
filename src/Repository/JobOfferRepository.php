@@ -149,6 +149,56 @@ public function findByCompany(Company $company): array
 
     return (int) $qb->getQuery()->getSingleScalarResult();
 }
+public function findPendingOffers($company, ?int $roleId): array
+{
+    $qb = $this->createQueryBuilder('j')
+        ->andWhere('j.status = :status')
+        ->andWhere('j.company = :company')
+        ->setParameter('status', 'en attente')
+        ->setParameter('company', $company);
 
+    if ($roleId !== null) {
+        $qb->andWhere('j.roleId IS NULL OR j.roleId = :roleId')
+           ->setParameter('roleId', $roleId);
+    } else {
+        $qb->andWhere('j.roleId IS NULL');
+    }
+
+    return $qb
+        ->orderBy('j.dateCreation', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
+
+    // ================= OFFRES PUBLIÉES =================
+    public function findPublishedOffers($company, int $roleId): array
+    {
+        return $this->createQueryBuilder('j')
+            ->andWhere('j.status = :status')
+            ->andWhere('j.company = :company')
+            ->andWhere('j.roleId = :roleId')
+            ->setParameter('status', 'publiée')
+            ->setParameter('company', $company)
+            ->setParameter('roleId', $roleId)
+            ->orderBy('j.dateCreation', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    // ================= OFFRES DÉJÀ PRISE =================
+    public function findTakenOffers($company, int $roleId): array
+    {
+        return $this->createQueryBuilder('j')
+            ->andWhere('j.status = :status')
+            ->andWhere('j.company = :company')
+            ->andWhere('j.roleId = :roleId')
+            ->setParameter('status', 'déjà prise')
+            ->setParameter('company', $company)
+            ->setParameter('roleId', $roleId)
+            ->orderBy('j.dateCreation', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+    
 
 }

@@ -1,54 +1,113 @@
-{# templates/departement/new.html.twig #}
 {% extends 'layout/layout_frontend/sidebar.html.twig' %}
 {% set menus = ['dashboard', 'offre','utilisateur','departement','candidat'] %}
-{% block title %}Créer un département
-{% endblock %}
+
+{% block title %}Créer un département{% endblock %}
 
 {% block body %}
-	<div class="page-wrap">
-		<div class="page-header">
-			<div class="header-left">
-				<span class="pretitle">CRÉATION</span>
-				<h1 class="page-title">Ajouter un département</h1>
-				<p class="page-subtitle">Remplissez les informations pour créer un nouveau département.</p>
-			</div>
-			<div class="header-right">
-				<a class="btn btn-secondary btn-back" href="{{ path('app_department_ajout') }}">
-					<span class="icon">&larr;</span>
-					Retour à la liste
-				</a>
-			</div>
-		</div>
+<style>
+.page-wrap { max-width:1100px; margin:0 auto; padding:24px; }
+.page-header { display:flex; justify-content:space-between; margin-bottom:32px; }
+.pretitle { font-size:12px; color:#6366f1; font-weight:600; }
+.page-title { font-size:28px; font-weight:700; }
+.page-subtitle { color:#6b7280; }
 
-		{% for label, messages in app.flashes %}
-			{% for message in messages %}
-				<div class="alert alert-{{ label }}">{{ message }}</div>
-			{% endfor %}
-		{% endfor %}
+.form-card {
+    background:#fff;
+    padding:32px;
+    border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.06);
+}
 
-		<div class="card form-card">
-			{{ form_start(form, { attr: { class: 'dept-form' } }) }}
-			<div class="form-row">
-				<label for="{{ form.departmentName.vars.id }}">
-					Nom du département
-					<span class="required">*</span>
-				</label>
-				{{ form_widget(form.departmentName, { attr: { class: 'input-text' } }) }}
-				<div class="form-help">{{ form_help(form.departmentName) }}</div>
-				{% if form_errors(form.departmentName) %}
-					<div class="form-error">{{ form_errors(form.departmentName) }}</div>
-				{% endif %}
-			</div>
+.dept-form { display:flex; flex-direction:column; gap:24px; }
 
+.form-row label { font-weight:600; font-size:14px; }
+.input-text {
+    width:100%; padding:12px 14px;
+    border-radius:10px; border:1px solid #d1d5db;
+}
+.input-text:focus {
+    border-color:#6366f1;
+    box-shadow:0 0 0 3px rgba(99,102,241,.15);
+    outline:none;
+}
+.required { color:#ef4444; }
 
-			<div class="form-actions-depart">
-				<a href="{{ path('app_department_ajout') }}" class="btn btn-ghost">Annuler</a>
-				<button type="submit" class="btn btn-primary">
-					<span class="check">✔</span>
-					Créer le département
-				</button>
-			</div>
-			{{ form_end(form) }}
-		</div>
-	</div>
+.form-actions-depart {
+    display:flex; justify-content:flex-end; gap:12px;
+}
+
+.btn-primary {
+    background:#6366f1; color:white;
+    padding:10px 18px; border-radius:10px;
+    font-weight:600; border:none;
+}
+
+.btn-ghost {
+    border:1px solid #d1d5db;
+    padding:10px 18px;
+    border-radius:10px;
+}
+
+.alert-success {
+    background:#ecfdf5;
+    color:#065f46;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:16px;
+}
+</style>
+
+<div class="page-wrap">
+
+    <div class="page-header">
+        <div>
+            <span class="pretitle">CRÉATION</span>
+            <h1 class="page-title">Ajouter un département</h1>
+            <p class="page-subtitle">
+                Le manager sera automatiquement créé.
+            </p>
+        </div>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert-success">{{ message }}</div>
+    {% endfor %}
+
+    <div class="form-card">
+        {{ form_start(form, { attr: { class: 'dept-form' } }) }}
+
+        <div class="form-row">
+            <label>Nom du département <span class="required">*</span></label>
+            {{ form_widget(form.departmentName, {
+                attr: { class:'input-text', placeholder:'Informatique' }
+            }) }}
+        </div>
+
+        <hr>
+
+        <h3>Informations du manager</h3>
+
+        <div class="form-row">
+            <label>Prénom <span class="required">*</span></label>
+            {{ form_widget(form.managerFirstName, { attr:{ class:'input-text' } }) }}
+        </div>
+
+        <div class="form-row">
+            <label>Nom <span class="required">*</span></label>
+            {{ form_widget(form.managerLastName, { attr:{ class:'input-text' } }) }}
+        </div>
+
+        <div class="form-row">
+            <label>Email <span class="required">*</span></label>
+            {{ form_widget(form.managerEmail, { attr:{ class:'input-text' } }) }}
+        </div>
+
+        <div class="form-actions-depart">
+            <a href="{{ path('app_department_ajout') }}" class="btn-ghost">Annuler</a>
+            <button class="btn-primary">✔ Créer</button>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
 {% endblock %}

@@ -6,6 +6,8 @@ use App\Entity\Candidacy;
 use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\JobOffer;
+
 
 class CandidacyRepository extends ServiceEntityRepository
 {
@@ -47,4 +49,38 @@ class CandidacyRepository extends ServiceEntityRepository
     {
         return $this->countByUserAndStatus($user, 'Invitée à un entretien');
     }
+
+
+// src/Repository/CandidacyRepository.php
+
+public function findByOfferStatusAndAfterDeadline(
+    JobOffer $offer,
+    string $status
+): array {
+    return $this->createQueryBuilder('c')
+        ->andWhere('c.jobOffer = :offer')
+        ->andWhere('c.status = :status')
+        ->andWhere('c.dateCandidacy >= :deadline')
+        ->setParameter('offer', $offer)
+        ->setParameter('status', $status)
+        ->setParameter('deadline', $offer->getDeadline())
+        ->orderBy('c.dateCandidacy', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
+
+public function findByOfferAndStatus(JobOffer $offer, string $status): array
+{
+    return $this->createQueryBuilder('c')
+        ->andWhere('c.jobOffer = :offer')
+        ->andWhere('c.status = :status')
+        ->setParameter('offer', $offer)
+        ->setParameter('status', $status)
+        ->orderBy('c.dateCandidacy', 'DESC') // ✅ ICI
+        ->getQuery()
+        ->getResult();
+}
+
+
+
 }

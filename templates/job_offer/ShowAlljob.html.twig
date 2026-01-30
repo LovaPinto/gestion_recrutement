@@ -6,11 +6,12 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="job-page">
 
     <h1 class="page-title">Toutes les offres d'emploi</h1>
 
-    <!-- Barre de recherche -->
+    <!-- 🔍 Recherche -->
     <form method="get" action="{{ path('app_job_offer') }}" class="search-form">
         <div class="search-wrapper">
             <input
@@ -20,56 +21,74 @@
                 value="{{ app.request.get('q') }}"
             >
             <button type="submit" class="search-btn">
-                <i class="fas fa-search"></i>
+                🔍
             </button>
         </div>
     </form>
 
-    <!-- Liste des offres -->
+    <!-- 📄 Liste des offres -->
     <div class="job-list">
+
         {% for job in jobOffers %}
+
+            {% set daysLeft = job.deadline ? date(job.deadline).diff(date()).days : null %}
+            {% set isUrgent = daysLeft is not null and daysLeft <= 5 %}
+
             <div class="job-card">
 
-                <div class="job-color-bar"></div>
-
                 <div class="job-content">
-                    <!-- TITRE + CONTRAT -->
+
+                    <!-- TITRE -->
                     <div class="job-header">
                         <h3 class="job-title">
                             <a href="{{ path('job_offer_show', {id: job.id}) }}">
                                 {{ job.title }}
                             </a>
                         </h3>
-                        <span class="job-contract">{{ job.offerType }}</span>
+
+                        <div class="job-meta">
+                            <span class="job-contract">{{ job.offerType }}</span>
+
+                            {% if isUrgent %}
+                                <span class="badge-urgent">URGENT</span>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- DESCRIPTION -->
                     <p class="job-description">
-                        {{ job.description|slice(0, 180) }}...
+                        {{ job.description|slice(0, 160) }}...
                     </p>
 
-                    <!-- INFOS SUPPLÉMENTAIRES -->
+                    <!-- INFOS -->
                     <div class="job-info">
-                        <span><i class="fas fa-map-marker-alt"></i> Madagascar</span>
-                        <span><i class="far fa-clock"></i> Publié : {{ job.dateCreation|date('d/m/Y') }}</span>
-                        <span><i class="fas fa-calendar-alt"></i> Deadline : {{ job.deadline|date('d/m/Y') }}</span>
+                        <span>📅 Publié : {{ job.dateCreation|date('d/m/Y') }}</span>
+                        <span>⏳ Deadline : {{ job.deadline|date('d/m/Y') }}</span>
+
+                        {% if daysLeft is not null %}
+                            <span>⏱ {{ daysLeft }} jour(s) restant(s)</span>
+                        {% endif %}
                     </div>
 
-                    <!-- BOUTON -->
-                    <a href="{{ path('job_offer_show', {id: job.id}) }}" class="btn-details btn-small">
+                    <!-- ACTION -->
+                    <a href="{{ path('job_offer_show', {id: job.id}) }}" class="btn-details">
                         Voir l’offre
                     </a>
-                </div>
 
+                </div>
             </div>
+
         {% else %}
-            <p class="no-result">Aucune offre disponible.</p>
+            <p class="no-result">Aucune offre disponible pour le moment.</p>
         {% endfor %}
+
     </div>
 
+    <!-- Pagination -->
     <div class="pagination-wrapper">
         {{ knp_pagination_render(jobOffers) }}
     </div>
 
 </div>
+
 {% endblock %}

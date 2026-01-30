@@ -29,11 +29,9 @@ class Candidate
     #[Assert\Email]
     private ?string $email = null;
 
-    // =========================
-    // Relation OneToOne avec Users
-    // =========================
-    #[ORM\OneToOne(inversedBy: 'candidate', targetEntity: Users::class)]
-    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    // 🔗 FK user_id (OWNING SIDE)
+    #[ORM\OneToOne(targetEntity: Users::class, inversedBy: 'candidate')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Users $user = null;
 
     #[ORM\Column(type: Types::STRING, length: 20, nullable: true)]
@@ -75,27 +73,20 @@ class Candidate
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $password = null;
 
-    // =====================
     // Relations
-    // =====================
     #[ORM\OneToMany(mappedBy: 'candidate', targetEntity: Candidacy::class, orphanRemoval: true)]
     private Collection $candidacies;
 
     #[ORM\ManyToMany(targetEntity: JobOffer::class, mappedBy: 'candidates')]
     private Collection $jobOffers;
 
-    // =====================
-    // Constructor
-    // =====================
     public function __construct()
     {
         $this->candidacies = new ArrayCollection();
         $this->jobOffers = new ArrayCollection();
     }
 
-    // =====================
-    // Getters & Setters
-    // =====================
+    // ---------------- GETTERS / SETTERS ----------------
 
     public function getId(): ?int
     {
@@ -106,6 +97,7 @@ class Candidate
     {
         return $this->nom;
     }
+
     public function setNom(?string $nom): static
     {
         $this->nom = $nom;
@@ -116,6 +108,7 @@ class Candidate
     {
         return $this->prenom;
     }
+
     public function setPrenom(?string $prenom): static
     {
         $this->prenom = $prenom;
@@ -126,6 +119,7 @@ class Candidate
     {
         return $this->email;
     }
+
     public function setEmail(?string $email): static
     {
         $this->email = $email;
@@ -136,9 +130,15 @@ class Candidate
     {
         return $this->user;
     }
+
     public function setUser(Users $user): static
     {
         $this->user = $user;
+
+        if ($user->getCandidate() !== $this) {
+            $user->setCandidate($this);
+        }
+
         return $this;
     }
 
@@ -146,6 +146,7 @@ class Candidate
     {
         return $this->telephone;
     }
+
     public function setTelephone(?string $telephone): static
     {
         $this->telephone = $telephone;
@@ -156,6 +157,7 @@ class Candidate
     {
         return $this->adresse;
     }
+
     public function setAdresse(?string $adresse): static
     {
         $this->adresse = $adresse;
@@ -166,6 +168,7 @@ class Candidate
     {
         return $this->ville;
     }
+
     public function setVille(?string $ville): static
     {
         $this->ville = $ville;
@@ -176,6 +179,7 @@ class Candidate
     {
         return $this->codePostal;
     }
+
     public function setCodePostal(?string $codePostal): static
     {
         $this->codePostal = $codePostal;
@@ -186,6 +190,7 @@ class Candidate
     {
         return $this->linkedin;
     }
+
     public function setLinkedin(?string $linkedin): static
     {
         $this->linkedin = $linkedin;
@@ -196,6 +201,7 @@ class Candidate
     {
         return $this->facebook;
     }
+
     public function setFacebook(?string $facebook): static
     {
         $this->facebook = $facebook;
@@ -206,6 +212,7 @@ class Candidate
     {
         return $this->nationalite;
     }
+
     public function setNationalite(?string $nationalite): static
     {
         $this->nationalite = $nationalite;
@@ -216,6 +223,7 @@ class Candidate
     {
         return $this->status;
     }
+
     public function setStatus(?string $status): static
     {
         $this->status = $status;
@@ -226,6 +234,7 @@ class Candidate
     {
         return $this->genre;
     }
+
     public function setGenre(?string $genre): static
     {
         $this->genre = $genre;
@@ -236,6 +245,7 @@ class Candidate
     {
         return $this->dateNaissance;
     }
+
     public function setDateNaissance(?\DateTimeInterface $dateNaissance): static
     {
         $this->dateNaissance = $dateNaissance;
@@ -246,6 +256,7 @@ class Candidate
     {
         return $this->cvFile;
     }
+
     public function setCvFile(mixed $cvFile): static
     {
         $this->cvFile = $cvFile;
@@ -256,6 +267,7 @@ class Candidate
     {
         return $this->lmFile;
     }
+
     public function setLmFile(mixed $lmFile): static
     {
         $this->lmFile = $lmFile;
@@ -266,15 +278,13 @@ class Candidate
     {
         return $this->password;
     }
+
     public function setPassword(string $password): static
     {
         $this->password = $password;
         return $this;
     }
 
-    /**
-     * @return Collection|Candidacy[]
-     */
     public function getCandidacies(): Collection
     {
         return $this->candidacies;

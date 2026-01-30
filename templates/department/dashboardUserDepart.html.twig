@@ -7,52 +7,61 @@ Dashboard {{ roleId == 1 ? 'RH' : 'Manager' }} - {{ companyName }}
 {% block body %}
 <div class="dashboard-container">
 
-    <h2 class="dashboard-title">Tableau de bord du {{ roleId == 1 ? 'RH' : 'Manager' }}</h2>
+    <!-- Bonjour utilisateur -->
+    <h2 class="greeting">Bonjour {{ user.firstName ~ ' ' ~ user.lastName }}</h2>
 
-    <!-- ================= NOMBRE OFFRES PAR STATUT ================= -->
-    <div class="offers-count">
-       <div class="count-box">
-    <h3 class="section-title">Offres en attente</h3>
-    <div class="count-number">
-        {{ offersByStatus['en attente']|default(0) }}
-    </div>
-</div>
+    <div class="dashboard-main">
+        <!-- ================= CARDS OFFRES ET MESSAGE ================= -->
+        <div class="cards-section">
+            <!-- ================= NOMBRE OFFRES PAR STATUT ================= -->
+            <div class="offers-count">
+                <div class="count-box count-en-attente">
+                    <h3 class="section-title">Offres en attente</h3>
+                    <div class="count-number">{{ offersByStatus['en attente']|default(0) }}</div>
+                    <div class="mini-bar" style="width: {{ offersByStatus['en attente']|default(0) * 5 }}%"></div>
+                </div>
+                <div class="count-box count-publiee">
+                    <h3 class="section-title">Offres publiées</h3>
+                    <div class="count-number">{{ offersByStatus['publiée']|default(0) }}</div>
+                    <div class="mini-bar" style="width: {{ offersByStatus['publiée']|default(0) * 5 }}%"></div>
+                </div>
+                <div class="count-box count-deja-prise">
+                    <h3 class="section-title">Offres déjà prises</h3>
+                    <div class="count-number">{{ offersByStatus['déjà prise']|default(0) }}</div>
+                    <div class="mini-bar" style="width: {{ offersByStatus['déjà prise']|default(0) * 5 }}%"></div>
+                </div>
+                <div class="count-box count-refusee">
+                    <h3 class="section-title">Offres refusées</h3>
+                    <div class="count-number">{{ offersByStatus['refusée']|default(0) }}</div>
+                    <div class="mini-bar" style="width: {{ offersByStatus['refusée']|default(0) * 5 }}%"></div>
+                </div>
+                <div class="count-box count-total">
+                    <h3 class="section-title">Total des offres</h3>
+                    <div class="count-number">{{ offersCount|default(0) }}</div>
+                    <div class="mini-bar" style="width: 100%"></div>
+                </div>
+            </div>
 
-<div class="count-box">
-    <h3 class="section-title">Offres publiées</h3>
-    <div class="count-number">
-        {{ offersByStatus['publiée']|default(0) }}
-    </div>
-</div>
-
-<div class="count-box">
-    <h3 class="section-title">Offres déjà prises</h3>
-    <div class="count-number">
-        {{ offersByStatus['déjà prise']|default(0) }}
-    </div>
-</div>
-
-        <div class="count-box">
-            <h3 class="section-title">Total des offres</h3>
-            <div class="count-number">
-                {{ offersCount|default(0) }}
+            <!-- ================= MESSAGE ENTretien ================= -->
+            <div class="message-box">
+                <h3>Prochain entretien</h3>
+                <p>{{ interviewMessage }}</p>
             </div>
         </div>
+
+        <!-- ================= FORMULAIRE MOIS ================= -->
+        <form method="get" class="month-form">
+            <label for="month">Choisir le mois :</label>
+            <input type="month" id="month" name="month" value="{{ selectedMonth }}">
+            <button type="submit" class="btn-month">Afficher</button>
+        </form>
+
+        <!-- ================= DIAGRAMME BARRES ================= -->
+        <div class="chart-section">
+            <h3 class="section-title">Offres publiées par jour</h3>
+            <canvas id="offersChart" height="120"></canvas>
+        </div>
     </div>
-
-    <!-- ================= FORMULAIRE MOIS ================= -->
-    <form method="get" class="month-form">
-        <label for="month">Choisir le mois :</label>
-        <input type="month" id="month" name="month" value="{{ selectedMonth }}">
-        <button type="submit" class="btn-month">Afficher</button>
-    </form>
-
-    <!-- ================= DIAGRAMME BARRES ================= -->
-    <div class="chart-section">
-        <h3 class="section-title">Offres créées par jour et par rôle</h3>
-        <canvas id="offersChart" height="120"></canvas>
-    </div>
-
 </div>
 
 <!-- ================= SCRIPT CHART ================= -->
@@ -63,26 +72,21 @@ new Chart(ctx, {
     type: 'bar',
     data: {
         labels: {{ chartLabels|json_encode|raw }},
-        datasets: [
-            {
-                label: 'RH',
-                data: {{ chartRH|json_encode|raw }},
-                backgroundColor: '#22c55e', // vert clair
-                borderRadius: 6
-            },
-            {
-                label: 'Manager',
-                data: {{ chartManager|json_encode|raw }},
-                backgroundColor: '#3b82f6', // bleu doux
-                borderRadius: 6
-            }
-        ]
+        datasets: [{
+            label: 'Offres publiées',
+            data: {{ chartValues|json_encode|raw }},
+            backgroundColor: '#1f2937',
+            borderRadius: 6
+        }]
     },
     options: {
         responsive: true,
         plugins: {
-            legend: { position: 'bottom', labels: { font: { size: 12 } } },
+            legend: { display: false },
             tooltip: {
+                backgroundColor: '#374151',
+                titleColor: '#fff',
+                bodyColor: '#fff',
                 callbacks: {
                     label: function(context) {
                         return context.dataset.label + ': ' + context.parsed.y + ' offre(s)';
@@ -92,15 +96,16 @@ new Chart(ctx, {
         },
         scales: {
             x: {
-                stacked: false,
-                title: { display: true, text: 'Jour du mois', color: '#6b7280', font: { size: 12 } },
-                grid: { display: false }
+                grid: { color: '#e5e7eb' },
+                ticks: { color: '#111827' },
+                title: { display: true, text: 'Jour du mois', color: '#111827' }
             },
             y: {
                 beginAtZero: true,
                 stepSize: 1,
-                title: { display: true, text: 'Nombre d’offres', color: '#6b7280', font: { size: 12 } },
-                ticks: { color: '#4b5563', font: { size: 12 } }
+                grid: { color: '#e5e7eb' },
+                ticks: { color: '#111827' },
+                title: { display: true, text: 'Nombre d’offres', color: '#111827' }
             }
         }
     }
@@ -109,109 +114,49 @@ new Chart(ctx, {
 
 <!-- ================= STYLES ================= -->
 <style>
-.dashboard-container{
-    max-width: 1200px;
-    padding: 24px;
-    font-family: 'Inter', sans-serif;
-    color: #374151;
-}
-.dashboard-title{
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 24px;
-    color: #0c71ff;
-}
-/* ================= COUNT BOX ================= */
-.offers-count {
-    margin-bottom: 30px;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 24px;
-}
-.count-box {
-    width: 140px;
-    height: 140px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: #f9fafb;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    transition: all 0.3s;
-    padding: 16px;
-}
-.count-box:hover {
-    box-shadow: 0 6px 14px rgba(0,0,0,0.1);
-}
-.count-box .section-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #4b5563;
-    text-align: center;
-    margin-bottom: 12px;
-}
-.count-box .count-number {
-    font-size: 36px;
-    font-weight: 700;
-    color: #111827;
-    text-align: center;
-    line-height: 1;
-}
+body { background: #ffffff; color: #111827; font-family: 'Inter', sans-serif; }
 
-/* ================= FORMULAIRE MOIS ================= */
-.month-form{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-.month-form label{
-    font-size: 13px;
-    color: #6b7280;
-}
-.month-form input[type="month"]{
-    padding: 6px 10px;
-    font-size: 13px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    background: #f3f4f6;
-}
-.month-form .btn-month{
-    padding: 6px 12px;
-    background: #3b82f6;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.2s;
-}
-.month-form .btn-month:hover{
-    background: #2563eb;
-}
+.greeting{ font-size: 22px; font-weight: 600; margin-bottom: 20px; }
+.dashboard-main{ display: flex; flex-direction: column; gap: 24px; }
 
-/* ================= DIAGRAMME ================= */
-.chart-section{
-    margin-top: 20px;
-    background: #ffffff;
-    padding: 12px;
-    border-radius: 12px;
-    box-shadow:0 3px 6px rgba(0,0,0,0.05);
+/* Cards et message */
+.cards-section{ display: flex; justify-content: space-between; gap: 16px; }
+.offers-count{ display: flex; flex-wrap: wrap; gap: 12px; flex: 1; }
+
+.count-box{
+    width: 140px; min-height: 140px; background: #f3f4f6; border-radius: 12px;
+    padding: 16px; display: flex; flex-direction: column; justify-content: space-between;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s;
 }
-.chart-section .section-title{
-    font-size: 14px;
-    font-weight: 500;
-    color: #4b5563;
-    margin-bottom: 10px;
+.count-box:hover{ transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
+
+.count-number{ font-size: 32px; font-weight: 700; color: #111827; }
+.section-title{ font-size: 14px; font-weight: 600; color: #4b5563; margin-bottom: 8px; }
+.mini-bar{ height: 5px; border-radius: 3px; margin-top: 8px; }
+.count-en-attente .mini-bar{ background: #fbbf24; }
+.count-publiee .mini-bar{ background: #22c55e; }
+.count-deja-prise .mini-bar{ background: #3b82f6; }
+.count-refusee .mini-bar{ background: #ef4444; }
+.count-total .mini-bar{ background: #6b7280; }
+
+.message-box{
+    width: 200px; min-height: 140px; background: #e5e7eb;
+    border-radius: 12px; padding: 16px; display: flex; flex-direction: column;
+    justify-content: center; box-shadow: 0 3px 6px rgba(0,0,0,0.1);
 }
-canvas{
-    background:#ffffff;
-    border-radius:12px;
-    box-shadow:0 3px 6px rgba(0,0,0,0.05);
-    padding:10px;
-}
+.message-box h3{ font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+.message-box p{ font-size: 14px; color: #111827; }
+
+/* Formulaire mois */
+.month-form{ display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 30px; }
+.month-form label{ color: #4b5563; font-size: 13px; }
+.month-form input[type="month"]{ padding: 6px 10px; border-radius: 6px; border: 1px solid #d1d5db; background: #ffffff; color: #111827; }
+.month-form .btn-month{ padding: 6px 12px; background: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+.month-form .btn-month:hover{ background: #1d4ed8; }
+
+/* Chart */
+.chart-section{ background: #f9fafb; padding: 16px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
+.chart-section .section-title{ font-size: 14px; font-weight: 500; color: #4b5563; margin-bottom: 12px; }
+canvas{ background:#ffffff; border-radius:12px; padding:10px; }
 </style>
 {% endblock %}

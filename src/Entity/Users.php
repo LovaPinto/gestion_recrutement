@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\UsersRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UsersRepository::class)]
@@ -21,70 +19,30 @@ class Users
     #[ORM\Column(length: 50)]
     private ?string $lastName = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 100, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 255)]
     private ?string $password = null;
 
+    // RÔLE (RH / MANAGER / CANDIDAT)
     #[ORM\ManyToOne(targetEntity: Role::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?Role $role = null;
 
-
+    // DÉPARTEMENT D’APPARTENANCE
     #[ORM\ManyToOne(targetEntity: Department::class)]
     private ?Department $department = null;
-#[ORM\OneToOne(mappedBy: 'user', targetEntity: Candidate::class, cascade: ['persist', 'remove'])]
-private ?Candidate $candidate = null;
 
-public function getCandidate(): ?Candidate
-{
-    return $this->candidate;
-}
+    // 🔗 RELATION INVERSE AVEC CANDIDATE (AJOUTÉ)
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Candidate::class, cascade: ['persist', 'remove'])]
+    private ?Candidate $candidate = null;
 
-public function setCandidate(Candidate $candidate): static
-{
-    $this->candidate = $candidate;
-    // On s’assure que le candidate pointe vers ce user
-    if ($candidate->getUser() !== $this) {
-        $candidate->setUser($this);
-    }
-    return $this;
-}
-
-    public function getRole(): ?Role
-    {
-        return $this->role;
-    }
-
-    public function setRole(?Role $role): self
-    {
-        $this->role = $role;
-        return $this;
-    }
-
-    // --- getters/setters ---
-    public function getDepartment(): ?Department
-    {
-        return $this->department;
-    }
-
-    public function setDepartment(?Department $department): static
-    {
-        $this->department = $department;
-        return $this;
-    }
+    // ---------------- GETTERS / SETTERS ----------------
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function setId(int $id): static
-    {
-        $this->id = $id;
-
-        return $this;
     }
 
     public function getFirstName(): ?string
@@ -95,7 +53,6 @@ public function setCandidate(Candidate $candidate): static
     public function setFirstName(string $firstName): static
     {
         $this->firstName = $firstName;
-
         return $this;
     }
 
@@ -107,7 +64,6 @@ public function setCandidate(Candidate $candidate): static
     public function setLastName(string $lastName): static
     {
         $this->lastName = $lastName;
-
         return $this;
     }
 
@@ -119,7 +75,6 @@ public function setCandidate(Candidate $candidate): static
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -131,9 +86,56 @@ public function setCandidate(Candidate $candidate): static
     public function setPassword(string $password): static
     {
         $this->password = $password;
+        return $this;
+    }
+
+    public function getRole(): ?Role
+    {
+        return $this->role;
+    }
+
+    public function setRole(Role $role): static
+    {
+        $this->role = $role;
+        return $this;
+    }
+
+    public function getDepartment(): ?Department
+    {
+        return $this->department;
+    }
+
+    public function setDepartment(?Department $department): static
+    {
+        $this->department = $department;
+        return $this;
+    }
+
+    // 🔗 GETTER / SETTER CANDIDATE (AJOUTÉS)
+    public function getCandidate(): ?Candidate
+    {
+        return $this->candidate;
+    }
+
+    public function setCandidate(?Candidate $candidate): static
+    {
+        $this->candidate = $candidate;
+
+        if ($candidate && $candidate->getUser() !== $this) {
+            $candidate->setUser($this);
+        }
 
         return $this;
     }
 
-    
+    // 🔍 HELPERS MÉTIER
+    public function isManager(): bool
+    {
+        return $this->role?->getType() === 'Manager';
+    }
+
+    public function isRh(): bool
+    {
+        return $this->role?->getType() === 'RH';
+    }
 }
