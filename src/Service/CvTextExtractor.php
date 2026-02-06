@@ -1,21 +1,21 @@
 <?php
 namespace App\Service;
 
-use Smalot\PdfParser\Parser;
-use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\Element\TextRun;
-use PhpOffice\PhpWord\Element\Text;
 use PhpOffice\PhpWord\Element\Table;
+use PhpOffice\PhpWord\Element\Text;
+use PhpOffice\PhpWord\Element\TextRun;
+use PhpOffice\PhpWord\IOFactory;
+use Smalot\PdfParser\Parser;
 
 class CvTextExtractor
 {
     public function extract(string $path, string $mime): string
     {
         return match (true) {
-            str_contains($mime, 'pdf') => $this->pdf($path),
+            str_contains($mime, 'pdf')                                           => $this->pdf($path),
             str_contains($mime, 'word') || str_contains($mime, 'officedocument') => $this->docx($path),
-            str_contains($mime, 'image') => $this->image($path),
-            default => '',
+            str_contains($mime, 'image')                                         => $this->image($path),
+            default                                                              => '',
         };
     }
 
@@ -28,7 +28,7 @@ class CvTextExtractor
     private function docx(string $path): string
     {
         $phpWord = IOFactory::load($path);
-        $text = '';
+        $text    = '';
 
         foreach ($phpWord->getSections() as $section) {
             foreach ($section->getElements() as $el) {
@@ -72,11 +72,11 @@ class CvTextExtractor
     }
 
     private function image(string $path): string
-    {
-        $cmd = sprintf(
-            'tesseract %s stdout -l eng+fra',
-            escapeshellarg($path)
-        );
-        return strtolower(shell_exec($cmd) ?? '');
-    }
+{
+    $tesseractExe = '"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"';
+    $cmd = sprintf('%s %s stdout -l eng+fra', $tesseractExe, escapeshellarg($path));
+
+    return strtolower(shell_exec($cmd) ?? '');
+}
+
 }

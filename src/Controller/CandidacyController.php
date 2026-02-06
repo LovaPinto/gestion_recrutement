@@ -262,81 +262,73 @@ public function candidaturesParOffre(
     CandidacyRepository $candidacyRepository,
     AtsAiService $atsAiService,
     CvTextExtractor $cvTextExtractor
-): Response {
-
-    // ===================== 1. Offre =====================
+): Response
+{
+    // ===================== 1. Récupérer l’offre =====================
     $offer = $jobOfferRepository->find($id);
-
     if (!$offer) {
         throw $this->createNotFoundException('Offre introuvable');
     }
 
-    // ===================== 2. Texte Job =====================
+    // ===================== 2. Construire le texte de comparaison =====================
     $jobText = strtolower(trim(
         ($offer->getDescription() ?? '') . ' ' .
-        (is_array($offer->getJobSkills())
-            ? implode(' ', $offer->getJobSkills())
-            : ($offer->getJobSkills() ?? '')
-        )
+        (is_array($offer->getJobSkills()) ? implode(' ', $offer->getJobSkills()) : ($offer->getJobSkills() ?? ''))
     ));
 
-    // ===================== 3. Statuts =====================
-    $statuses = [
-        'pending'   => Candidacy::STATUS_PENDING,
-        'interview' => Candidacy::STATUS_INTERVIEW,
-        'accepted'  => Candidacy::STATUS_ACCEPTED,
-        'refused'   => Candidacy::STATUS_REFUSED,
-    ];
+    // ===================== 3. Récupérer toutes les candidatures en attente =====================
+    $pendingCandidacies = $candidacyRepository->findBy([
+        'jobOffer' => $offer,
+        'status'   => Candidacy::STATUS_PENDING
+    ]);
 
-    $results = [];
+    // ===================== 4. Calculer le score ATS =====================
+    foreach ($pendingCandidacies as $candidacy) {
+        $score = null;
 
-    // ===================== 4. Boucle =====================
-    foreach ($statuses as $key => $status) {
+        if ($candidacy->getCvPath()) {
+            $tmpPath = tempnam(sys_get_temp_dir(), 'cv_');
+            file_put_contents($tmpPath, $candidacy->getCvPath());
 
-        $candidatures = $candidacyRepository->findBy([
-            'jobOffer' => $offer,
-            'status'   => $status,
-        ]);
+            $mime = $candidacy->getCvMimeType() ?? mime_content_type($tmpPath);
+            $cvText = $cvTextExtractor->extract($tmpPath, $mime);
+            $score = $atsAiService->score($cvText, $jobText);
 
-        foreach ($candidatures as $candidacy) {
-
-            $score = null;
-
-            if ($candidacy->getCvPath()) {
-
-                $tmpPath = tempnam(sys_get_temp_dir(), 'cv_');
-                file_put_contents($tmpPath, $candidacy->getCvPath());
-
-                $mime = $candidacy->getCvMimeType()
-                    ?? mime_content_type($tmpPath);
-
-                $cvText = $cvTextExtractor->extract($tmpPath, $mime);
-                $score  = $atsAiService->score($cvText, $jobText);
-
-                unlink($tmpPath);
-            }
-
-            // ATS injecté dynamiquement (pas persisté)
-            $candidacy->setAtsScore($score);
+            unlink($tmpPath);
         }
 
-        // ===================== 5. Tri ATS =====================
-        usort($candidatures, fn ($a, $b) =>
-            ($b->getAtsScore() ?? 0) <=> ($a->getAtsScore() ?? 0)
-        );
-
-        $results[$key] = $candidatures;
+        $candidacy->setAtsScore($score);
     }
 
-    // ===================== 6. Rendu =====================
+    // ===================== 5. Trier par score décroissant =====================
+    usort($pendingCandidacies, fn($a, $b) => ($b->getAtsScore() ?? 0) <=> ($a->getAtsScore() ?? 0));
+
+    // ===================== 6. Récupérer les autres statuts =====================
+    $interview = $candidacyRepository->findBy([
+        'jobOffer' => $offer,
+        'status'   => Candidacy::STATUS_INTERVIEW
+    ]);
+
+    $accepted = $candidacyRepository->findBy([
+        'jobOffer' => $offer,
+        'status'   => Candidacy::STATUS_ACCEPTED
+    ]);
+
+    $refused = $candidacyRepository->findBy([
+        'jobOffer' => $offer,
+        'status'   => Candidacy::STATUS_REFUSED
+    ]);
+
+    // ===================== 7. Rendu =====================
     return $this->render('department/suivieCandidature.html.twig', [
         'offer'     => $offer,
-        'pending'   => $results['pending'],
-        'interview' => $results['interview'],
-        'accepted'  => $results['accepted'],
-        'refused'   => $results['refused'],
+        'pending'   => $pendingCandidacies,  // trié par score ATS
+        'interview' => $interview,
+        'accepted'  => $accepted,
+        'refused'   => $refused,
     ]);
 }
+
 
 #[Route('/Entretien', name: 'interview')]
 public function showAllInterview(Request $request): Response
