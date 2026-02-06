@@ -127,10 +127,17 @@ public function showAllOffers(
         5
     );
 
+    // Récupération du message et du résultat depuis GET
+    $result  = $request->query->get('result');
+    $message = $request->query->get('message') ? urldecode($request->query->get('message')) : null;
+
     return $this->render('job_offer/ShowAlljob.html.twig', [
         'jobOffers' => $jobOffers,
+        'result'    => $result,
+        'message'   => $message,
     ]);
 }
+
 
 
 

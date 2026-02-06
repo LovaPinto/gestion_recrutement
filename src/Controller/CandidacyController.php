@@ -55,23 +55,37 @@ public function apply(JobOffer $jobOffer, Request $request): Response
         ]);
     }
 
-    if ($request->isMethod('POST')) {
+    /* 🔒 Vérification : candidature déjà existante */
+    $existingCandidacy = $this->entityManager
+        ->getRepository(Candidacy::class)
+        ->findOneBy([
+            'user'     => $user,
+            'jobOffer' => $jobOffer
+        ]);
 
+    if ($existingCandidacy) {
+        // Redirection vers la liste des offres avec paramètres GET pour afficher l'alerte
+        return $this->redirectToRoute('app_job_offer', [
+            'result'  => 'warning',
+            'message' => urlencode('Désolé, vous avez déjà postulé à cette offre.')
+        ]);
+    }
+
+    if ($request->isMethod('POST')) {
         try {
             $candidacy = new Candidacy();
             $candidacy->setJobOffer($jobOffer);
             $candidacy->setUser($user);
             $candidacy->setDateCandidacy(new \DateTime());
 
-            if (
-                $jobOffer->getDeadline() !== null &&
-                new \DateTime() > $jobOffer->getDeadline()
-            ) {
+            // Vérification de la deadline
+            if ($jobOffer->getDeadline() !== null && new \DateTime() > $jobOffer->getDeadline()) {
                 $candidacy->setStatus(Candidacy::STATUS_REFUSED);
             } else {
                 $candidacy->setStatus(Candidacy::STATUS_PENDING);
             }
 
+            // Fichiers
             if ($cv = $request->files->get('cv_path')) {
                 $candidacy->setCvPath(file_get_contents($cv->getPathname()));
             }
@@ -80,6 +94,7 @@ public function apply(JobOffer $jobOffer, Request $request): Response
                 $candidacy->setAttachement(file_get_contents($att->getPathname()));
             }
 
+            // Lien portfolio et message de motivation
             $candidacy->setPortfolioLink($request->request->get('portfolio_link'));
             $candidacy->setReason($request->request->get('reason'));
 
@@ -90,7 +105,7 @@ public function apply(JobOffer $jobOffer, Request $request): Response
                 'jobOffer' => $jobOffer,
                 'user'     => $user,
                 'result'   => 'success',
-                'message'  => 'Candidature envoyée avec succès. Vous allez être redirigé…',
+                'message'  => 'Votre candidature a été envoyée avec succès.',
             ]);
 
         } catch (\Exception $e) {
@@ -98,7 +113,7 @@ public function apply(JobOffer $jobOffer, Request $request): Response
                 'jobOffer' => $jobOffer,
                 'user'     => $user,
                 'result'   => 'error',
-                'message'  => 'Échec de l’envoi de la candidature. Veuillez réessayer.',
+                'message'  => 'Une erreur est survenue. Veuillez réessayer.',
             ]);
         }
     }
@@ -108,8 +123,6 @@ public function apply(JobOffer $jobOffer, Request $request): Response
         'user'     => $user,
     ]);
 }
-
-
 
     /* ===================== LISTE DES CANDIDATURES ===================== */
     #[Route('/job/offer/{id}/candidacies', name: 'job_offer_candidacies')]

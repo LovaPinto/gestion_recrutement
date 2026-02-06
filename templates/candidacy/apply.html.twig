@@ -8,7 +8,6 @@ Postuler – {{ jobOffer.title }}
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
-/* ================= BASE ================= */
 body {
     font-family: 'Inter', sans-serif;
     background: #ffffff;
@@ -37,58 +36,27 @@ body {
     animation: scaleIn .3s ease;
 }
 
-/* ICON */
+.alert-card.success { border: 2px solid #22c55e; }
+.alert-card.error   { border: 2px solid #ef4444; }
+.alert-card.warning { border: 2px solid #f59e0b; }
+
 .alert-icon {
     font-size: 56px;
     font-weight: 800;
-    position: relative;
-    z-index: 3;
-    margin-top: -6px; /* ⬅️ montée */
+    margin-top: -6px;
 }
 
-/* RING */
-.ring {
-    position: absolute;
-    width: 118px;
-    height: 118px;
-    top: 26px;        /* ⬅️ montée */
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 50%;
-    border: 3px solid #fff;
-    z-index: 2;
-}
+.alert-icon.success { color: #22c55e; }
+.alert-icon.error   { color: #ef4444; }
+.alert-icon.warning { color: #f59e0b; }
 
-/* WATER */
-.ring::before {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    border-radius: 50%;
-    background:
-        conic-gradient(
-            transparent 0deg,
-            transparent 310deg,
-            #9ca3af 330deg,
-            #9ca3af 350deg,
-            transparent 360deg
-        );
-    animation: waterFlow 1.6s linear infinite;
-    mask: radial-gradient(
-        farthest-side,
-        transparent calc(100% - 6px),
-        #000 calc(100% - 3px)
-    );
-}
-
-/* TEXT */
 .alert-text {
     margin-top: 26px;
     font-size: 16px;
     font-weight: 600;
 }
 
-/* ================= FORM BOX ================= */
+/* ================= FORM ================= */
 .apply-box {
     max-width: 760px;
     margin: 60px auto;
@@ -110,7 +78,6 @@ body {
     margin-bottom: 36px;
 }
 
-/* ================= USER INFO ================= */
 .user-info {
     display: grid;
     grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
@@ -130,11 +97,6 @@ body {
     font-weight: 600;
 }
 
-.user-card div {
-    margin-top: 4px;
-}
-
-/* ================= FORM ================= */
 .form-group { margin-bottom: 22px; }
 
 label {
@@ -152,9 +114,6 @@ input, textarea {
 
 textarea { min-height: 130px; }
 
-input[readonly] { background: #f3f4f6; }
-
-/* ================= FILE INPUT (UNIFIED) ================= */
 .file-wrapper {
     display: flex;
     gap: 12px;
@@ -176,10 +135,9 @@ input[readonly] { background: #f3f4f6; }
     border-radius: 12px;
     background: #f9fafb;
     border: 1px solid #d1d5db;
-    font-size: 14px;
 }
 
-/* SUBMIT */
+/* ================= BUTTON ================= */
 .btn-apply {
     width: 100%;
     margin-top: 20px;
@@ -192,8 +150,7 @@ input[readonly] { background: #f3f4f6; }
     cursor: pointer;
 }
 
-/* ANIM */
-@keyframes waterFlow { to { transform: rotate(360deg); } }
+/* ================= ANIM ================= */
 @keyframes scaleIn {
     from { transform: scale(.85); opacity: 0 }
     to   { transform: scale(1); opacity: 1 }
@@ -204,11 +161,10 @@ input[readonly] { background: #f3f4f6; }
 {% if result is defined %}
 <div id="alert-overlay">
     <div class="alert-card {{ result }}">
-        {% if result == 'success' %}
-            <div class="ring"></div>
-        {% endif %}
-        <div class="alert-icon">
-            {{ result == 'success' ? '✓' : '✕' }}
+        <div class="alert-icon {{ result }}">
+            {% if result == 'success' %}✓
+            {% elseif result == 'warning' %}⚠
+            {% else %}✕{% endif %}
         </div>
         <div class="alert-text">{{ message }}</div>
     </div>
@@ -245,7 +201,7 @@ input[readonly] { background: #f3f4f6; }
         </div>
 
         <div class="form-group">
-            <label>Pièce jointe (optionnel)</label>
+            <label>Pièce jointe (optionnelle)</label>
             <div class="file-wrapper">
                 <button type="button" class="file-btn" onclick="att.click()">Choisir</button>
                 <span class="file-name" id="att-name">Aucun fichier</span>
@@ -280,8 +236,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             window.location.href = "{{ path('app_candidate_dashboard') }}";
         }, 2200);
-    {% elseif result is defined %}
-        setTimeout(() => overlay.remove(), 1800);
+    {% else %}
+        setTimeout(() => overlay.remove(), 2200);
     {% endif %}
 });
 </script>
