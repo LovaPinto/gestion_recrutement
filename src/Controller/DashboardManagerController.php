@@ -78,6 +78,12 @@ class DashboardManagerController extends AbstractController
             'department' => $department,
             'status'     => JobOffer::STATUS_PRISE
         ]);
+        //Refuse
+         $refusedOffers = $jobOfferRepository->count([
+            'company'    => $company,
+            'department' => $department,
+            'status'     => JobOffer:: STATUS_REFUSEE
+        ]);
 
         // 📩 Candidatures invitées à un entretien
         $interviewCount = $candidacyRepository->createQueryBuilder('c')
@@ -101,7 +107,9 @@ class DashboardManagerController extends AbstractController
             'pendingOffers'    => $pendingOffers,
             'publishedOffers'  => $publishedOffers,
             'takenOffers'      => $takenOffers,
+            'refusedOffers'    => $refusedOffers,
             'interviewCount'   => $interviewCount,
+
 
             'jobOffers'        => $jobOffers,
         ]);

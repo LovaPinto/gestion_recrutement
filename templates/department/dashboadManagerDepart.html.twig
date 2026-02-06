@@ -93,7 +93,7 @@
     text-transform: uppercase;  /* majuscules pro */
     color: #000000;                /* gris foncé pro */
     background: #f5f5f5;        /* léger fond de separation */
-    padding: 16px 14px;
+    padding: 10px 10px;
     border-bottom: 2px solid #e5e5e5; /* ligne de séparation nette */
 }
 
@@ -114,7 +114,7 @@
 }
 
 /* ================= COLUMNS ================= */
-.col-title    { width: 26%; text-align: left; }
+.col-title    { width: 10%; text-align: left; }
 .col-type     { width: 10%; text-align: center; }
 .col-exp      { width: 12%; text-align: center; }
 .col-created  { width: 12%; text-align: center; }
@@ -176,6 +176,14 @@
         <div class="stat">
             <div class="stat-label">Offres en attente</div>
             <div class="stat-value">{{ pendingOffers }}</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Offres publiées</div>
+            <div class="stat-value">{{ publishedOffers }}</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Offres refusées</div>
+            <div class="stat-value">{{ refusedOffers }}</div>
         </div>
         <div class="stat">
             <div class="stat-label">Entretiens planifiés</div>

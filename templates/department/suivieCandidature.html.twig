@@ -4,18 +4,13 @@
 {% block body %}
 
 <style>
-/* =====================================================
-   PAGE
-   ===================================================== */
+
 .page-wrapper {
     width: 100%;
     max-width: 100%;
     padding: 16px 0 32px;
 }
 
-/* =====================================================
-   HEADER
-   ===================================================== */
 .page-header {
     display: flex;
     justify-content: space-between;
@@ -31,9 +26,7 @@
     color: #0f172a;
 }
 
-/* =====================================================
-   SEARCH
-   ===================================================== */
+
 .search-container {
     position: relative;
     width: 420px;
@@ -66,12 +59,10 @@
     stroke: #6b7280;
 }
 
-/* =====================================================
-   🔥 SCROLL ISOLÉ (CLÉ DU FIX)
-   ===================================================== */
+
 .kanban-scroll-zone {
     width: 100%;
-    overflow-x: auto;       /* ✅ scroll ici */
+    overflow-x: auto;      
     overflow-y: hidden;
     padding-bottom: 16px;
 }
@@ -84,18 +75,14 @@
     border-radius: 10px;
 }
 
-/* =====================================================
-   KANBAN CONTENT
-   ===================================================== */
+
 .kanban {
-    display: inline-flex;   /* 🔑 IMPORTANT */
+    display: inline-flex;   
     gap: 28px;
     padding: 0 8px;
 }
 
-/* =====================================================
-   COLUMN
-   ===================================================== */
+
 .kanban-column {
     width: 330px;
     min-width: 330px;
@@ -117,9 +104,7 @@
     margin-bottom: 22px;
 }
 
-/* =====================================================
-   CARD
-   ===================================================== */
+
 .kanban-card {
     background: #f9fafb;
     border-radius: 14px;
@@ -154,9 +139,7 @@
     margin-top: 48px;
 }
 
-/* =====================================================
-   RESPONSIVE
-   ===================================================== */
+
 @media (max-width: 768px) {
     .page-header {
         flex-direction: column;

@@ -1,83 +1,149 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Créer une offre d'emploi{% endblock %}
+{% block title %}Créer une offre d'emploi
+{% endblock %}
 
 {% block body %}
-<style>
-body { background: #111; color: #eee; font-family: "Segoe UI", sans-serif; }
-.container { max-width: 900px; margin: 40px auto; }
-.card { background: #1c1c1c; padding: 35px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,.5); }
-h2 { text-align: center; margin-bottom: 25px; color: #fff; }
-label { display: block; margin-top: 18px; font-weight: 600; }
-input, select, textarea { width: 100%; margin-top: 6px; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #222; color: #fff; }
-textarea { resize: vertical; }
-.btn { margin-top: 30px; padding: 12px 30px; font-size: 16px; border: none; border-radius: 6px; background-color: #0d6efd; color: #fff; cursor: pointer; transition: all 0.3s ease; }
-.btn:hover { background-color: #0b5ed7; }
-.alert { margin-top: 20px; padding: 15px; border-radius: 6px; font-weight: bold; font-size: 14px; }
-.alert-danger { background: #842029; color: #fff; }
-</style>
+	<style>
+		body {
+			background: #fefdfdff;
+			color: #eee;
+			font-family: "Segoe UI", sans-serif;
+		}
+		.container {
+			max-width: 900px;
+			margin: 40px auto;
+		}
+		.card {
+			background: #fffdfdff;
+			padding: 35px;
+			border-radius: 12px;
+			box-shadow: 0 10px 25px rgba(0, 0, 0, 0.77);
+		}
+		h2 {
+			text-align: center;
+			margin-bottom: 25px;
+			color: #030303ff;
+            font-family: italic;
+            font-size: 30px;
+		}
+		label {
+			display: block;
+			margin-top: 18px;
+			font-weight: 600;
+            color: #080707ff;
+		}
+		input,
+		select,
+		textarea {
+			width: 100%;
+			margin-top: 6px;
+			padding: 10px;
+			border-radius: 6px;
+			border: 1px solid #333;
+			background: #f1eeeeff;
+			color: #050404ff;
+		}
+		textarea {
+			resize: vertical;
+		}
+		.btn {
+			margin-top: 30px;
+			padding: 12px 30px;
+			font-size: 16px;
+			border: none;
+			border-radius: 6px;
+			background-color: #032b66ff;
+			color: #fff;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+		.btn:hover {
+			background-color: #020d1fff;
+		}
+		.alert {
+			margin-top: 20px;
+			padding: 15px;
+			border-radius: 6px;
+			font-weight: bold;
+			font-size: 14px;
+		}
+		.alert-danger {
+			background: #842029;
+			color: #fff;
+		}
+        
+       
+	</style>
 
-<div class="container">
-    <div class="card">
-        <h2>Créer une offre d'emploi</h2>
+	<div class="container">
+		<div class="card">
+			<h2>Créer une offre d'emploi</h2>
 
-        {% if error is defined %}
-        <div class="alert alert-danger">{{ error }}</div>
-        {% endif %}
+			{% if error is defined %}
+				<div class="alert alert-danger">{{ error }}</div>
+			{% endif %}
 
-        <form method="POST" action="{{ path('job_offer_create', { step: step }) }}">
-            {% if step == 1 %}
-                <label>Titre de l’offre</label>
-                <input type="text" name="title" required placeholder="Entrez le titre du poste">
+			<form method="POST" action="{{ path('job_offer_create', { step: step }) }}">
+				{% if step == 1 %}
+					<label>Titre de l’offre</label>
+					<input type="text" name="title" required placeholder="Entrez le titre du poste">
 
-                <label>Type de contrat</label>
-                <select name="offerType" required>
-                    <option value="">-- Choisir --</option>
-                    <option>CDI</option>
-                    <option>CDD</option>
-                    <option>Stage</option>
-                    <option>Freelance</option>
-                </select>
+					<label>Type de contrat</label>
+					<select name="offerType" required>
+						<option value="">-- Choisir --</option>
+						<option>CDI</option>
+						<option>CDD</option>
+						<option>Stage</option>
+						<option>Freelance</option>
+					</select>
 
-                <label>Niveau d’expérience</label>
-                <select name="experience_level" required>
-                    <option value="">-- Choisir --</option>
-                    <option>Junior</option>
-                    <option>Intermédiaire</option>
-                    <option>Senior</option>
-                </select>
+					<label>Niveau d’expérience</label>
+					<select name="experience_level" required>
+						<option value="">-- Choisir --</option>
+						<option>Junior</option>
+						<option>Intermédiaire</option>
+						<option>Senior</option>
+					</select>
 
-                <label>Description du poste</label>
-                <textarea name="description" rows="6" required placeholder="Décrivez le poste"></textarea>
+					<label>Description du poste</label>
+					<textarea name="description" rows="6" required placeholder="Décrivez le poste"></textarea>
 
-            {% elseif step == 2 %}
-                <label>Département</label>
-                <select name="department" required>
-                    <option value="">-- Sélectionner --</option>
-                    {% for dep in departments %}
-                        <option value="{{ dep.id }}">{{ dep.departmentName }}</option>
-                    {% endfor %}
-                </select>
+				{% elseif step == 2 %}
+					<label>Département</label>
+					<select name="department" required>
+						<option value="">-- Sélectionner --</option>
+						{% for dep in departments %}
+							<option value="{{ dep.id }}">{{ dep.departmentName }}</option>
+						{% endfor %}
+					</select>
 
-                <label>Responsabilités</label>
-                <textarea name="responsability" rows="5" required placeholder="Responsabilités principales"></textarea>
+					<label>Responsabilités</label>
+					<textarea name="responsability" rows="5" required placeholder="Responsabilités principales"></textarea>
 
-                <label>Compétences (une par ligne)</label>
-                <textarea name="job_skills" rows="5" placeholder="compétence1\ncompétence2\ncompétence3"></textarea>
+					<label>Compétences (une par ligne)</label>
+					<textarea name="job_skills" rows="5" placeholder="compétence1\ncompétence2\ncompétence3"></textarea>
 
-                <label>Date limite</label>
-                <input type="date" name="deadline">
-            {% endif %}
+					<label>Date limite</label>
+					<input type="date" name="deadline">
+				{% endif %}
 
-            <button class="btn">{{ step == 2 ? 'Créer l’offre' : 'Étape suivante' }}</button>
-        </form>
-    </div>
-</div>
+				<button class="btn">{{ step == 2 ? 'Créer l’offre' : 'Étape suivante' }}</button>
+			</form>
+		</div>
+	</div>
 
-{% for msg in app.flashes('success') %}
-<script>
-Swal.fire({ icon:'success', title:'Offre créée !', text:'{{ msg|e('js') }}', showConfirmButton:false, timer:2000 })
-.then(()=>{ window.location.href='{{ path('dashboard_user_depart') }}'; });
-</script>
-{% endfor %}
+	{% for msg in app.flashes('success') %}
+		<script>
+			Swal.fire({
+icon: 'success',
+title: 'Offre créée !',
+text:'{{ msg|e('js') }}',
+showConfirmButton: false,
+timer: 2000
+}).then(() => {
+window.location.href ='{{ path('dashboard_user_depart') }}';
+});
+		</script>
+	{% endfor %}
 {% endblock %}

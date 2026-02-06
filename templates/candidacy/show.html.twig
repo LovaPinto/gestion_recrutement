@@ -1,132 +1,258 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700 &display=swap');
 
-body { font-family: 'Inter', sans-serif; background: #f5f7fa; color:#1f2937; margin:0; }
-.wrapper { max-width:700px; margin:50px auto; padding:40px 30px; background:#fff; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.05); }
-h2 { font-size:26px; font-weight:700; text-align:center; color:#2563eb; margin-bottom:30px; }
-.info-section { display:flex; flex-direction:column; gap:12px; margin-bottom:30px; }
-.info-item { display:flex; justify-content:space-between; font-size:15px; }
-.info-item span.label { font-weight:600; color:#4b5563; }
-.info-item span.value { font-weight:500; color:#111827; }
-.reason { background:#f9fafb; padding:18px 20px; border-radius:16px; font-size:15px; line-height:1.6; margin-bottom:25px; }
-.links a { text-decoration:none; color:#2563eb; font-weight:600; margin-right:15px; }
-.links a:hover { text-decoration:underline; }
-.form-box { background:#f3f4f6; padding:28px 25px; border-radius:20px; }
-.form-box label { font-weight:600; margin-bottom:6px; display:block; }
-.form-box input, .form-box select, .form-box textarea { width:100%; padding:12px 14px; border-radius:12px; border:none; background:#fff; margin-bottom:16px; font-size:14px; box-shadow:0 1px 3px rgba(0,0,0,0.08); }
-.form-box textarea { min-height:100px; }
-.form-box button { background:#2563eb; color:white; padding:14px 28px; border:none; border-radius:16px; font-weight:600; font-size:15px; cursor:pointer; width:100%; transition:0.3s; }
-.form-box button:hover { background:#1e40af; }
-.alert { position:fixed; top:20px; right:20px; padding:14px 22px; border-radius:12px; font-weight:600; color:#fff; opacity:0; transform:translateY(-10px); transition:all 0.3s ease; z-index:9999; }
-.alert.show { opacity:1; transform:translateY(0); }
-.alert.success { background:#16a34a; }
-.alert.error { background:#dc2626; }
-.alert.warning { background:#d97706; }
-</style>
+		body {
+			font-family: 'Inter', sans-serif;
+			background: #f5f7fa;
+			color: #1f2937;
+			margin: 0;
+		}
+		.wrapper {
+			max-width: 700px;
+			margin: 50px auto;
+			padding: 40px 30px;
+			background: #fff;
+			border-radius: 20px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+		}
+		h2 {
+			font-size: 26px;
+			font-weight: 700;
+			text-align: center;
+			color: #2563eb;
+			margin-bottom: 30px;
+		}
+		.info-section {
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+			margin-bottom: 30px;
+		}
+		.info-item {
+			display: flex;
+			justify-content: space-between;
+			font-size: 15px;
+		}
+		.info-item span.label {
+			font-weight: 600;
+			color: #4b5563;
+		}
+		.info-item span.value {
+			font-weight: 500;
+			color: #111827;
+		}
+		.reason {
+			background: #f9fafb;
+			padding: 18px 20px;
+			border-radius: 16px;
+			font-size: 15px;
+			line-height: 1.6;
+			margin-bottom: 25px;
+		}
+		.links a {
+			text-decoration: none;
+			color: #2563eb;
+			font-weight: 600;
+			margin-right: 15px;
+		}
+		.links a:hover {
+			text-decoration: underline;
+		}
+		.form-box {
+			background: #f3f4f6;
+			padding: 28px 25px;
+			border-radius: 20px;
+		}
+		.form-box label {
+			font-weight: 600;
+			margin-bottom: 6px;
+			display: block;
+		}
+		.form-box input,
+		.form-box select,
+		.form-box textarea {
+			width: 100%;
+			padding: 12px 14px;
+			border-radius: 12px;
+			border: none;
+			background: #fff;
+			margin-bottom: 16px;
+			font-size: 14px;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+		}
+		.form-box textarea {
+			min-height: 100px;
+		}
+		.form-box button {
+			background: #2563eb;
+			color: white;
+			padding: 14px 28px;
+			border: none;
+			border-radius: 16px;
+			font-weight: 600;
+			font-size: 15px;
+			cursor: pointer;
+			width: 100%;
+			transition: 0.3s;
+		}
+		.form-box button:hover {
+			background: #1e40af;
+		}
+		.alert {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			padding: 14px 22px;
+			border-radius: 12px;
+			font-weight: 600;
+			color: #fff;
+			opacity: 0;
+			transform: translateY(-10px);
+			transition: all 0.3s ease;
+			z-index: 9999;
+		}
+		.alert.show {
+			opacity: 1;
+			transform: translateY(0);
+		}
+		.alert.success {
+			background: #16a34a;
+		}
+		.alert.error {
+			background: #dc2626;
+		}
+		.alert.warning {
+			background: #d97706;
+		}
+	</style>
 
-<div class="wrapper">
+	<div class="wrapper">
 
-    <h2>
-        {{ candidate ? candidate.prenom ~ ' ' ~ candidate.nom : 'Candidat Inconnu' }}
-    </h2>
+		<h2>
+			{{ candidate ? candidate.prenom ~ ' ' ~ candidate.nom : 'Candidat Inconnu' }}
+		</h2>
 
-    <div class="info-section">
-        {% if candidate %}
-            {% if candidate.adresse %}
-            <div class="info-item"><span class="label">Adresse</span><span class="value">{{ candidate.adresse }}</span></div>
-            {% endif %}
-            {% if candidate.nationalite %}
-            <div class="info-item"><span class="label">Nationalité</span><span class="value">{{ candidate.nationalite }}</span></div>
-            {% endif %}
-            {% if candidate.linkedin %}
-            <div class="info-item"><span class="label">LinkedIn</span><span class="value"><a href="{{ candidate.linkedin }}" target="_blank">{{ candidate.linkedin }}</a></span></div>
-            {% endif %}
-        {% endif %}
-        <div class="info-item"><span class="label">Statut actuel</span><span class="value">{{ candidacy.status }}</span></div>
-        {% if candidacy.interviewDate %}
-        <div class="info-item"><span class="label">Date d'entretien</span><span class="value">{{ candidacy.interviewDate|date('d/m/Y') }}</span></div>
-        {% endif %}
-    </div>
+		<div class="info-section">
+			{% if candidate %}
+				{% if candidate.adresse %}
+					<div class="info-item">
+						<span class="label">Adresse</span>
+						<span class="value">{{ candidate.adresse }}</span>
+					</div>
+				{% endif %}
+				{% if candidate.nationalite %}
+					<div class="info-item">
+						<span class="label">Nationalité</span>
+						<span class="value">{{ candidate.nationalite }}</span>
+					</div>
+				{% endif %}
+				{% if candidate.linkedin %}
+					<div class="info-item">
+						<span class="label">LinkedIn</span>
+						<span class="value">
+							<a href="{{ candidate.linkedin }}" target="_blank">{{ candidate.linkedin }}</a>
+						</span>
+					</div>
+				{% endif %}
+			{% endif %}
+			<div class="info-item">
+				<span class="label">Statut actuel</span>
+				<span class="value">{{ candidacy.status }}</span>
+			</div>
+			{% if candidacy.interviewDate %}
+				<div class="info-item">
+					<span class="label">Date d'entretien</span>
+					<span class="value">{{ candidacy.interviewDate|date('d/m/Y') }}</span>
+				</div>
+			{% endif %}
+		</div>
 
-    <div class="reason">
-        <strong>Motivation / Raison :</strong><br><br>
-        {{ candidacy.reason ?: 'Non fournie' }}
-    </div>
+		<div class="reason">
+			<strong>Motivation / Raison :</strong><br><br>
+			{{ candidacy.reason ?: 'Non fournie' }}
+		</div>
 
-    <div class="links" style="margin-bottom:25px;">
-        {% if candidacy.cvPath %}
-            <a href="{{ path('candidacy_file', {'id': candidacy.id, 'type':'cv'}) }}" target="_blank">Voir / Télécharger CV</a>
-        {% endif %}
-        {% if candidacy.attachement %}
-            <a href="{{ path('candidacy_file', {'id': candidacy.id, 'type':'attachement'}) }}" target="_blank">Voir / Télécharger pièce jointe</a>
-        {% endif %}
-        {% if candidacy.portfolioLink %}
-            <a href="{{ candidacy.portfolioLink }}" target="_blank">Portfolio</a>
-        {% endif %}
-    </div>
+		<div class="links" style="margin-bottom:25px;">
+			{% if candidacy.cvPath %}
+				<a href="{{ path('candidacy_file', {'id': candidacy.id, 'type':'cv'}) }}" target="_blank">Voir / Télécharger CV</a>
+			{% endif %}
+			{% if candidacy.attachement %}
+				<a href="{{ path('candidacy_file', {'id': candidacy.id, 'type':'attachement'}) }}" target="_blank">Voir / Télécharger pièce jointe</a>
+			{% endif %}
+			{% if candidacy.portfolioLink %}
+				<a href="{{ candidacy.portfolioLink }}" target="_blank">Portfolio</a>
+			{% endif %}
+		</div>
 
-    <div class="form-box">
-        <form id="candidacyForm" method="POST" action="{{ path('candidacy_update', {'id': candidacy.id}) }}">
-            <label>Statut</label>
-            <select name="status" id="status_select">
-                <option value="invité à un entretien">Invité à un entretien</option>
-                <option value="acceptée">Acceptée</option>
-                <option value="refusée">Refusée</option>
-            </select>
+		<div class="form-box">
+			<form id="candidacyForm" method="POST" action="{{ path('candidacy_update', {'id': candidacy.id}) }}">
+				<label>Statut</label>
+				<select name="status" id="status_select">
+					<option value="invité à un entretien">Invité à un entretien</option>
+					<option value="acceptée">Acceptée</option>
+					<option value="refusée">Refusée</option>
+				</select>
 
-            <label>Note RH</label>
-            <textarea name="recruiter_note">{{ candidacy.recruiterNote }}</textarea>
+				<label>Note RH</label>
+				<textarea name="recruiter_note">{{ candidacy.recruiterNote }}</textarea>
 
-            <div id="interview_date_wrapper" style="display:none;">
-                <label>Date d'entretien</label>
-                <input type="text" id="interview_date" name="interview_date" value="{{ candidacy.interviewDate ? candidacy.interviewDate|date('Y-m-d') : '' }}">
-            </div>
+				<div id="interview_date_wrapper" style="display:none;">
+					<label>Date d'entretien</label>
+					<input type="text" id="interview_date" name="interview_date" value="{{ candidacy.interviewDate ? candidacy.interviewDate|date('Y-m-d') : '' }}">
+				</div>
 
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-            <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-            <script>
-                flatpickr("#interview_date", { dateFormat:"Y-m-d", locale:"fr" });
-                const statusSelect = document.getElementById('status_select');
-                const interviewWrapper = document.getElementById('interview_date_wrapper');
-                const initialStatus = "{{ candidacy.status }}";
+				<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+				<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+				<script>
+					flatpickr("#interview_date", {
+dateFormat: "Y-m-d",
+locale: "fr"
+});
+const statusSelect = document.getElementById('status_select');
+const interviewWrapper = document.getElementById('interview_date_wrapper');
+const initialStatus = "{{ candidacy.status }}";
 
-                function toggleInterviewDate() {
-                    interviewWrapper.style.display = statusSelect.value === 'invité à un entretien' ? 'block' : 'none';
-                }
+function toggleInterviewDate() {
+interviewWrapper.style.display = statusSelect.value === 'invité à un entretien' ? 'block' : 'none';
+}
 
-                statusSelect.addEventListener('change', toggleInterviewDate);
-                toggleInterviewDate();
+statusSelect.addEventListener('change', toggleInterviewDate);
+toggleInterviewDate();
 
-                function showAlert(message, type='success') {
-                    const alertDiv = document.createElement('div');
-                    alertDiv.className = 'alert ' + type;
-                    alertDiv.textContent = message;
-                    document.body.appendChild(alertDiv);
-                    setTimeout(()=> alertDiv.classList.add('show'), 50);
-                    setTimeout(()=> {
-                        alertDiv.classList.remove('show');
-                        setTimeout(()=> document.body.removeChild(alertDiv), 300);
-                    }, 3500);
-                }
+function showAlert(message, type = 'success') {
+const alertDiv = document.createElement('div');
+alertDiv.className = 'alert ' + type;
+alertDiv.textContent = message;
+document.body.appendChild(alertDiv);
+setTimeout(() => alertDiv.classList.add('show'), 50);
+setTimeout(() => {
+alertDiv.classList.remove('show');
+setTimeout(() => document.body.removeChild(alertDiv), 300);
+}, 3500);
+}
 
-                document.getElementById('candidacyForm').addEventListener('submit', function(e){
-                    const newStatus = statusSelect.value;
-                    if(initialStatus === 'acceptée' && newStatus !== 'acceptée'){
-                        e.preventDefault(); showAlert('Statut "acceptée" ne peut pas être changé !', 'warning'); return false;
-                    }
-                    if(initialStatus === 'invité à un entretien' && newStatus === 'en attente'){
-                        e.preventDefault(); showAlert('Statut "invité à un entretien" ne peut pas revenir à "en attente"', 'warning'); return false;
-                    }
-                    showAlert('Mise à jour envoyée !', 'success');
-                });
-            </script>
+document.getElementById('candidacyForm').addEventListener('submit', function (e) {
+const newStatus = statusSelect.value;
+if (initialStatus === 'acceptée' && newStatus !== 'acceptée') {
+e.preventDefault();
+showAlert('Statut "acceptée" ne peut pas être changé !', 'warning');
+return false;
+}
+if (initialStatus === 'invité à un entretien' && newStatus === 'en attente') {
+e.preventDefault();
+showAlert('Statut "invité à un entretien" ne peut pas revenir à "en attente"', 'warning');
+return false;
+}
+showAlert('Mise à jour envoyée !', 'success');
+});
+				</script>
 
-            <button type="submit">Mettre à jour</button>
-        </form>
-    </div>
+				<button type="submit">Mettre à jour</button>
+			</form>
+		</div>
 
-</div>
+	</div>
 {% endblock %}
