@@ -5,14 +5,10 @@
 {% block title %}Gestion des départements{% endblock %}
 
 {% block body %}
-  <div class="page-header">
-      <nav class="breadcrumb">
-        <span>Accueil</span> &gt; <span>Gestion de département</span>
-      </nav>
-  </div>
+
 
     <div class="page-actions">
-    <h2>Gestion de département</h2>
+    <h2>Liste des départements de {{ app.session.get('company').name }}</h2>
       <button class="bton bton-primary" onclick="window.location.href='{{ path('formulaire_departement') }}'">Ajouter un département
       </button>
     </div>

@@ -1,0 +1,249 @@
+{% extends 'layout/layout_frontend/layoutDepart.html.twig' %}
+{% block title %}Entretiens{% endblock %}
+
+{% block body %}
+<div class="interview-wrapper">
+
+    <h2 class="page-title">📅 Entretiens à venir</h2>
+
+    <!-- ===== FILTRE MODERNE ===== -->
+    <div class="filter-card">
+        <div class="filter-title">
+            <i class="bi bi-calendar-range"></i>
+            Filtrer par période
+        </div>
+
+        <div class="filter-row">
+            <div class="field">
+                <label>Du</label>
+                <input
+                    type="datetime-local"
+                    name="start_date"
+                    value="{{ startDate }}"
+                    placeholder="{{ now|date('Y-m-d\TH:i') }}"
+                    onchange="validateAndSubmit()"
+                    id="startDate"
+                >
+            </div>
+
+            <div class="field">
+                <label>Au</label>
+                <input
+                    type="datetime-local"
+                    name="end_date"
+                    value="{{ endDate }}"
+                    placeholder="{{ now|date('Y-m-d\TH:i') }}"
+                    onchange="validateAndSubmit()"
+                    id="endDate"
+                >
+            </div>
+        </div>
+
+        <!-- ===== ALERT UX ===== -->
+        <div id="dateAlert" class="alert hidden">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            La date de fin doit être supérieure à la date de début.
+        </div>
+    </div>
+
+    <!-- ===== LISTE ===== -->
+    <div class="interview-list">
+
+        {% for candidacy in upcoming %}
+            {% set interviewDate = candidacy.interviewDate %}
+            {% set diff = (interviewDate|date('U') - now|date('U')) / 86400 %}
+            {% set days = diff|round(0, 'floor') %}
+
+            <a href="{{ path('candidacy_show', {id: candidacy.id}) }}" class="interview-card">
+
+                <div>
+                    <div class="date">
+                        {{ interviewDate|date('d/m/Y H:i') }}
+                    </div>
+                    <div class="offer">
+                        Offre : {{ candidacy.jobOffer.title }}
+                    </div>
+                </div>
+
+                <span class="badge
+                    {{ days == 0 ? 'today' : (days == 1 ? 'tomorrow' : 'later') }}">
+                    {% if days == 0 %}
+                        Aujourd’hui
+                    {% elseif days == 1 %}
+                        Demain
+                    {% else %}
+                        Dans {{ days }} jours
+                    {% endif %}
+                </span>
+            </a>
+        {% endfor %}
+
+        {% if past is not empty %}
+            <div class="past-title">Entretiens déjà terminés</div>
+
+            {% for candidacy in past %}
+                <div class="interview-card disabled">
+                    <div>
+                        <div class="date">
+                            {{ candidacy.interviewDate|date('d/m/Y H:i') }}
+                        </div>
+                        <div class="offer">
+                            Offre : {{ candidacy.jobOffer.title }}
+                        </div>
+                    </div>
+
+                    <span class="badge finished">
+                        Terminé
+                    </span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if upcoming is empty and past is empty %}
+            <div class="empty">Aucun entretien trouvé.</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ================= STYLE ================= -->
+<style>
+/* ===== FILTRE MODERNE ===== */
+.filter-card{
+    background:#f9fafb;
+    border-radius:12px;
+    padding:16px;
+    margin-bottom:18px;
+    max-width:400px; /* réduit largeur filtre */
+}
+
+.filter-title{
+    font-weight:600;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.filter-row{
+    display:flex;
+    gap:8px; /* réduit l’espacement */
+    flex-wrap:wrap;
+}
+
+.field{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+}
+
+.field label{
+    font-size:12px;
+    color:#555;
+    margin-bottom:4px;
+}
+
+.field input{
+    padding:8px;
+    border-radius:6px;
+    border:1px solid #ddd;
+    background:#fff;
+}
+
+/* ===== ALERT ===== */
+.alert{
+    margin-top:10px;
+    padding:10px 12px;
+    border-radius:8px;
+    font-size:13px;
+    background:#fee2e2;
+    color:#991b1b;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.hidden{
+    display:none;
+}
+
+/* ===== LISTE ===== */
+.interview-list{
+    max-height:420px; /* environ 6 cartes visibles */
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.interview-card{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 14px;
+    background:white;
+    text-decoration:none;
+    color:inherit;
+    border-radius:8px;
+}
+
+.interview-card:hover{
+    background:#f1f1f1;
+}
+
+.interview-card.disabled{
+    opacity:.6;
+    pointer-events:none;
+}
+
+.date{ font-weight:600; }
+.offer{ font-size:12px; color:#666; }
+
+/* ===== BADGES ===== */
+.badge{
+    padding:6px 12px;
+    font-size:12px;
+    border-radius:14px;
+}
+
+.today{ background:#dc2626; color:#fff; }
+.tomorrow{ background:#2563eb; color:#fff; }
+.later{ background:#e5e7eb; color:#333; }
+.finished{ background:#9ca3af; color:#fff; }
+
+.past-title{
+    font-size:13px;
+    font-weight:600;
+    margin:12px 0 4px;
+    color:#555;
+}
+
+.empty{
+    text-align:center;
+    padding:40px;
+    color:#777;
+}
+</style>
+
+<!-- ================= JS UX ================= -->
+<script>
+function validateAndSubmit(){
+    const start = document.getElementById('startDate').value;
+    const end   = document.getElementById('endDate').value;
+    const alertBox = document.getElementById('dateAlert');
+
+    if(start && end && new Date(start) > new Date(end)){
+        alertBox.classList.remove('hidden');
+        return;
+    }
+
+    alertBox.classList.add('hidden');
+
+    const params = new URLSearchParams(window.location.search);
+    if(start) params.set('start_date', start);
+    if(end)   params.set('end_date', end);
+
+    window.location.search = params.toString();
+}
+</script>
+
+{% endblock %}

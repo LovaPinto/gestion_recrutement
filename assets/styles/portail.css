@@ -31,7 +31,7 @@ body {
 }
 
 .header .logo .orange {
-    color: orange;
+    color: rgb(255, 255, 255);
 }
 
 .header .login .btn-login {

@@ -1,68 +1,159 @@
-{% extends 'base.html.twig' %}
+{% extends 'candidate/menu.html.twig' %}
 
 {% block stylesheets %}
+    {{ parent() }}
     <link rel="stylesheet" href="{{ asset('styles/AllJob.css') }}">
 {% endblock %}
 
-{% block body %}
-<div class="job-page">
+{% block content %}
 
-    <h1 class="page-title">Offres d'emploi disponibles</h1>
-
-    <!-- Barre de recherche -->
-    <form method="get" action="{{ path('app_job_offer') }}" class="search-form">
-       <div class="search-wrapper">
-    <input type="text" placeholder="Rechercher un emploi..." />
-    <span class="search-icon">
-        🔍
-    </span>
+{# ================= ALERT ================= #}
+{% if result is defined and message is defined and message != '' %}
+<div id="alert-overlay">
+    <div class="alert-card {{ result }}">
+        <div class="alert-icon">
+            {% if result == 'success' %}✓
+            {% elseif result == 'warning' %}⚠
+            {% else %}✕{% endif %}
+        </div>
+        <div class="alert-text">{{ message }}</div>
+    </div>
 </div>
 
+<style>
+#alert-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
 
+.alert-card {
+    background: #fff;
+    padding: 40px 48px;
+    border-radius: 20px;
+    width: 420px;
+    text-align: center;
+    animation: scaleIn .25s ease;
+}
+
+.alert-card.warning { border: 2px solid #f59e0b; }
+.alert-card.success { border: 2px solid #22c55e; }
+.alert-card.error   { border: 2px solid #ef4444; }
+
+.alert-icon {
+    font-size: 52px;
+    font-weight: 800;
+}
+
+.alert-text {
+    margin-top: 18px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+@keyframes scaleIn {
+    from { transform: scale(.85); opacity: 0 }
+    to   { transform: scale(1); opacity: 1 }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const alert = document.getElementById('alert-overlay');
+    if (!alert) return;
+    setTimeout(() => alert.remove(), 2600);
+});
+</script>
+{% endif %}
+
+{# ================= PAGE OFFRES ================= #}
+<div class="job-page">
+
+    <h1 class="page-title">Toutes les offres d'emploi</h1>
+
+    <!-- 🔍 Recherche -->
+    <form method="get" action="{{ path('app_job_offer') }}" class="search-form">
+        <div class="search-wrapper">
+            <input
+                type="text"
+                name="q"
+                placeholder="Rechercher un emploi..."
+                value="{{ app.request.get('q') }}"
+            >
+            <button type="submit" class="search-btn">
+                🔍
+            </button>
+        </div>
     </form>
 
-    <!-- Liste des offres -->
+    <!-- 📄 Liste des offres -->
     <div class="job-list">
+
         {% for job in jobOffers %}
+
+            {% set daysLeft = job.deadline ? date(job.deadline).diff(date()).days : null %}
+            {% set isUrgent = daysLeft is not null and daysLeft <= 5 %}
+
             <div class="job-card">
 
-                <!-- TITRE (CLIC = PAGE DETAIL) -->
-                <h3 class="job-title">
-                    <a href="{{ path('job_offer_show', {'id': job.id}) }}">
-                        {{ job.title }}
+                <div class="job-content">
+
+                    <!-- TITRE -->
+                    <div class="job-header">
+                        <h3 class="job-title">
+                            <a href="{{ path('job_offer_show', {id: job.id}) }}">
+                                {{ job.title }}
+                            </a>
+                        </h3>
+
+                        <div class="job-meta">
+                            <span class="job-contract">{{ job.offerType }}</span>
+
+                            {% if isUrgent %}
+                                <span class="badge-urgent">URGENT</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- DESCRIPTION -->
+                    <p class="job-description">
+                        {{ job.description|slice(0, 160) }}...
+                    </p>
+
+                    <!-- INFOS -->
+                    <div class="job-info">
+                        <span>📅 Publié : {{ job.dateCreation|date('d/m/Y') }}</span>
+                        <span>⏳ Deadline : {{ job.deadline|date('d/m/Y') }}</span>
+
+                        {% if daysLeft is not null %}
+                            <span>⏱ {{ daysLeft }} jour(s) restant(s)</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- ACTION -->
+                    <a href="{{ path('job_offer_show', {id: job.id}) }}" class="btn-details">
+                        Voir l’offre
                     </a>
-                </h3>
 
-                <!-- INFOS -->
-                <div class="job-info">
-                    <span>📍 Madagascar</span>
-                    <span>⏱ Publiée le {{ job.dateCreation|date('d/m/Y') }}</span>
                 </div>
-
-                <!-- META -->
-                <div class="job-meta">
-                    <span>📅 Date limite : {{ job.deadline|date('d-m-Y') }}</span>
-                    <span>📄 Contrat : {{ job.offerType }}</span>
-                </div>
-
-                <!-- LIGNE NOIRE -->
-                <hr class="job-divider">
-
-                <!-- DESCRIPTION -->
-                <p class="job-description">
-                    {{ job.description|slice(0, 130) }}...
-                </p>
-
             </div>
+
         {% else %}
-            <p class="no-result">Aucune offre trouvée.</p>
+            <p class="no-result">Aucune offre disponible pour le moment.</p>
         {% endfor %}
+
     </div>
 
     <!-- Pagination -->
-    <div class="pagination">
+    <div class="pagination-wrapper">
         {{ knp_pagination_render(jobOffers) }}
     </div>
 
 </div>
+
 {% endblock %}

@@ -40,4 +40,17 @@ class CandidateRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    // CandidateRepository.php
+public function findStats($user): array
+{
+  
+        $qb = $this->createQueryBuilder('c')
+            ->select('c.id, c.firstName, c.lastName, c.email, u.id AS userId, u.email AS userEmail')
+            ->innerJoin('c.user', 'u') 
+            ->where('u.email = :email')
+            ->setParameter('email', $user->getEmail());
+
+        $result = $qb->getQuery()->getArrayResult();
+        return $result[0] ?? null;
+}
 }
