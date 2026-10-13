@@ -13,19 +13,12 @@ class Role
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $type = null;
+    #[ORM\Column(length: 50, unique: true)]
+    private ?string $type = null; // RH | MANAGER | CANDIDAT
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function setId(int $id): static
-    {
-        $this->id = $id;
-
-        return $this;
     }
 
     public function getType(): ?string
@@ -36,11 +29,6 @@ class Role
     public function setType(string $type): static
     {
         $this->type = $type;
-
         return $this;
     }
-    public function __toString(): string
-{
-    return $this->type;
-}
 }

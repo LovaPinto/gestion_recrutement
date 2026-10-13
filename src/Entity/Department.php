@@ -16,20 +16,20 @@ class Department
     #[ORM\Column(length: 50)]
     private ?string $departmentName = null;
 
-    // ✅ Ajout cascade persist pour éviter l'erreur Doctrine
     #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'departments', cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
-    
+
+    // ✅ MANAGER DU DÉPARTEMENT
+    #[ORM\ManyToOne(targetEntity: Users::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Users $manager = null;
+
+    // ---------------- GETTERS / SETTERS ----------------
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function setId(int $id): static
-    {
-        $this->id = $id;
-        return $this;
     }
 
     public function getDepartmentName(): ?string
@@ -51,6 +51,17 @@ class Department
     public function setCompany(?Company $company): static
     {
         $this->company = $company;
+        return $this;
+    }
+
+    public function getManager(): ?Users
+    {
+        return $this->manager;
+    }
+
+    public function setManager(Users $manager): static
+    {
+        $this->manager = $manager;
         return $this;
     }
 }

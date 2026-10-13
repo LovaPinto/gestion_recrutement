@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login Candidat{% endblock %}
+
+{% block body %}
+<div class="page-wrapper">
+    <div class="left-image">
+        <div class="gradient-mask"></div>
+        <div class="left-text">
+            <h1>JobTracker</h1>
+            <p>Vous accompagne vers un avenir meilleur.</p>
+        </div>
+    </div>
+
+    <div class="right-side">
+        <div class="login-card">
+            <h2>Veuillez vous connecter</h2>
+
+            <form method="post" action="/admin/login" onsubmit="return confirm('envoi reussi');">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="Votre email" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" name="password" placeholder="Votre mot de passe" required>
+                </div>
+
+                <button type="submit" class="btn-login">Se connecter</button>
+                {% if message is not empty %}
+                    <p style="color:red;">{{ message }}</p>
+                {% endif %}
+            </form>
+
+            <div class="separator"></div>
+            <p class="small-text">Pas encore de compte ?</p>
+            <a href="{{ path('app_new_user') }}" class="btn-create">Créer compte</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

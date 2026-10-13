@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Entity;
 
 use App\Repository\JobOfferRepository;
@@ -11,6 +10,13 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: JobOfferRepository::class)]
 class JobOffer
 {
+    /* ================= STATUTS ================= */
+    public const STATUS_PUBLIEE   = 'publiée';
+    public const STATUS_EN_ATTENTE = 'en attente';
+    public const STATUS_PRISE     = 'prise';
+    public const STATUS_REFUSEE = 'refusée';
+    public const STATUS_SUPPRIMEE = 'supprimée';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -32,33 +38,9 @@ class JobOffer
     private ?\DateTime $deadline = null;
 
     #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: 'jobOffers')]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Users $user = null;
 
-    #[ORM\OneToMany(mappedBy: 'jobOffer', targetEntity: Candidacy::class, orphanRemoval: true)]
-    private Collection $candidacies;
-
-    #[ORM\ManyToMany(targetEntity: Candidate::class, inversedBy: 'jobOffers')]
-    #[ORM\JoinTable(name: 'job_offer_candidate')]
-    private Collection $candidates;
-
-    // =====================
-    // Constructor
-    // =====================
-    public function __construct()
-    {
-        $this->candidacies = new ArrayCollection();
-        $this->candidates = new ArrayCollection();
-    }
-
-    // =====================
-    // Getters & Setters
-    // =====================
-
-    #[ORM\ManyToOne(targetEntity: Users::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Users $user = null;
-
-    // ✅ Correction : cascade persist pour éviter l'erreur Doctrine
     #[ORM\ManyToOne(targetEntity: Company::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
@@ -75,17 +57,33 @@ class JobOffer
 
     #[ORM\Column(length: 255)]
     private ?string $experience_level = null;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+private ?string $responsability = null;
+
+
+#[ORM\Column(type: 'boolean')]
+private bool $isVisible = true;
 
     /**
      * @var Collection<int, Candidacy>
      */
-    #[ORM\OneToMany(targetEntity: Candidacy::class, mappedBy: 'jobOffer')]
+    #[ORM\OneToMany(mappedBy: 'jobOffer', targetEntity: Candidacy::class, orphanRemoval: true)]
     private Collection $candidacies;
+
+    #[ORM\ManyToMany(targetEntity: Candidate::class, inversedBy: 'jobOffers')]
+    #[ORM\JoinTable(name: 'job_offer_candidate')]
+    private Collection $candidates;
+
+    // ================= NOUVEAU =================
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $roleId = null; // 1 = RH, 2 = Manager
 
     public function __construct()
     {
         $this->candidacies = new ArrayCollection();
-        $this->job_skills = []; // initialisation sécurisée
+        $this->candidates = new ArrayCollection();
+        $this->job_skills = [];
+        $this->status = self::STATUS_EN_ATTENTE; // initialisation par défaut
     }
 
     /* ================= GETTERS & SETTERS ================= */
@@ -93,6 +91,17 @@ class JobOffer
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
+        return $this;
     }
 
     public function getOfferType(): ?string
@@ -144,87 +153,65 @@ class JobOffer
         return $this->user;
     }
 
-    public function setUser(?Users $user): static
+    public function setUser(Users $user): static
     {
         $this->user = $user;
         return $this;
     }
 
-    // =====================
-    // Candidacies Relation
-    // =====================
-    /**
-     * @return Collection|Candidacy[]
-     */
-    public function getCandidacies(): Collection
+    public function getCompany(): ?Company
     {
-        return $this->candidacies;
+        return $this->company;
     }
 
-    public function addCandidacy(Candidacy $candidacy): static
+    public function setCompany(?Company $company): static
     {
-        if (!$this->candidacies->contains($candidacy)) {
-            $this->candidacies->add($candidacy);
-            $candidacy->setJobOffer($this);
-        }
+        $this->company = $company;
         return $this;
     }
 
-    public function removeCandidacy(Candidacy $candidacy): static
+    public function getDepartment(): ?Department
     {
-        if ($this->candidacies->removeElement($candidacy)) {
-            if ($candidacy->getJobOffer() === $this) {
-                $candidacy->setJobOffer(null);
-            }
-        }
+        return $this->department;
+    }
+
+    public function setDepartment(?Department $department): static
+    {
+        $this->department = $department;
         return $this;
     }
 
-
-    // =====================
-    // Candidates Relation
-    // =====================
-    /**
-     * @return Collection|Candidate[]
-     */
-    public function getCandidates(): Collection
-    {
-        return $this->candidates;
-    }
-
-    public function addCandidate(Candidate $candidate): static
-    {
-        if (!$this->candidates->contains($candidate)) {
-            $this->candidates->add($candidate);
-            $candidate->addJobOffer($this);
-        }
-
-    // 🔹 JOB SKILLS : getter sécurisé
     public function getJobSkills(): array
     {
         return $this->job_skills ?? [];
     }
 
-    // 🔹 JOB SKILLS : setter sécurisé
     public function setJobSkills(?array $job_skills): static
     {
         $this->job_skills = $job_skills ?? [];
         return $this;
     }
 
-    public function removeCandidate(Candidate $candidate): static
+    public function getStatus(): ?string
     {
-
-        if ($this->candidates->removeElement($candidate)) {
-            $candidate->removeJobOffer($this);
-
         return $this->status;
     }
 
     public function setStatus(string $status): static
     {
-        $this->status = $status;
+        $allowedStatuses = [
+            self::STATUS_PUBLIEE,
+            self::STATUS_EN_ATTENTE,
+            self::STATUS_PRISE,
+            self::STATUS_REFUSEE,
+            self::STATUS_SUPPRIMEE,
+        ];
 
+        if (!in_array($status, $allowedStatuses, true)) {
+            throw new \InvalidArgumentException('Statut invalide pour une offre d\'emploi');
+        }
+
+        $this->status = $status;
         return $this;
     }
 
@@ -239,9 +226,7 @@ class JobOffer
         return $this;
     }
 
-    /**
-     * @return Collection<int, Candidacy>
-     */
+    // ===================== Candidacies Relation =====================
     public function getCandidacies(): Collection
     {
         return $this->candidacies;
@@ -266,8 +251,7 @@ class JobOffer
         return $this;
     }
 
-    /* ================= CANDIDATES RELATION ================= */
-
+    // ===================== Candidates Relation =====================
     /**
      * @return Collection|Candidate[]
      */
@@ -276,20 +260,40 @@ class JobOffer
         return $this->candidates;
     }
 
-    public function addCandidate(Candidate $candidate): static
+    // ===================== RoleId Getter/Setter =====================
+    public function getRoleId(): ?int
     {
-        if (!$this->candidates->contains($candidate)) {
-            $this->candidates->add($candidate);
-            $candidate->addJobOffer($this);
-        }
+        return $this->roleId;
+    }
+
+    public function setRoleId(int $roleId): static
+    {
+        $this->roleId = $roleId;
         return $this;
     }
 
-    public function removeCandidate(Candidate $candidate): static
-    {
-        if ($this->candidates->removeElement($candidate)) {
-            $candidate->removeJobOffer($this);
-        }
-        return $this;
-    }
+    public function getResponsability(): ?string
+{
+    return $this->responsability;
+}
+
+public function setResponsability(?string $responsability): static
+{
+    $this->responsability = $responsability;
+    return $this;
+}
+
+
+public function isVisible(): bool
+{
+    return $this->isVisible;
+}
+
+public function setIsVisible(bool $isVisible): static
+{
+    $this->isVisible = $isVisible;
+    return $this;
+}
+
+    
 }

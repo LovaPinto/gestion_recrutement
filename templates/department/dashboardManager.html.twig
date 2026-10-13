@@ -1,0 +1,342 @@
+{% extends 'layout/layout_frontend/layoutDepart.html.twig' %}
+{% set menus = ['dashboard', 'offre','utilisateur','departement','candidat'] %}
+
+{% block title %}
+DashboardRH
+{% endblock %}
+{% block stylesheets %}
+{{ parent() }}
+<style>
+
+/* ================= GLOBAL ================= */
+/* ================= GLOBAL ================= */
+.page-title {
+    margin-bottom: 30px;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+}
+
+/* ================= STAT BOXES ================= */
+.offers-count {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 22px;
+    margin-bottom: 40px;
+}
+
+.count-box {
+    background: #ffffff;
+    border-radius: 22px;
+    padding: 28px;
+    box-shadow: 0 14px 34px rgba(0,0,0,0.08);
+    position: relative;
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.count-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 42px rgba(0,0,0,0.12);
+}
+
+.count-box h3 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: #64748b;
+    margin-bottom: 10px;
+}
+
+.count-number {
+    font-size: 40px;
+    font-weight: 800;
+}
+
+.icon-stat {
+    position: absolute;
+    top: 22px;
+    right: 22px;
+    font-size: 30px;
+    opacity: 0.18;
+}
+
+/* Accent bars */
+.orange { border-left: 6px solid #c29519; }
+.green  { border-left: 6px solid #78c43a; }
+.blue   { border-left: 6px solid #3b82f6; }
+.purple { border-left: 6px solid #8b5cf6; }
+
+/* ================= FILTER ================= */
+.status-filter {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 35px;
+}
+
+.filter-btn {
+    padding: 10px 22px;
+    border-radius: 999px;
+    background: #e5e7eb;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    color: #111827;
+    transition: all .2s;
+}
+
+.filter-btn:hover {
+    background: #111827;
+    color: #fff;
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg,#111827,#1f2937);
+    color: #fff;
+}
+
+/* ================= CARDS ================= */
+.job-offer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+}
+
+.job-offer-card {
+    background: #fff;
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.1);
+    transition: transform .25s ease;
+}
+
+.job-offer-card:hover {
+    transform: translateY(-3px);
+}
+
+.job-offer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* ================= STATUS BADGES ================= */
+.badge-status {
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    color: #fff;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.badge-status.en_attente {
+    background: linear-gradient(135deg,#f59e0b,#fbbf24);
+}
+.badge-status.publiee {
+    background: linear-gradient(135deg,#10b981,#34d399);
+}
+.badge-status.prise {
+    background: linear-gradient(135deg,#3b82f6,#60a5fa);
+}
+
+/* ================= META ================= */
+.job-offer-meta {
+    display: flex;
+    gap: 26px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+    font-size: 14px;
+    color: #475569;
+}
+
+.job-offer-desc {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #334155;
+}
+
+/* ================= FOOTER ================= */
+.job-offer-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.btn-view {
+    background: #111827;
+    color: #fff;
+    padding: 11px 22px;
+    border-radius: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all .2s;
+}
+
+.btn-view:hover {
+    background: #000;
+}
+
+.btn-view.secondary {
+    background: linear-gradient(135deg,#3b82f6,#60a5fa);
+}
+
+.btn-view.secondary:hover {
+    opacity: .9;
+}
+
+
+</style>
+{% endblock %}
+
+
+{% block body %}
+
+<h2 class="page-title">
+     Ressources Humaines
+</h2>
+
+<!-- ================= STAT BOXES ================= -->
+<div class="offers-count">
+
+    <div class="count-box orange">
+        <h3>En attente</h3>
+        <div class="count-number">
+            {{ offersByStatus['en attente']|default(0) }}
+        </div>
+        <i class="bi bi-hourglass-split icon-stat"></i>
+    </div>
+
+    <div class="count-box green">
+        <h3>Publiées</h3>
+        <div class="count-number">
+            {{ offersByStatus['publiée']|default(0) }}
+        </div>
+        <i class="bi bi-megaphone icon-stat"></i>
+    </div>
+
+    <div class="count-box blue">
+        <h3>Déjà prises</h3>
+        <div class="count-number">
+            {{ offersByStatus['déjà prise']|default(0) }}
+        </div>
+        <i class="bi bi-check-circle icon-stat"></i>
+    </div>
+
+    <div class="count-box purple">
+        <h3>Total</h3>
+        <div class="count-number">
+            {{ jobOffers|length }}
+        </div>
+        <i class="bi bi-card-list icon-stat"></i>
+    </div>
+
+</div>
+
+<!-- ================= FILTER ================= -->
+<div class="top-bar">
+    {% set currentStatus = app.request.query.get('status') %}
+
+    <div class="status-filter">
+        <a href="{{ path(app.request.attributes.get('_route')) }}"
+           class="filter-btn {{ currentStatus is null ? 'active' : '' }}">
+            Toutes
+        </a>
+
+        <a href="?status=en attente"
+           class="filter-btn {{ currentStatus == 'en attente' ? 'active' : '' }}">
+            En attente
+        </a>
+
+        <a href="?status=publiée"
+           class="filter-btn {{ currentStatus == 'publiée' ? 'active' : '' }}">
+            Publiées
+        </a>
+
+        <a href="?status=déjà prise"
+           class="filter-btn {{ currentStatus == 'déjà prise' ? 'active' : '' }}">
+            Déjà prises
+        </a>
+    </div>
+</div>
+
+<!-- ================= OFFERS LIST ================= -->
+{% if jobOffers is empty %}
+    <p>Aucune offre disponible.</p>
+{% else %}
+
+<div class="job-offer-list">
+
+{% for offer in jobOffers %}
+    {% set offerStatus = offer.status %}
+
+    {% if currentStatus is null or currentStatus == offerStatus %}
+
+    <div class="job-offer-card">
+
+        <div class="job-offer-header">
+            <div>
+            
+                <span class="badge-status
+                    {% if offerStatus == 'en attente' %}en_attente
+                    {% elseif offerStatus == 'publiée' %}publiee
+                    {% elseif offerStatus == 'déjà prise' %}prise
+                    {% endif %}
+                ">
+                    {{ offerStatus|capitalize }}
+                </span>
+                <h3>{{ offer.title }}</h3>
+
+            </div>
+
+            <div class="job-offer-actions-header">
+                <span class="badge-candidature">
+                    <i class="bi bi-people-fill"></i>
+                    {{ offer.candidacies|length }}
+
+                </span>
+                
+            </div>
+        </div>
+
+        <div class="job-offer-meta">
+            <span><strong>Type :</strong> {{ offer.offerType }}</span>
+            <span><strong>Département :</strong>
+                {{ offer.department ? offer.department.departmentName : '—' }}
+            </span>
+            <span><strong>Publié :</strong>
+                {{ offer.dateCreation|date('d/m/Y') }}
+            </span>
+            <span><strong>Deadline :</strong>
+                {{ offer.deadline ? offer.deadline|date('d/m/Y') : '—' }}
+            </span>
+        </div>
+
+        <p class="job-offer-desc">
+            {{ offer.description|slice(0, 220) }}
+            {% if offer.description|length > 220 %}…{% endif %}
+        </p>
+
+        <div class="job-offer-footer">
+            <a href="{{ path('job_offer_pending', { id: offer.id }) }}" class="btn-view">
+                Voir l’offre
+            </a>
+
+            {% if offerStatus != 'en attente' %}
+                <a href="{{ path('offre_candidatures', { id: offer.id }) }}"
+                   class="btn-view secondary">
+                    Voir candidatures
+                </a>
+            {% endif %}
+        </div>
+
+    </div>
+
+    {% endif %}
+{% endfor %}
+
+</div>
+{% endif %}
+
+{% endblock %}
