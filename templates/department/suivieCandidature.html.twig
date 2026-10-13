@@ -1,56 +1,235 @@
-{% extends 'layout/layout_frontend/sidebar.html.twig' %}
-{% set menus = ['dashboard', 'offre','utilisateur','recrutement','departement','candidat'] %}
-{% block title %}Suivi des candidatures{% endblock %}
+{% extends 'layout/layout_frontend/layoutDepart.html.twig' %}
+{% block title %}Suivi des candidatures
+{% endblock %}
 
 {% block body %}
 
-<h1 class="page-title">Suivi des candidatures</h1>
-<p class="page-subtitle">
-    Gérez et suivez toutes vos candidatures avec la vue Kanban
-</p>
+	<style>
 
-<!-- FILTER BAR -->
-<div class="filter-bar">
-    <select>
-        <option>Toutes les offres</option>
-    </select>
+		.page-wrapper {
+			width: 100%;
+			max-width: 100%;
+			padding: 16px 0 32px;
+		}
 
-    <div class="view-switch">
-        <button class="btn-outline">Liste</button>
-        <button class="btn-primary">Kanban</button>
-    </div>
-</div>
+		.page-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 20px;
+			margin-bottom: 24px;
+			flex-wrap: wrap;
+		}
 
-<!-- KANBAN -->
-<div class="kanban">
+		.page-title {
+			font-size: 26px;
+			font-weight: 600;
+			color: #0f172a;
+		}
 
-    <div class="kanban-column yellow">
-        <div class="kanban-header">
-            ⏳ En cours d'évaluation <span>0</span>
-        </div>
-        <div class="kanban-body">
-            <p>Aucune candidature</p>
-        </div>
-    </div>
 
-    <div class="kanban-column red">
-        <div class="kanban-header">
-            ❌ Non qualifié <span>0</span>
-        </div>
-        <div class="kanban-body">
-            <p>Aucune candidature</p>
-        </div>
-    </div>
+		.search-container {
+			position: relative;
+			width: 420px;
+			max-width: 100%;
+		}
 
-    <div class="kanban-column blue">
-        <div class="kanban-header">
-            ✔️ Qualifié <span>0</span>
-        </div>
-        <div class="kanban-body">
-            <p>Aucune candidature</p>
-        </div>
-    </div>
+		.search-input {
+			width: 100%;
+			padding: 14px 18px 14px 48px;
+			border-radius: 18px;
+			border: 1px solid #e5e7eb;
+			font-size: 14px;
+			background: #ffffff;
+			transition: all 0.25s ease;
+		}
 
-</div>
+		.search-input:focus {
+			outline: none;
+			border-color: #6366f1;
+			box-shadow: 0 8px 20px rgba(99, 102, 241, .2);
+		}
+
+		.search-icon {
+			position: absolute;
+			left: 18px;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 18px;
+			height: 18px;
+			stroke: #6b7280;
+		}
+
+
+		.kanban-scroll-zone {
+			width: 100%;
+			overflow-x: auto;
+			overflow-y: hidden;
+			padding-bottom: 16px;
+		}
+
+		.kanban-scroll-zone::-webkit-scrollbar {
+			height: 8px;
+		}
+		.kanban-scroll-zone::-webkit-scrollbar-thumb {
+			background: #e5e7eb;
+			border-radius: 10px;
+		}
+
+
+		.kanban {
+			display: inline-flex;
+			gap: 28px;
+			padding: 0 8px;
+		}
+
+
+		.kanban-column {
+			width: 330px;
+			min-width: 330px;
+			background: #ffffff;
+			border-radius: 18px;
+			padding: 20px;
+			box-shadow: 0 10px 26px rgba(0, 0, 0, .08);
+		}
+
+		.yellow {
+			border-top: 6px solid #facc15;
+		}
+		.blue {
+			border-top: 6px solid #38bdf8;
+		}
+		.green {
+			border-top: 6px solid #4ade80;
+		}
+		.red {
+			border-top: 6px solid #f87171;
+		}
+
+		.kanban-column h3 {
+			text-align: center;
+			font-size: 17px;
+			font-weight: 600;
+			margin-bottom: 22px;
+		}
+
+
+		.kanban-card {
+			background: #f9fafb;
+			border-radius: 14px;
+			padding: 16px;
+			margin-bottom: 16px;
+			border: 1px solid #e5e7eb;
+			display: block;
+			text-decoration: none;
+			color: inherit;
+			transition: 0.25s ease;
+		}
+
+		.kanban-card:hover {
+			transform: translateY(-4px);
+			box-shadow: 0 10px 22px rgba(0, 0, 0, .12);
+		}
+
+		.kanban-card strong {
+			font-size: 16px;
+			font-weight: 600;
+		}
+
+		.kanban-card p {
+			font-size: 13px;
+			color: #6b7280;
+			margin-top: 6px;
+		}
+
+		.empty-message {
+			text-align: center;
+			color: #9ca3af;
+			margin-top: 48px;
+		}
+
+
+		@media(max-width: 768px) {
+			.page-header {
+				flex-direction: column;
+				align-items: stretch;
+			}
+
+			.page-title {
+				text-align: center;
+			}
+
+			.kanban-column {
+				width: 300px;
+				min-width: 300px;
+			}
+		}
+	</style>
+
+	<div
+		class="page-wrapper">
+
+		<!-- HEADER -->
+		<div class="page-header">
+			<div class="page-title">
+				Suivi des candidatures –
+				<strong>{{ offer.title }}</strong>
+			</div>
+
+			<div class="search-container">
+				<svg class="search-icon" fill="none" viewbox="0 0 24 24" stroke-width="2">
+					<circle cx="11" cy="11" r="7"></circle>
+					<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+				</svg>
+				<input type="text" id="searchInput" class="search-input" placeholder="Entrez le nom du candidat à rechercher">
+			</div>
+		</div>
+
+		<!-- ✅ SEULE ZONE SCROLLABLE -->
+		<div class="kanban-scroll-zone">
+			<div class="kanban">
+
+				{% macro column(title, list, color) %}
+					<div class="kanban-column {{ color }}">
+						<h3>{{ title }}
+							({{ list|length }})</h3>
+
+						{% for c in list %}
+							<a href="{{ path('candidacy_show', {id:c.id}) }}" class="kanban-card" data-name="{{ (c.user.firstname ~ ' ' ~ c.user.lastname)|lower }}">
+								<strong>{{ loop.index }}.
+									{{ c.user.firstname }}
+									{{ c.user.lastname }}</strong>
+								<p>
+									Score ATS :
+									{{ c.atsScore ?? 0 }}%<br>
+									Candidaté le
+									{{ c.dateCandidacy|date('d/m/Y') }}
+								</p>
+							</a>
+						{% else %}
+							<div class="empty-message">Aucun candidat</div>
+						{% endfor %}
+					</div>
+				{% endmacro %}
+
+
+				{{ _self.column('⏳ En attente', pending, 'yellow') }}
+				{{ _self.column('📅 Invité à un entretien', interview, 'blue') }}
+				{{ _self.column('❌ Refusée', refused, 'red') }}
+				{{ _self.column('✔️ Acceptée', accepted, 'green') }}
+
+			</div>
+		</div>
+
+	</div>
+
+	<script>
+		document.getElementById('searchInput').addEventListener('input', function () {
+const q = this.value.toLowerCase();
+document.querySelectorAll('.kanban-card').forEach(card => {
+card.style.display = card.dataset.name.includes(q) ? 'block' : 'none';
+});
+});
+	</script>
 
 {% endblock %}

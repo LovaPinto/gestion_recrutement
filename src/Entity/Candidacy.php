@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\CandidacyRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Users;
 
 #[ORM\Entity(repositoryClass: CandidacyRepository::class)]
 class Candidacy
@@ -17,8 +18,24 @@ class Candidacy
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $dateCandidacy = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
+    /* =====================================================
+     * STATUTS — VALEURS EXACTES DE LA BASE DE DONNÉES
+     * ===================================================== */
+    public const STATUS_PENDING   = 'en attente';
+    public const STATUS_INTERVIEW = 'invité à un entretien';
+    public const STATUS_ACCEPTED  = 'acceptée';
+        public const STATUS_REFUSED   = 'refusée';
+    
+
+    public const STATUSES = [
+        self::STATUS_PENDING,
+        self::STATUS_INTERVIEW,
+        self::STATUS_ACCEPTED,
+        self::STATUS_REFUSED,
+    ];
+
+    #[ORM\Column(length: 50, options: ['default' => 'en attente'])]
+    private string $status = self::STATUS_PENDING;
 
     #[ORM\Column(type: Types::BLOB)]
     private mixed $cvPath = null;
@@ -32,24 +49,33 @@ class Candidacy
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $recruiterNote = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTime $interviewDate = null;
+#[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+private ?\DateTimeInterface $interviewDate = null;
+
 
     #[ORM\ManyToOne(inversedBy: 'candidacies')]
     #[ORM\JoinColumn(nullable: false)]
     private ?JobOffer $jobOffer = null;
 
-    // ================= GETTERS & SETTERS =================
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: 'candidacies')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Users $user = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $reason = null;
+
+    /* ================== ATS ================== */
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $atsScore = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $cvMimeType = null;
+
+    /* ================= GETTERS & SETTERS ================= */
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function setId(int $id): static
-    {
-        $this->id = $id;
-        return $this;
     }
 
     public function getDateCandidacy(): ?\DateTime
@@ -63,13 +89,22 @@ class Candidacy
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): string
     {
         return $this->status;
     }
 
+    /**
+     * ✅ CORRECTION CRITIQUE
+     * - n’écrase PLUS les statuts valides
+     * - respecte EXACTEMENT les valeurs de la base
+     */
     public function setStatus(string $status): static
     {
+        if (!in_array($status, self::STATUSES, true)) {
+            throw new \InvalidArgumentException('Statut invalide : ' . $status);
+        }
+
         $this->status = $status;
         return $this;
     }
@@ -118,16 +153,18 @@ class Candidacy
         return $this;
     }
 
-    public function getInterviewDate(): ?\DateTime
-    {
-        return $this->interviewDate;
-    }
+ public function getInterviewDate(): ?\DateTimeInterface
+{
+    return $this->interviewDate;
+}
 
-    public function setInterviewDate(?\DateTime $interviewDate): static
-    {
-        $this->interviewDate = $interviewDate;
-        return $this;
-    }
+
+ public function setInterviewDate(?\DateTimeInterface $interviewDate): static
+{
+    $this->interviewDate = $interviewDate;
+    return $this;
+}
+
 
     public function getJobOffer(): ?JobOffer
     {
@@ -138,5 +175,42 @@ class Candidacy
     {
         $this->jobOffer = $jobOffer;
         return $this;
+    }
+
+    public function getUser(): ?Users
+    {
+        return $this->user;
+    }
+
+    public function setUser(?Users $user): static
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    public function getReason(): ?string
+    {
+        return $this->reason;
+    }
+
+    public function setReason(?string $reason): static
+    {
+        $this->reason = $reason;
+        return $this;
+    }
+
+    public function getAtsScore(): ?float
+    {
+        return $this->atsScore;
+    }
+
+    public function setAtsScore(?float $score): static
+    {
+        $this->atsScore = $score;
+        return $this;
+    }
+    public function getCvMimeType(): ?string
+    {
+        return $this->cvMimeType;
     }
 }

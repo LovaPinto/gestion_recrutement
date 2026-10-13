@@ -2,10 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Candidate;
 use App\Repository\UsersRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UsersRepository::class)]
@@ -22,55 +19,26 @@ class Users
     #[ORM\Column(length: 50)]
     private ?string $lastName = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 100, unique: true)]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
+    // RÔLE (RH / MANAGER / CANDIDAT)
     #[ORM\ManyToOne(targetEntity: Role::class)]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Role $role = null;
 
+    // DÉPARTEMENT D’APPARTENANCE
     #[ORM\ManyToOne(targetEntity: Department::class)]
     private ?Department $department = null;
+
+    // 🔗 RELATION INVERSE AVEC CANDIDATE (AJOUTÉ)
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: Candidate::class, cascade: ['persist', 'remove'])]
     private ?Candidate $candidate = null;
 
-
-    // =====================
-    // Relations
-    // =====================
-
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: JobOffer::class, orphanRemoval: true)]
-    private Collection $jobOffers;
-
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Candidacy::class)]
-    private Collection $candidacies;
-
-    // =====================
-    // Constructor
-    // =====================
-    public function __construct()
-    {
-        $this->jobOffers = new ArrayCollection();
-        $this->candidacies = new ArrayCollection();
-    }
-
-    // =====================
-    // Getters & Setters
-    // =====================
-
-    public function getCandidate(): ?Candidate
-    {
-        return $this->candidate;
-    }
-
-    public function setCandidate(?Candidate $candidate): self
-    {
-        $this->candidate = $candidate;
-        return $this;
-    }
-
+    // ---------------- GETTERS / SETTERS ----------------
 
     public function getId(): ?int
     {
@@ -126,7 +94,7 @@ class Users
         return $this->role;
     }
 
-    public function setRole(?Role $role): static
+    public function setRole(Role $role): static
     {
         $this->role = $role;
         return $this;
@@ -143,63 +111,31 @@ class Users
         return $this;
     }
 
-    // =====================
-    // JobOffers Relation
-    // =====================
-    /**
-     * @return Collection|JobOffer[]
-     */
-    public function getJobOffers(): Collection
+    // 🔗 GETTER / SETTER CANDIDATE (AJOUTÉS)
+    public function getCandidate(): ?Candidate
     {
-        return $this->jobOffers;
+        return $this->candidate;
     }
 
-    public function addJobOffer(JobOffer $jobOffer): static
+    public function setCandidate(?Candidate $candidate): static
     {
-        if (!$this->jobOffers->contains($jobOffer)) {
-            $this->jobOffers->add($jobOffer);
-            $jobOffer->setUser($this);
+        $this->candidate = $candidate;
+
+        if ($candidate && $candidate->getUser() !== $this) {
+            $candidate->setUser($this);
         }
+
         return $this;
     }
 
-    public function removeJobOffer(JobOffer $jobOffer): static
+    // 🔍 HELPERS MÉTIER
+    public function isManager(): bool
     {
-        if ($this->jobOffers->removeElement($jobOffer)) {
-            if ($jobOffer->getUser() === $this) {
-                $jobOffer->setUser(null);
-            }
-        }
-        return $this;
+        return $this->role?->getType() === 'Manager';
     }
 
-    // =====================
-    // Candidacies Relation
-    // =====================
-    /**
-     * @return Collection|Candidacy[]
-     */
-    public function getCandidacies(): Collection
+    public function isRh(): bool
     {
-        return $this->candidacies;
-    }
-
-    public function addCandidacy(Candidacy $candidacy): static
-    {
-        if (!$this->candidacies->contains($candidacy)) {
-            $this->candidacies->add($candidacy);
-            $candidacy->setUser($this);
-        }
-        return $this;
-    }
-
-    public function removeCandidacy(Candidacy $candidacy): static
-    {
-        if ($this->candidacies->removeElement($candidacy)) {
-            if ($candidacy->getUser() === $this) {
-                $candidacy->setUser(null);
-            }
-        }
-        return $this;
+        return $this->role?->getType() === 'RH';
     }
 }

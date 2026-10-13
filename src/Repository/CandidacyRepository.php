@@ -3,12 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\Candidacy;
+use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\JobOffer;
 
-/**
- * @extends ServiceEntityRepository<Candidacy>
- */
+
 class CandidacyRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,28 +16,71 @@ class CandidacyRepository extends ServiceEntityRepository
         parent::__construct($registry, Candidacy::class);
     }
 
-    //    /**
-    //     * @return Candidacy[] Returns an array of Candidacy objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    // Count par statut pour un utilisateur donné
+    public function countByUserAndStatus(Users $user, string $status): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.user = :user')
+            ->andWhere('c.status = :status')
+            ->setParameter('user', $user)
+            ->setParameter('status', $status)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Candidacy
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    // Méthodes pratiques pour chaque statut
+    public function countPending(Users $user): int
+    {
+        return $this->countByUserAndStatus($user, 'En attente');
+    }
+
+    public function countAccepted(Users $user): int
+    {
+        return $this->countByUserAndStatus($user, 'Acceptée');
+    }
+
+    public function countRefused(Users $user): int
+    {
+        return $this->countByUserAndStatus($user, 'Refusée');
+    }
+
+    public function countInterviewInvited(Users $user): int
+    {
+        return $this->countByUserAndStatus($user, 'Invitée à un entretien');
+    }
+
+
+// src/Repository/CandidacyRepository.php
+
+public function findByOfferStatusAndAfterDeadline(
+    JobOffer $offer,
+    string $status
+): array {
+    return $this->createQueryBuilder('c')
+        ->andWhere('c.jobOffer = :offer')
+        ->andWhere('c.status = :status')
+        ->andWhere('c.dateCandidacy >= :deadline')
+        ->setParameter('offer', $offer)
+        ->setParameter('status', $status)
+        ->setParameter('deadline', $offer->getDeadline())
+        ->orderBy('c.dateCandidacy', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
+
+public function findByOfferAndStatus(JobOffer $offer, string $status): array
+{
+    return $this->createQueryBuilder('c')
+        ->andWhere('c.jobOffer = :offer')
+        ->andWhere('c.status = :status')
+        ->setParameter('offer', $offer)
+        ->setParameter('status', $status)
+        ->orderBy('c.dateCandidacy', 'DESC') // ✅ ICI
+        ->getQuery()
+        ->getResult();
+}
+
+
+
 }

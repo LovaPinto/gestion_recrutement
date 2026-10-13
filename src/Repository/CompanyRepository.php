@@ -4,6 +4,7 @@ namespace App\Repository;
 use App\Entity\Company;
 use App\Entity\Role;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Mapping\OrderBy;
 use Doctrine\Persistence\ManagerRegistry;
 
 class CompanyRepository extends ServiceEntityRepository
@@ -73,5 +74,13 @@ class CompanyRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
-
+       public function findAllCompanyName(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->select('DISTINCT c.companyName AS companyName')
+            ->orderBy('c.companyName', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
+

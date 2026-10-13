@@ -1,28 +1,148 @@
 {% extends 'layout/layout_frontend/connexionDepart.html.twig' %}
-
-{% block title %}Connexion société
-{% endblock %}
+{% block title %}Connexion société{% endblock %}
 
 {% block auth_content %}
-	<h2>Ravie de te revoir !</h2>
 
-	<form method="post" action="{{ path('loginSociety') }}">
+<h2>Bienvenue 👋</h2>
+<p class="subtitle">Accédez à votre espace entreprise</p>
 
-		<input type="text" name="company_name" placeholder="Nom du société" required>
+<form method="post"
+      action="{{ path('loginSociety') }}"
+      class="auth-form"
+      autocomplete="off">
 
-		<div class="password-field">
-			<input type="password" name="password" placeholder="Password" required>
-			<span class="eye">👁</span>
-		</div>
+    <input
+        type="text"
+        name="company_name"
+        placeholder="Nom de votre entreprise"
+        autocomplete="off"
+        required
+    >
 
-		<button class="btn-primary">Se connecter</button>
+    <div class="password-field">
+        <input
+            type="password"
+            name="password"
+            placeholder="........."
+            autocomplete="new-password"
+            required
+        >
+        <span class="eye" onclick="togglePassword(this)">👁</span>
+    </div>
 
-	</form>
+    <button type="submit" class="btn-primary">
+        Connexion
+    </button>
+</form>
 
-	<p class="register">
-		Don’t have an account ?
-		<a href="{{ path('creer_Compte_Department') }}">Sign in</a>
-	</p>
+<a class="forgot" href="#">Mot de passe oublié ?</a>
 
-	<a class="forgot" href="#">Mot de passe oublié ?</a>
+{# ================= OVERLAY STATUS ================= #}
+
+{% if loginSuccess is defined %}
+<div id="statusOverlay">
+    <div class="status-card success">
+        <div class="icon">✔</div>
+        <span>Connexion réussie</span>
+        <small>Redirection en cours…</small>
+    </div>
+</div>
+{% endif %}
+
+{% if loginError is defined %}
+<div id="statusOverlay">
+    <div class="status-card error">
+        <div class="icon">✖</div>
+        <span>Connexion échouée</span>
+        <small>Identifiants incorrects</small>
+    </div>
+</div>
+{% endif %}
+
+{% if app.request.get('logout') %}
+<div id="statusOverlay">
+    <div class="status-card logout">
+        <div class="icon">⤴</div>
+        <span>Déconnexion</span>
+        <small>Session terminée</small>
+    </div>
+</div>
+{% endif %}
+
+<script>
+function togglePassword(el) {
+    const input = el.previousElementSibling;
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Sécurité : vider les champs à chaque chargement
+    document.querySelectorAll('input').forEach(i => i.value = '');
+
+    if (document.querySelector('.status-card.success')) {
+        setTimeout(() => {
+            window.location.href = "{{ path('app_department_ajout') }}";
+        }, 1500);
+    }
+
+    if (document.querySelector('.status-card.error, .status-card.logout')) {
+        setTimeout(() => {
+            document.getElementById('statusOverlay')?.remove();
+        }, 2000);
+    }
+});
+</script>
+
+<style>
+/* ===== OVERLAY ===== */
+#statusOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,15,.65);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+/* ===== CARD ===== */
+.status-card {
+    width: 260px;
+    padding: 26px;
+    border-radius: 14px;
+    background: #fff;
+    text-align: center;
+    box-shadow: 0 25px 50px rgba(0,0,0,.3);
+    animation: scaleIn .4s ease;
+}
+
+.status-card .icon {
+    font-size: 42px;
+    margin-bottom: 8px;
+}
+
+.status-card span {
+    display: block;
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+.status-card small {
+    font-size: 13px;
+    color: #666;
+}
+
+/* ===== STATES ===== */
+.success .icon { color: #2e7d32; }
+.error .icon   { color: #e53935; }
+.logout .icon  { color: #ff9800; }
+
+@keyframes scaleIn {
+    from { transform: scale(.85); opacity: 0 }
+    to   { transform: scale(1); opacity: 1 }
+}
+</style>
+
 {% endblock %}

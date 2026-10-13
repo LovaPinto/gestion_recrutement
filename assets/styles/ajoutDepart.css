@@ -8,6 +8,7 @@
   font-size: 0.9rem;
   color: #666;
 }
+
 .page-actions {
   display: flex;
   align-items: center;
@@ -17,21 +18,22 @@
   margin-top: 80px;
   color: rgb(0, 2, 3);
   padding: 30px;
-  
+
 }
-.page-actions h2{
+
+.page-actions h2 {
   font-size: 30px;
 }
 
-.diff{
+.diff {
   background-color: #f4f1f1e2;
-  padding: 17px;  
+  padding: 17px;
   border-radius: 8px;
-  
-} 
+
+}
 
 .bton {
-   display: inline-block;
+  display: inline-block;
   padding: 18px 18px;
   font-size: 10px;
   font-weight: 500;
@@ -49,8 +51,9 @@
   display: flex;
   flex-direction: row;
   margin-left: 270px;
-  
+
 }
+
 .bton-primary:hover {
   background-color: #000000;
   transform: scale(1.05);
@@ -83,13 +86,12 @@
   background-color: white;
   border-radius: 8px;
   padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 
 
 
-.body{
+.body {
   background-color: #66666668;
 }
-

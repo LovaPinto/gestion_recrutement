@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif;">
+    <h2>Bonjour {{ user.firstName }} {{ user.lastName }},</h2>
+
+    <p>
+        Nous vous informons que votre candidature est désormais :
+        <strong>{{ status }}</strong>
+    </p>
+
+    {% if status == 'invité à un entretien' %}
+        <p>📅 Nous vous contacterons prochainement pour les détails.</p>
+    {% endif %}
+
+    <p>Cordialement,<br>L’équipe recrutement</p>
+</body>
+</html>
